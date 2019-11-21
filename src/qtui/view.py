@@ -1531,6 +1531,7 @@ class WebEngineView(QWebEngineView):
     saveSignal = pyqtSignal()
     switchSignal = pyqtSignal(str)
     setThemeSignal = pyqtSignal(str)
+    fileStatusSignal = pyqtSignal(str, str)
 
     def __init__(self, *args, **kwargs):
         super(WebEngineView, self).__init__(*args, **kwargs)
@@ -1540,6 +1541,8 @@ class WebEngineView(QWebEngineView):
         self.channel.registerObject('Bridge', self)
         # 设置交互接口
         self.page().setWebChannel(self.channel)
+
+        self.files = []
 
         # START #####以下代码可能是在5.6 QWebEngineView刚出来时的bug,必须在每次加载页面的时候手动注入
         #### 也有可能是跳转页面后就失效了，需要手动注入，有没有修复具体未测试
@@ -1554,11 +1557,16 @@ class WebEngineView(QWebEngineView):
 
     # 注意pyqtSlot用于把该函数暴露给js可以调用
     @pyqtSlot(str, str)
-    def callFromJs(self, file, text):
+    def callFromJs(self, file, text, confirm):
         try:
-            with open(file, mode='w', encoding='utf-8') as f:
-                f.write(text.replace('\r', ''))
-                f.close()
+            if confirm:
+                reply = QMessageBox.question(self, '提示', '是否保存已修改的文件？', QMessageBox.Yes|QMessageBox.No)
+                if reply == QMessageBox.Yes:
+                    with open(file, mode='w', encoding='utf-8') as f:
+                        f.write(text.replace('\r', ''))
+            else:
+                with open(file, mode='w', encoding='utf-8') as f:
+                    f.write(text.replace('\r', ''))
         except Exception as e:
             print(e)
 
@@ -1568,8 +1576,8 @@ class WebEngineView(QWebEngineView):
             text = f.read()
         self.customSignal.emit(file, text)
 
-    def sendSaveSignal(self):
-        self.saveSignal.emit()
+    def sendSaveSignal(self, file):
+        self.saveSignal.emit(file)
 
     def sendSetThemeSignal(self, theme):
         self.setThemeSignal.emit(theme)
@@ -1578,6 +1586,22 @@ class WebEngineView(QWebEngineView):
     def switchFile(self, path):
         """编辑器切换tab时候发信号到app修改策略路径"""
         self.switchSignal.emit(path)
+
+    @pyqtSlot(str, str)
+    def receiveFileStatus(self, file, status):
+        """
+        从编辑器接收文件保存状态
+        :param file: 文件路径
+        :param status: 文件状态(True: 已保存, False: 未保存)
+        :return:
+        """
+        if status:
+            if file in self.files:
+                self.files.remove(file)
+        else:
+            if file not in self.files:
+                self.files.append(file)
+
 
     @pyqtSlot(str)
     @pyqtSlot(QUrl)
@@ -1689,8 +1713,8 @@ class QuantApplication(QWidget):
         # 获取所有策略可用过滤规则及目录
         self.strategy_filter = get_strategy_filters(strategy_path)
 
-        self.create_stragety_vbox()
         self.create_content_vbox()
+        self.create_stragety_vbox()
         self.create_func_tab()
         self.create_tab()
         self.create_func_doc()
@@ -1755,6 +1779,11 @@ class QuantApplication(QWidget):
 
     def closeEvent(self, event):
         # 退出子线程和主线程
+        if self.contentEdit.files:
+            reply = QMessageBox.question(self, '提示', '是否保存已修改的文件？', QMessageBox.Yes|QMessageBox.No)
+            if reply:
+                for file in self.contentEdit.files:
+                    self.contentEdit.sendSaveSignal(file)
         self.settings.setValue('left_top_splitter', self.left_top_splitter.saveState())
         self.settings.setValue('left_splitter', self.left_splitter.saveState())
         self.settings.setValue('right_splitter', self.right_splitter.saveState())
@@ -1856,6 +1885,7 @@ class QuantApplication(QWidget):
                     else:
                         shutil.copy(fname, _path)
                     self.contentEdit.sendCustomSignal(_path)
+                    self.strategy_path = _path
         elif action == add_strategy:
             index = self.strategy_tree.currentIndex()
             model = index.model()  # 请注意这里可以获得model的对象
@@ -2130,7 +2160,7 @@ class QuantApplication(QWidget):
         self.run_btn.setEnabled(status)
 
     def emit_custom_signal(self):
-        self.contentEdit.sendSaveSignal()
+        self.contentEdit.sendSaveSignal(self.strategy_path)
 
     def create_func_tab(self):
         # 函数列表
