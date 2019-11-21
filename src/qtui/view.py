@@ -45,6 +45,7 @@ class StrategyPolicy(QWidget):
 
         self.strategyTabWidget = QTabWidget()
         self.strategyTabWidget.setObjectName("StrategyTabWidget")
+
         self.run_policy()
         self.create_contract_policy()
         self.create_money_policy()
@@ -97,7 +98,6 @@ class StrategyPolicy(QWidget):
         self._strategyPath = path
         # 是否时属性设置运行窗口标志位
         self._paramFlag = flag
-
         self._strConfig = StrategyConfig_new()
 
         # 设置属性值
@@ -1644,7 +1644,6 @@ class WebEngineView(QWebEngineView):
 
 class QuantApplication(QWidget):
 
-    reportShowSignal = pyqtSignal(dict)
     exitSignal = pyqtSignal()
     positionSignal = pyqtSignal(list)
 
@@ -2467,7 +2466,7 @@ class QuantApplication(QWidget):
             self.main_strategy_policy_win.titleBar.iconLabel.hide()
             self.main_strategy_policy_win.titleBar.buttonMaximum.setEnabled(False)
             self.main_strategy_policy_win.setWindowTitle('属性设置')
-            # self.main_strategy_policy_win.titleBar.buttonClose.clicked.connect(self.strategy_policy_win.close)
+            self.main_strategy_policy_win.titleBar.buttonClose.clicked.connect(self.strategy_policy_win.close)
             self.main_strategy_policy_win.setWidget(self.strategy_policy_win)
             if self._controller.mainWnd.getWinThese() == '浅色':
                 style = CommonHelper.readQss(WHITESTYLE)
@@ -2478,7 +2477,7 @@ class QuantApplication(QWidget):
             self.strategy_policy_win.setStyleSheet('')
             self.strategy_policy_win.setStyleSheet(style)
             self.strategy_policy_win.confirm.clicked.connect(self.main_strategy_policy_win.close)  # todo
-            self.strategy_policy_win.cancel.clicked.connect(self.main_strategy_policy_win.close)
+            self.strategy_policy_win.cancel.clicked.connect(self.main_strategy_policy_win.titleBar.closeWindow)
             self.strategy_policy_win.contractWin.select.clicked.connect(
                 lambda: self.strategy_policy_win.contractSelect(self._exchange, self._commodity, self._contract))
 
@@ -2504,6 +2503,7 @@ class QuantApplication(QWidget):
                 self.strategy_policy_win.paramsTableWidget.setItem(i, 3, QTableWidgetItem(str(item[1][1])))
             self.main_strategy_policy_win.setWindowModality(Qt.ApplicationModal)  # 设置阻塞父窗口
             self.main_strategy_policy_win.show()
+            self.strategy_policy_win.show()
         else:
             MyMessageBox.warning(self, '提示', '请选择策略！！！', QMessageBox.Yes)
 
