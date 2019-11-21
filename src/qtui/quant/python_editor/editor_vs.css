@@ -33,6 +33,18 @@ body{
 #tabs a:after{
     transform: translateY(-20px) rotate(-45deg);
 }
+#tabs a.modify_btn:before{
+    background: #00f;
+    width: 10px;
+    height: 2px;
+    transform: translateY(11px) rotate(45deg);
+}
+#tabs a.modify_btn:after{
+    background: #00f;
+    width: 10px;
+    height: 2px;
+    transform: translateY(-21px) rotate(-45deg);
+}
 #tabs a.curr_btn:before, #tabs a.curr_btn:after{
     background: #666;
 }

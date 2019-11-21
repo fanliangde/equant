@@ -18,36 +18,26 @@
 
             // 绑定自定义的信号customSignal
             Bridge.customSignal.connect(function (file, text) {
-                // g_filename = file;
-                // g_editor.setValue(text);
-                if (currtab) {
-                    Bridge.callFromJs(g_filename, g_editor.getValue());
-                    add_tab(file, text);
-                    switch_tab(file);
-                    // update_tab(file, text);
-                    g_filename = file;
-                    g_editor.setValue(text);
-                } else {
-                    add_tab(file, text)
-                }
+                add_tab(file, text);
             });
             Bridge.saveSignal.connect(function () {
-                save_strategy(g_filename, g_editor.getValue())
+                save_strategy(g_filename, g_editor.getValue(), false)
             });
             Bridge.setThemeSignal.connect(function (text) {
-                monaco.editor.setTheme(text);
+                set_theme(text, '');
                 if (text == 'vs-dark'){
                     document.getElementById('main_link').href = 'editor.css'
                 }else {
                     document.getElementById('main_link').href = 'editor_vs.css'
                 }
             });
-
         }
     );
 
-    function save_strategy(file, text) {
-        Bridge.callFromJs(file, text);
+    // need_confirm为true时需要用户确认是否保存，否则不需要用户确认直接保存
+    function save_strategy(file, text, need_confirm) {
+        Bridge.callFromJs(file, text, need_confirm);
+        save_file(file)
     }
 </script>
 

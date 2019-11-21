@@ -80,8 +80,7 @@ function init_editor(layoutid, code_str, theme) {
             }
         );
         g_editor.onDidChangeModelContent((v) => {
-            if (org_datas[g_filename] != g_editor.getValue())
-                on_modify(g_filename)
+            on_modify(g_filename, org_datas[g_filename] != g_editor.getValue())
         });
 
     });
@@ -106,37 +105,54 @@ function set_theme(theme, fontsize) {
     ind = sizes.indexOf(fontsize);
     if (ind < 0)
         return;
-    //monaco.editor.FontInfo.fontSize = 24 * (1 + ind * 0.25)
+    fsize = 14 + 2 * ind;
+    g_editor.updateOptions({ fontSize: fsize, lineHeight: fsize + 10, });
 }
 
 //设置代码文件
-function load_file(file, txt)
-{
+function load_file(file, txt) {
     g_filename = file;
     g_editor.setValue(txt);
 }
 
 //保存代码到本地文件, 第一行为文件名, 文件名如果为空在在python端弹出保存对话框
-function save_file(reqid, file) {
-    fname = file ? file : g_filename;
-    data = {
-        'cmd':'savefile_rsp',
-        'reqid':reqid,
-        'file':fname,
-        'txt':g_editor.getValue(),
-        'errtxt':''
-    }
-    senddata(data);  
+function save_file(file) {
+    // data = {
+    //     'cmd':'savefile_rsp',
+    //     'reqid':reqid,
+    //     'file':file,
+    //     'txt':datas[file],
+    //     'errtxt':''
+    // }
+    // senddata(data);  
+
+    org_datas[file] = datas[file];
+    on_modify(file, false)
 }
 //文件被修改
-function on_modify(file)
-{
-    fname = file ? file : g_filename;
-    data = {
-        'cmd':'modify_nty',
-        'file':fname
-    }
-    //senddata(data);
+function on_modify(file, modified) {
+    // data = {
+    //     'cmd':'modify_nty',
+    //     'file':file,
+    //     'modified': modified
+    // }
+    // senddata(data);
+
+    var tab = $(file);
+    if (!tab)
+        return;
+    var btn = tab.children[0];
+    if (!btn)
+        return;
+
+    if (modified)
+        btn.className = 'modify_btn';
+    else if (tab.id == currtab)
+        btn.className = 'curr_btn';
+    else if (tab.id == overtab)
+        btn.className = 'over_btn';
+    else
+        btn.className = '';
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -147,12 +163,13 @@ function $(id){
     return typeof id === 'string' ? document.getElementById(id):id;
 }
  
-//全局字典 文件名->文件内容
+//全局字典 file->content
 var datas = new Array();
 var org_datas = new Array();
 
 // 当前标签
 var currtab = ""
+var overtab = ""
 
 // 切换标签
 function switch_tab(newtab) {
@@ -166,7 +183,7 @@ function switch_tab(newtab) {
     if (n_tab){
         n_tab.className = 'current';
         var btn = n_tab.children[0];
-        if (btn)
+        if (btn && btn.className != 'modify_btn')
             btn.className = 'curr_btn';
     }
 
@@ -174,22 +191,27 @@ function switch_tab(newtab) {
     if (c_tab){
         c_tab.className = '';
         var btn = c_tab.children[0];
-        if (btn)
+        if (btn && btn.className != 'modify_btn')
             btn.className = '';
 
         datas[currtab] = g_editor.getValue();
         org_datas[name] = g_editor.getValue();
-        save_strategy(g_filename, g_editor.getValue());
     }
 
     load_file(newtab, n_tab ? datas[newtab] : '');
-    currtab = newtab;
+    currtab = newtab; 
+
+    Bridge.switchFile(newtab);
 }
 
 // 添加标签
 function add_tab(name, value){
-    if (name == "" || datas.hasOwnProperty(name))
+    if (name == "")
         return;
+    if (datas.hasOwnProperty(name)){
+        switch_tab(name);
+        return;
+    }
 
     //新建标签
     var tab = document.createElement("li");
@@ -210,7 +232,6 @@ function add_tab(name, value){
     //设置标签和按钮的单击事件
     tab.onclick = function(){
         switch_tab(this.id);
-        Bridge.switchFile(g_filename);
     }
     btn.onclick = function(){
         var tab = this.parentNode;
@@ -221,18 +242,21 @@ function add_tab(name, value){
                 _tab = tab.previousElementSibling;
             switch_tab(_tab ? _tab.id : '');
         }
+        save_strategy(tab.id, datas[tab.id], true)
         delete datas[tab.id];
         delete org_datas[tab.id];
         tab.remove();
     }
     tab.onmouseover = function(){
+        overtab = this.id;
         var btn = this.children[0];
-        if (btn && btn.className != 'curr_btn')
+        if (btn && btn.className != 'curr_btn' && btn.className != 'modify_btn')
             btn.className = 'over_btn';
     }
-    tab.onmouseout = function(){
+    tab.onmouseout = function(){ 
+        overtab = "";
         var btn = this.children[0];
-        if (btn && btn.className != 'curr_btn')
+        if (btn && btn.className != 'curr_btn' && btn.className != 'modify_btn')
             btn.className = '';
     }
 
@@ -287,7 +311,7 @@ function add_tab(name, value){
 //         else if (data.cmd == 'settheme')
 //             set_theme(data.theme, data.fontname, data.fontsize);
 //         else if (data.cmd == 'savefile_req')
-//             save_file(data.reqid, data.file);
+//             save_file(data.file);
 //     };
 // }
 //
