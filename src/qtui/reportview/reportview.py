@@ -6,7 +6,6 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from qtui.reportview.dir import Dir
 from qtui.reportview.tab import Tab
-from qtui.reportview.commonhelper import CommonHelper
 
 
 class ReportView(QWidget):
@@ -44,6 +43,7 @@ class ReportView(QWidget):
         vLayout.setSpacing(0)
 
         self.tab = Tab()
+        self.tab.setObjectName("ReportTab")
         dir = Dir(self)
 
         vLayout.addSpacing(0)
@@ -59,5 +59,5 @@ class ReportView(QWidget):
         self._datas = datas
 
         self.tab.showData(self._datas)
-        self.show()
+        # self.show()
 

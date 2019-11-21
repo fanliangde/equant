@@ -541,35 +541,15 @@ QMessageBox QPushButton[text="&No"] {
     qproperty-text: "取消";
 }
 
-/*
-QMenu::icon {
-  margin: 0px;
-  padding-left: 4px;
+/***************************QToolTip********************/
+QToolTip {
+    background-color: #FFFFFF;
+    border: 1px solid #767676;
+    color: #575757;
+    padding: 0px;
+    opacity: 230;
 }
 
-QMenu::item {
-  background-color: #32414B;
-  padding: 4px 24px 4px 24px;
-  border: 1px transparent #32414B;
-}
-
-QMenu::item:selected {
-  color: #F0F0F0;
-}
-
-QMenu::indicator {
-  width: 12px;
-  height: 12px;
-  padding-left: 6px;
-}
-
-QMenu::right-arrow {
-  margin: 5px;
-  image: url(":/qss_icons/rc/arrow_right.png");
-  height: 12px;
-  width: 12px;
-}
-*/
 
 /***************************************************************************/
 
@@ -705,4 +685,26 @@ TitleBar {
 /*自定义标题栏窗口边框颜色*/
 #Framless {
     background: #363636;
+}
+
+/* 回测报告窗口属性设置 */
+#ReportView QLabel{
+    background-color: #0E6393;
+    color: #FFFFFF;
+    min-height: 20px;
+    max-height: 20px;
+}
+
+#StageIcon {
+    background-color: #0E6393:
+    border-style: flat;
+}
+
+#StageIcon:hover,
+#StageIcon:checked,
+#StageIcon:checked:selected,
+#StageIcon:checked:hover,
+#StageIcon:pressed
+#StageIcon:pressed:hover {
+    background-color: red;
 }

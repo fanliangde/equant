@@ -71,11 +71,11 @@ class Label(QWidget):
         label.setObjectName("StageLabel")
         label.setAlignment(Qt.AlignCenter)
         label.setFixedHeight(20)
-        label.setStyleSheet("background: rgb(44, 110, 173)")
+        # label.setStyleSheet("background: rgb(44, 110, 173)")
         icon = QPushButton()
         icon.setObjectName("StageIcon")
         icon.setFixedSize(20, 20)
-        icon.setStyleSheet("background: rgb(44, 110, 173)")
+        # icon.setStyleSheet("background: rgb(44, 110, 173)")
         icon.setIcon(QIcon(self._pixUp))
         icon.clicked.connect(self._toggle)
 
