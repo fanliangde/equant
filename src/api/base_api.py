@@ -6595,7 +6595,7 @@ class BaseApi(object):
             获取最近N周期条件满足的计数
 
         【示例】
-            CountIf(Close > Open , 10); 最近10周期出现Close>Open的周期总数
+            CountIf(Close() > Open() , 10); 最近10周期出现Close>Open的周期总数
         '''
         return self._dataModel.getCountIf(cond, period)
         

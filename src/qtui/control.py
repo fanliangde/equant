@@ -47,15 +47,17 @@ class Controller(object):
         ###############回测报告#####################
         style = CommonHelper.readQss(DARKSTYLE)
         self.reportWnd = FramelessWindow()
+        self.reportWnd.resize(1000, 600)
+        self.reportWnd.setMinimumSize(600, 600)
+        self.reportWnd.setMaximumSize(1000, 600)
         self.reportWnd.setStyleSheet(style)
         self.reportWnd.setWindowTitle("回测报告")
         self.reportWnd.setWinThese(THESE_STATE_DARK)
         self.reportWnd.setWindowIcon(QIcon('icon/epolestar ix2.ico'))
         self.reportView = ReportView()
-        self.reportWnd.setWidget(self.reportView)
+        # self.reportWnd.setWidget(self.reportView)
 
         ##############################################
-
 
         self.app = QuantApplication(self)
         if self.app.settings.contains('theme') and self.app.settings.value('theme') == 'vs-dark':

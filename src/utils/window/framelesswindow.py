@@ -44,6 +44,9 @@ class FramelessWindow(QWidget):
         self.windowTitleChanged.connect(self.titleBar.setTitle)
         self.windowIconChanged.connect(self.titleBar.setIcon)
 
+    def closeWindow(self):
+        self.close()
+
     def getWinThese(self):
         """获取标题栏的配色风格"""
         return self.titleBar.theseState
