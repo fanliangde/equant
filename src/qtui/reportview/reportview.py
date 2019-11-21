@@ -25,9 +25,9 @@ class ReportView(QWidget):
 
         self.setWindowTitle(self._windowTitle)
         self.setWindowIcon(QIcon(self._iconPath))
-        self.resize(1000, 600)
-        self.setMinimumSize(600, 600)
-        self.setMaximumSize(1000, 600)
+        # self.resize(1000, 600)
+        # self.setMinimumSize(600, 600)
+        # self.setMaximumSize(1000, 600)
         self.setObjectName(self._objName)
 
         # 初始化界面
@@ -36,8 +36,8 @@ class ReportView(QWidget):
         self.reportShowSig.connect(self.showCallback)
 
     def _initUI(self):
-        style = CommonHelper.readQss(self.styleFile)
-        self.setStyleSheet(style)
+        # style = CommonHelper.readQss(self.styleFile)
+        # self.setStyleSheet(style)
 
         vLayout = QHBoxLayout()
         vLayout.setContentsMargins(0, 0, 0, 0)
