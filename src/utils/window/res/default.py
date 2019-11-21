@@ -2,6 +2,8 @@ MARGINS = 2
 
 DARKSTYLE = r"utils/window/res/darkthese.qss"
 WHITESTYLE = r"utils/window/res/whitethese.qss"
+MENUWHITESTYLE = r"utils/window/res/menu_white.qss"
+MENUDARKSTYLE = r"utils/window/res/menu_dark.qss"
 
 
 #FramlessWindow

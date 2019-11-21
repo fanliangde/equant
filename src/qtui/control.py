@@ -6,7 +6,7 @@ import importlib
 import traceback
 import re
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, qInstallMessageHandler
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import QApplication, QMessageBox, QDesktopWidget
 
@@ -34,9 +34,8 @@ class Controller(object):
         # UI2EG发送请求对象
         self._request = SendRequest(self._ui2egQueue, self.logger)
         # 高分辨率支持
-        QApplication.setAttribute(Qt.AA_EnableHighDpiScaling);
-        # 创建主窗口
-        QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)  # 高分辨率下适应屏幕
+        QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
+        qInstallMessageHandler(lambda x, y, z: None)
         self.mainApp = QApplication(sys.argv)
 
         # 根据分辨率调整字体

@@ -103,7 +103,7 @@ class StrategyPolicy(QWidget):
         # 设置属性值
         self.setDefaultConfigure()
         # 设置无边框
-        self.setWindowFlags(Qt.FramelessWindowHint)
+        # self.setWindowFlags(Qt.FramelessWindowHint)
         # print('--------------------------------')
         # print(self.style())
         self.contractWin = ContractWin()
@@ -1785,9 +1785,20 @@ class QuantApplication(QWidget):
         self.strategy_layout.addWidget(self.strategy_tree)
         self.strategy_vbox.setLayout(self.strategy_layout)
 
+    def get_menu_style(self):
+        if self._controller.mainWnd.getWinThese() == THESE_STATE_DARK:
+            style_path = MENUDARKSTYLE
+        else:
+            style_path = MENUWHITESTYLE
+        with open(style_path, 'r', encoding='utf-8') as f:
+            style = f.read()
+        return style
+
     # 策略右键菜单
     def strategy_tree_right_menu(self, point):
         self.strategy_tree.popMenu = QMenu()
+        self.strategy_tree.popMenu.setStyleSheet(self.get_menu_style())
+
         self.strategy_tree.addType = QMenu(self.strategy_tree.popMenu)
         self.strategy_tree.addType.setTitle('新建')
         import_file = QAction('导入')
@@ -1795,14 +1806,14 @@ class QuantApplication(QWidget):
         delete = QAction('删除', self.strategy_tree)
         add_strategy = QAction('新建策略')
         add_group = QAction('新建分组')
-        # refresh = QAction('刷新', self.strategy_tree)
+        start_file = QAction('打开文件所在位置', self.strategy_tree)
         self.strategy_tree.popMenu.addAction(import_file)
         self.strategy_tree.popMenu.addMenu(self.strategy_tree.addType)
         self.strategy_tree.addType.addAction(add_strategy)
         self.strategy_tree.addType.addAction(add_group)
         self.strategy_tree.popMenu.addAction(rename)
         self.strategy_tree.popMenu.addAction(delete)
-        # self.strategy_tree.popMenu.addAction(refresh)
+        self.strategy_tree.popMenu.addAction(start_file)
 
         # 右键动作
         action = self.strategy_tree.popMenu.exec_(self.strategy_tree.mapToGlobal(point))
@@ -1889,10 +1900,12 @@ class QuantApplication(QWidget):
                     self.model.setNameFilters(self.strategy_filter)
                     break
 
-        # elif action == refresh:
-        #     index = self.strategy_tree.currentIndex()
-        #     model = index.model()  # 请注意这里可以获得model的对象
-        #     model.dataChanged.emit(index, index)
+        elif action == start_file:
+            index = self.strategy_tree.currentIndex()
+            model = index.model()  # 请注意这里可以获得model的对象
+            item_path = model.filePath(index)
+            dir_name = os.path.dirname(item_path)
+            os.startfile(dir_name)
         elif action == rename:
             index = self.strategy_tree.currentIndex()
             model = index.model()  # 请注意这里可以获得model的对象
@@ -1948,6 +1961,7 @@ class QuantApplication(QWidget):
     # QTextBrowser 右键菜单
     def user_log_right_menu(self, point):
         self.user_log_widget.popMenu = QMenu()
+        self.user_log_widget.popMenu.setStyleSheet(self.get_menu_style())
         copy = QAction('复制')
         select_all = QAction('全选')
         clear = QAction('清除')
@@ -1967,6 +1981,7 @@ class QuantApplication(QWidget):
 
     def error_log_right_menu(self, point):
         self.error_info_widget.popMenu = QMenu()
+        self.error_info_widget.popMenu.setStyleSheet(self.get_menu_style())
         copy = QAction('复制')
         select_all = QAction('全选')
         clear = QAction('清除')
@@ -1986,6 +2001,7 @@ class QuantApplication(QWidget):
 
     def signal_log_right_menu(self, point):
         self.signal_log_widget.popMenu = QMenu()
+        self.signal_log_widget.popMenu.setStyleSheet(self.get_menu_style())
         copy = QAction('复制')
         select_all = QAction('全选')
         clear = QAction('清除')
@@ -2009,6 +2025,7 @@ class QuantApplication(QWidget):
 
     def sys_log_right_menu(self, point):
         self.sys_log_widget.popMenu = QMenu()
+        self.sys_log_widget.popMenu.setStyleSheet(self.get_menu_style())
         copy = QAction('复制')
         select_all = QAction('全选')
         clear = QAction('清除')
@@ -2032,6 +2049,7 @@ class QuantApplication(QWidget):
 
     def func_doc_right_menu(self, point):
         self.func_content.popMenu = QMenu()
+        self.func_content.popMenu.setStyleSheet(self.get_menu_style())
         copy = QAction('复制')
         select_all = QAction('全选')
 
@@ -2317,6 +2335,7 @@ class QuantApplication(QWidget):
 
     def strategy_table_right_menu(self, point):
         self.strategy_table.popMenu = QMenu()
+        self.strategy_table.popMenu.setStyleSheet(self.get_menu_style())
         run = QAction('启动', self.strategy_table)
         stop = QAction('停止', self.strategy_table)
         delete = QAction('删除', self.strategy_table)
