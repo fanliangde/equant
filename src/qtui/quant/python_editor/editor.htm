@@ -5,43 +5,15 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link id="main_link" href="editor.css" type="text/css" rel="stylesheet"/>
     <title>python-editor</title>
+    <script src="qwebchannel.js" type="text/javascript"></script>
     <script src="editor.js" type="text/javascript"></script>
     <script src="monaco-editor/package/min/vs/loader.js"></script>
 </head>
 
-<script src="qwebchannel.js" type="text/javascript"></script>
-<script>
-    new QWebChannel(qt.webChannelTransport,
-        function (channel) {
-            window.Bridge = channel.objects.Bridge;
-
-            // 绑定自定义的信号customSignal
-            Bridge.customSignal.connect(function (file, text) {
-                add_tab(file, text);
-            });
-            Bridge.saveSignal.connect(function () {
-                save_strategy(g_filename, g_editor.getValue(), false)
-            });
-            Bridge.setThemeSignal.connect(function (text) {
-                set_theme(text, '');
-                if (text == 'vs-dark'){
-                    document.getElementById('main_link').href = 'editor.css'
-                }else {
-                    document.getElementById('main_link').href = 'editor_vs.css'
-                }
-            });
-        }
-    );
-
-    // need_confirm为true时需要用户确认是否保存，否则不需要用户确认直接保存
-    function save_strategy(file, text, need_confirm) {
-        Bridge.callFromJs(file, text, need_confirm);
-        save_file(file)
-    }
-</script>
-
 <body>
+
 <!--标签栏-->
 <ul id="tabs">
 </ul>
@@ -51,8 +23,7 @@
     <script type="text/javascript">
         init_editor("editor", "# equant code editor\n\n", 'vs-dark');
     </script>
-    <link id="main_link" href="editor.css" type="text/css" rel="stylesheet"/>
 </div>
-</body>
 
+</body>
 </html>

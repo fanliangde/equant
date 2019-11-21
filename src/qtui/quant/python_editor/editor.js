@@ -17,6 +17,31 @@
 //////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////
+///websocket客户端通道
+//////////////////////////////////////////////////////////////////////////////
+new QWebChannel(qt.webChannelTransport,
+    function (channel) {
+        window.Bridge = channel.objects.Bridge;
+
+        // 绑定自定义的信号customSignal
+        Bridge.customSignal.connect(function (file, text) {
+            add_tab(file, text);
+        });
+        Bridge.saveSignal.connect(function (file){
+            save_file(file, false)
+        });
+        Bridge.setThemeSignal.connect(function (text) {
+            set_theme(text, '');
+            if (text == 'vs-dark'){
+                document.getElementById('main_link').href = 'editor.css'
+            }else {
+                document.getElementById('main_link').href = 'editor_vs.css'
+            }
+        });
+    }
+);
+
+//////////////////////////////////////////////////////////////////////////////
 ///代码编辑器 monaco.editor
 //////////////////////////////////////////////////////////////////////////////
 
@@ -88,7 +113,7 @@ function init_editor(layoutid, code_str, theme) {
     //自适应大小，可以不要
     window.onresize = editor_layout;
     //编辑器加载成功后创建websocket连接
-    // window.onload = init_webskt;
+    //window.onload = init_webskt;
 }
 
 //自适应窗口大小
@@ -115,8 +140,8 @@ function load_file(file, txt) {
     g_editor.setValue(txt);
 }
 
-//保存代码到本地文件, 第一行为文件名, 文件名如果为空在在python端弹出保存对话框
-function save_file(file) {
+//保存代码到本地文件, need_confirm为true时需要用户确认是否保存，否则不需要用户确认直接保存
+function save_file(file, need_confirm) {
     // data = {
     //     'cmd':'savefile_rsp',
     //     'reqid':reqid,
@@ -125,6 +150,8 @@ function save_file(file) {
     //     'errtxt':''
     // }
     // senddata(data);  
+
+    Bridge.callFromJs(file, datas[file], need_confirm);
 
     org_datas[file] = datas[file];
     on_modify(file, false)
@@ -137,6 +164,8 @@ function on_modify(file, modified) {
     //     'modified': modified
     // }
     // senddata(data);
+    
+    Bridge.receiveFileState(file, modified);
 
     var tab = $(file);
     if (!tab)
@@ -242,7 +271,7 @@ function add_tab(name, value){
                 _tab = tab.previousElementSibling;
             switch_tab(_tab ? _tab.id : '');
         }
-        save_strategy(tab.id, datas[tab.id], true)
+        save_file(tab.id, true)
         delete datas[tab.id];
         delete org_datas[tab.id];
         tab.remove();
