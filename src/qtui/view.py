@@ -1574,7 +1574,7 @@ class WebEngineView(QWebEngineView):
                 with open(file, mode='w', encoding='utf-8') as f:
                     f.write(text.replace('\r', ''))
                 self.files.remove(file)
-                if not self.files:
+                if not self.files and self.exit_flag:
                     self.exitSignal.emit()
         except Exception as e:
             print(e)
@@ -1789,20 +1789,24 @@ class QuantApplication(QWidget):
         self._controller.quitThread()
         self._controller.mainWnd.titleBar.closeWindow()
 
-
     def save_edit_strategy(self):
-        if self.contentEdit.files:
-            reply = QMessageBox.question(self, '提示', '是否保存已修改的文件？', QMessageBox.Yes|QMessageBox.No)
-            if reply == QMessageBox.Yes:
-                for file in self.contentEdit.files:
-                    print(file)
-                    self.contentEdit.saveSignal.emit(file)
-            else:
-                self.contentEdit.files = []
+        question = QMessageBox(self)
+        check = QCheckBox('保存已修改策略')
+        check.setChecked(True)
+        question.setCheckBox(check)
+        question.setIcon(QMessageBox.Question)
+        question.setText('确定退出极星量化程序吗？\t\t\n')
+        question.setWindowTitle('极星量化')
+        question.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        reply = question.exec_()
+        if reply == QMessageBox.Yes:
             self.contentEdit.exit_flag = True
             self.contentEdit.exitSignal.connect(self.close_app)
-        else:
-            self.close_app()
+            if check.isChecked():
+                for file in self.contentEdit.files:
+                    self.contentEdit.saveSignal.emit(file)
+            else:
+                self.close_app()
 
 
     def closeEvent(self, event):
