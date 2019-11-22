@@ -24,10 +24,11 @@ new QWebChannel(qt.webChannelTransport,
         window.Bridge = channel.objects.Bridge;
 
         // 绑定自定义的信号customSignal
-        Bridge.customSignal.connect(function (file, text) {
+        Bridge.contentFromQt.connect(function (file, text) {
             add_tab(file, text);
         });
         Bridge.saveSignal.connect(function (file){
+            alert(file)
             save_file(file, false)
         });
         Bridge.setThemeSignal.connect(function (text) {
@@ -149,9 +150,8 @@ function save_file(file, need_confirm) {
     //     'txt':datas[file],
     //     'errtxt':''
     // }
-    // senddata(data);  
-
-    Bridge.callFromJs(file, datas[file], need_confirm);
+    // senddata(data);
+    Bridge.contentFromJS(file, datas[file], need_confirm);
 
     org_datas[file] = datas[file];
     on_modify(file, false)
@@ -165,7 +165,7 @@ function on_modify(file, modified) {
     // }
     // senddata(data);
     
-    Bridge.receiveFileState(file, modified);
+    Bridge.receiveFileStatus(file, modified);
 
     var tab = $(file);
     if (!tab)
