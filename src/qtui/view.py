@@ -1796,7 +1796,7 @@ class QuantApplication(QWidget):
     def save_edit_strategy(self):
         question = QMessageBox(self)
         if self.contentEdit.files:
-            question.setText('有策略被修改,\t\t\t\n程序退出前是否要保存这些策略？')
+            question.setText('有策略被修改，程序退出前是否要保存这些策略？')
             question.setStandardButtons(QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel)
         else:
             question.setText('您确定退出本程序吗？\t\t\t')
