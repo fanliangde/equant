@@ -314,6 +314,7 @@ class GraphTab(QWidget):
 
     def __init__(self, parent=None):
         super(GraphTab, self).__init__(parent)
+        self.setObjectName("GraphTab")
 
         self._initUI()
 

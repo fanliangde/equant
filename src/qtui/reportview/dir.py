@@ -13,7 +13,6 @@ class FileSystemModel(QFileSystemModel):
         return 1
 
     def data(self, index, role=Qt.DisplayRole):
-        # 鼠标悬停显示目录名称
         if role == Qt.ToolTipRole:
             filePath = self.filePath(index)
             if filePath and not os.path.isdir(filePath):

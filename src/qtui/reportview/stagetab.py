@@ -75,7 +75,8 @@ class Label(QWidget):
         icon = QPushButton()
         icon.setObjectName("StageIcon")
         icon.setFixedSize(20, 20)
-        # icon.setStyleSheet("background: rgb(44, 110, 173)")
+        icon.setStyleSheet("background: #0E6393;"
+                           "border-style: flat;")
         icon.setIcon(QIcon(self._pixUp))
         icon.clicked.connect(self._toggle)
 

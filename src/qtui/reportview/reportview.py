@@ -16,7 +16,6 @@ class ReportView(QWidget):
     def __init__(self):
         super(ReportView, self).__init__()
         self._windowTitle = "回测报告"
-        self._objName = "Report"
         self._iconPath = r"icon/epolestar ix2.ico"
         self.styleFile = r"qtui/reportview/style.qss"
 
@@ -27,7 +26,7 @@ class ReportView(QWidget):
         # self.resize(1000, 600)
         # self.setMinimumSize(600, 600)
         # self.setMaximumSize(1000, 600)
-        self.setObjectName(self._objName)
+        # self.setObjectName(self._objName)
 
         # 初始化界面
         self._initUI()

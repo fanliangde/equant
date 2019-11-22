@@ -227,6 +227,7 @@ class LineWidget(KeyWraper):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.setObjectName("LineWidget")
 
         self.parent = parent
         self.datas = None
