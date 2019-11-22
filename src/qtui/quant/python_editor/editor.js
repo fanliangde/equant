@@ -151,8 +151,7 @@ function save_file(file, need_confirm) {
     // }
     // senddata(data);  
 
-    txt = datas[file];
-    Bridge.callFromJs(file, txt, need_confirm);
+    //Bridge.callFromJs(file, datas[file], need_confirm);
 
     org_datas[file] = datas[file];
     on_modify(file, false)
@@ -166,7 +165,7 @@ function on_modify(file, modified) {
     // }
     // senddata(data);
 
-    Bridge.receiveFileStatus(file, modified);
+    //Bridge.receiveFileStatus(file, modified);
 
     var tab = $(file);
     if (!tab)
@@ -272,10 +271,9 @@ function add_tab(name, value){
                 _tab = tab.previousElementSibling;
             switch_tab(_tab ? _tab.id : '');
         }
-        if (org_datas[tab.id] != datas[tab.id]){
-            on_modify(file, false)
+        if (org_datas[tab.id] != datas[tab.id])
             save_file(tab.id, true)
-        }
+
         delete datas[tab.id];
         delete org_datas[tab.id];
         tab.remove();
