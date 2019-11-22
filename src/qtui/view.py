@@ -1799,8 +1799,11 @@ class QuantApplication(QWidget):
                     self.contentEdit.saveSignal.emit(file)
             else:
                 self.contentEdit.files = []
-        self.contentEdit.exit_flag = True
-        self.contentEdit.exitSignal.connect(self.close_app)
+            self.contentEdit.exit_flag = True
+            self.contentEdit.exitSignal.connect(self.close_app)
+        else:
+            self.close_app()
+
 
     def closeEvent(self, event):
         # 退出子线程和主线程
