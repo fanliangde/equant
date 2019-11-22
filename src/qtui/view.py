@@ -1,6 +1,8 @@
 import datetime
 import json
 import os
+import threading
+
 import pandas as pd
 import shutil
 # import sys
@@ -62,8 +64,8 @@ class StrategyPolicy(QWidget):
         self.main_layout.addLayout(layout1)
         self.main_layout.addLayout(layout2)
         self.setLayout(self.main_layout)
-        self.setMinimumSize(580, 600)
-        self.setBaseSize(580, 600)
+        # self.setMinimumSize(580, 600)
+        # self.setBaseSize(580, 600)
 
         self.contractTableWidget.hideColumn(4)
         self.contractTableWidget.verticalHeader().setVisible(False)
@@ -1314,7 +1316,6 @@ class ContractWin(QWidget):
         self.kLineTypeComboBox.currentIndexChanged.connect(self.valid)
         self.qtylineEdit.setValidator(QtGui.QIntValidator())
         self.confirm.clicked.connect(self.valid_contract)
-        self.setWindowFlags(Qt.FramelessWindowHint)
         self.row = -1
 
         self.layout().setContentsMargins(0, 0, 0, 0)
@@ -1527,11 +1528,12 @@ class ContractSelect(QWidget):
 
 
 class WebEngineView(QWebEngineView):
-    customSignal = pyqtSignal(str, str)
-    saveSignal = pyqtSignal()
+    contentFromQt = pyqtSignal(str, str)
+    saveSignal = pyqtSignal(str)
     switchSignal = pyqtSignal(str)
     setThemeSignal = pyqtSignal(str)
     fileStatusSignal = pyqtSignal(str, str)
+    exitSignal = pyqtSignal()
 
     def __init__(self, *args, **kwargs):
         super(WebEngineView, self).__init__(*args, **kwargs)
@@ -1543,6 +1545,9 @@ class WebEngineView(QWebEngineView):
         self.page().setWebChannel(self.channel)
 
         self.files = []
+
+        # 是否退出标志
+        self.exit_flag = False
 
         # START #####以下代码可能是在5.6 QWebEngineView刚出来时的bug,必须在每次加载页面的时候手动注入
         #### 也有可能是跳转页面后就失效了，需要手动注入，有没有修复具体未测试
@@ -1556,25 +1561,29 @@ class WebEngineView(QWebEngineView):
     # END ###########################
 
     # 注意pyqtSlot用于把该函数暴露给js可以调用
-    @pyqtSlot(str, str)
-    def callFromJs(self, file, text, confirm):
+    @pyqtSlot(str, str, bool)
+    def contentFromJS(self, file, text, confirm):
         try:
-            if confirm:
-                reply = QMessageBox.question(self, '提示', '是否保存已修改的文件？', QMessageBox.Yes|QMessageBox.No)
+            if confirm and file in self.files:
+                reply = QMessageBox.question(self, '提示', '是否保存修改？', QMessageBox.Yes|QMessageBox.No)
                 if reply == QMessageBox.Yes:
                     with open(file, mode='w', encoding='utf-8') as f:
                         f.write(text.replace('\r', ''))
+                    self.files.remove(file)
             else:
                 with open(file, mode='w', encoding='utf-8') as f:
                     f.write(text.replace('\r', ''))
+                self.files.remove(file)
+                if not self.files:
+                    self.exitSignal.emit()
         except Exception as e:
             print(e)
 
-    def sendCustomSignal(self, file):
+    def sendContentToJS(self, file):
         # 发送自定义信号
         with open(file, 'r', encoding='utf-8') as f:
             text = f.read()
-        self.customSignal.emit(file, text)
+        self.contentFromQt.emit(file, text)
 
     def sendSaveSignal(self, file):
         self.saveSignal.emit(file)
@@ -1587,7 +1596,7 @@ class WebEngineView(QWebEngineView):
         """编辑器切换tab时候发信号到app修改策略路径"""
         self.switchSignal.emit(path)
 
-    @pyqtSlot(str, str)
+    @pyqtSlot(str, bool)
     def receiveFileStatus(self, file, status):
         """
         从编辑器接收文件保存状态
@@ -1596,11 +1605,11 @@ class WebEngineView(QWebEngineView):
         :return:
         """
         if status:
-            if file in self.files:
-                self.files.remove(file)
-        else:
             if file not in self.files:
                 self.files.append(file)
+        else:
+            if file in self.files:
+                self.files.remove(file)
 
 
     @pyqtSlot(str)
@@ -1776,13 +1785,25 @@ class QuantApplication(QWidget):
     def init_settings(self):
         self.settings = QSettings('settings.ini', QSettings.IniFormat)
 
-    def closeEvent(self, event):
-        # 退出子线程和主线程
+    def close_app(self):
+        self._controller.quitThread()
+        self._controller.mainWnd.titleBar.closeWindow()
+
+
+    def save_edit_strategy(self):
         if self.contentEdit.files:
             reply = QMessageBox.question(self, '提示', '是否保存已修改的文件？', QMessageBox.Yes|QMessageBox.No)
-            if reply:
+            if reply == QMessageBox.Yes:
                 for file in self.contentEdit.files:
-                    self.contentEdit.sendSaveSignal(file)
+                    print(file)
+                    self.contentEdit.saveSignal.emit(file)
+            else:
+                self.contentEdit.files = []
+        self.contentEdit.exit_flag = True
+        self.contentEdit.exitSignal.connect(self.close_app)
+
+    def closeEvent(self, event):
+        # 退出子线程和主线程
         self.settings.setValue('left_top_splitter', self.left_top_splitter.saveState())
         self.settings.setValue('left_splitter', self.left_splitter.saveState())
         self.settings.setValue('right_splitter', self.right_splitter.saveState())
@@ -1883,7 +1904,7 @@ class QuantApplication(QWidget):
                             shutil.copy(fname, _path)
                     else:
                         shutil.copy(fname, _path)
-                    self.contentEdit.sendCustomSignal(_path)
+                    self.contentEdit.sendContentToJS(_path)
                     self.strategy_path = _path
         elif action == add_strategy:
             index = self.strategy_tree.currentIndex()
@@ -2452,7 +2473,7 @@ class QuantApplication(QWidget):
         model = index.model()  # 请注意这里可以获得model的对象
         item_path = model.filePath(index)
         if not os.path.isdir(item_path):
-            self.contentEdit.sendCustomSignal(item_path)
+            self.contentEdit.sendContentToJS(item_path)
             self.strategy_path = item_path
 
     def func_tree_clicked(self):
@@ -2504,8 +2525,6 @@ class QuantApplication(QWidget):
                 style = CommonHelper.readQss(DARKSTYLE)
             self.main_strategy_policy_win.setStyleSheet('')
             self.main_strategy_policy_win.setStyleSheet(style)
-            self.strategy_policy_win.setStyleSheet('')
-            self.strategy_policy_win.setStyleSheet(style)
             self.strategy_policy_win.confirm.clicked.connect(self.main_strategy_policy_win.close)  # todo
             self.strategy_policy_win.cancel.clicked.connect(self.main_strategy_policy_win.titleBar.closeWindow)
             self.strategy_policy_win.contractWin.select.clicked.connect(
