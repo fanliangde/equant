@@ -565,7 +565,7 @@ class StrategyPolicy(QWidget):
         if not self.timerListWidget.findItems(ti, Qt.MatchExactly):
             self.timerListWidget.addItem(ti)
         else:
-            MyMessageBox.warning(self, "提示", "已存在该时间！请重新提交！", QMessageBox.Yes)
+            MyMessageBox.warning(self, "提示", "已存在该时间！请重新提交！", QMessageBox.Ok)
 
     def delete_timer(self):
         row = self.timerListWidget.currentRow()
@@ -651,7 +651,7 @@ class StrategyPolicy(QWidget):
             for i in range(row):
                 sample_dict_list.append(json.loads(self.contractTableWidget.item(i, 4).text()))
             if json.loads(items[4]) in sample_dict_list:
-                MyMessageBox.warning(self, '提示', '请勿添加重复合约设置！', QMessageBox.Yes)
+                MyMessageBox.warning(self, '提示', '请勿添加重复合约设置！', QMessageBox.Ok)
                 return
             self.contractTableWidget.setRowCount(row + 1)
 
@@ -771,41 +771,41 @@ class StrategyPolicy(QWidget):
                 timerFormatter.append(t)
 
         if float(initFund) < 1000:
-            MyMessageBox.warning(self, "极星量化", "初始资金不能小于1000元", QMessageBox.Yes)
+            MyMessageBox.warning(self, "极星量化", "初始资金不能小于1000元", QMessageBox.Ok)
             return
 
         if cycle == "":
-            MyMessageBox.warning(self, "极星量化", "定时触发周期不能为空", QMessageBox.Yes)
+            MyMessageBox.warning(self, "极星量化", "定时触发周期不能为空", QMessageBox.Ok)
             return
         elif int(cycle) % 100 != 0:
-            MyMessageBox.warning(self, "极星量化", "定时触发周期为100的整数倍", QMessageBox.Yes)
+            MyMessageBox.warning(self, "极星量化", "定时触发周期为100的整数倍", QMessageBox.Ok)
             return
         else:
             pass
 
         if minQty == "":
-            MyMessageBox.warning(self, "极星量化", "最小下单量不能为空", QMessageBox.Yes)
+            MyMessageBox.warning(self, "极星量化", "最小下单量不能为空", QMessageBox.Ok)
             return
         elif int(minQty) > MAXSINGLETRADESIZE:
-            MyMessageBox.warning(self, "极星量化", "最小下单量不能大于1000", QMessageBox.Yes)
+            MyMessageBox.warning(self, "极星量化", "最小下单量不能大于1000", QMessageBox.Ok)
             return
         else:
             pass
 
         if isConOpenTimes:
             if conOpenTimes == '' or int(conOpenTimes) < 1 or int(conOpenTimes) > 100:
-                MyMessageBox.warning(self, "极星量化", "最大连续同向开仓次数必须介于1-100之间", QMessageBox.Yes)
+                MyMessageBox.warning(self, "极星量化", "最大连续同向开仓次数必须介于1-100之间", QMessageBox.Ok)
                 return
 
         if isOpenTimes:
             if openTimes == '' or int(openTimes) < 1 or int(openTimes) > 100:
-                MyMessageBox.warning(self, "极星量化", "每根K线同向开仓次数必须介于1-100之间", QMessageBox.Yes)
+                MyMessageBox.warning(self, "极星量化", "每根K线同向开仓次数必须介于1-100之间", QMessageBox.Ok)
                 return
 
         # 用户是否确定用新参数重新运行
         if self._paramFlag:
-            reply = MyMessageBox.question(self, '提示', '点确定后会重新运行策略？', QMessageBox.Yes | QMessageBox.No)
-            if reply == QMessageBox.No:
+            reply = MyMessageBox.question(self, '提示', '点确定后会重新运行策略？', QMessageBox.Ok | QMessageBox.Cancel)
+            if reply == QMessageBox.Cancel:
                 return
 
         # TODO: 合约设置，K线类型， K线周期、运算起始点设置
@@ -1332,19 +1332,19 @@ class ContractWin(QWidget):
 
     def valid_contract(self):
         if not self.contractCodeLineEdit.text():
-            MyMessageBox.warning(self, '提示', '请先选择合约！！！', QMessageBox.Yes)
+            MyMessageBox.warning(self, '提示', '请先选择合约！！！', QMessageBox.Ok)
             return
         if self.startDateRadioButton.isChecked():
             try:
                 assert len(self.startDateLineEdit.text()) == 8
             except:
-                MyMessageBox.warning(self, '提示', '输入的时间格式不合法，请重新输入！！！', QMessageBox.Yes)
+                MyMessageBox.warning(self, '提示', '输入的时间格式不合法，请重新输入！！！', QMessageBox.Ok)
                 return
         if self.qtyRadioButton.isChecked():
             try:
                 assert int(self.qtylineEdit.text())
             except:
-                MyMessageBox.warning(self, '提示', '固定根数输入不合法，请重新输入！！！', QMessageBox.Yes)
+                MyMessageBox.warning(self, '提示', '固定根数输入不合法，请重新输入！！！', QMessageBox.Ok)
                 return
         self.confirm_signal.emit(self.get_contract_policy())
         self.parent().close()
@@ -1522,7 +1522,7 @@ class ContractSelect(QWidget):
             root = QTreeWidgetItem(self.choice_tree)
             root.setText(0, item.text(0))
         else:
-            MyMessageBox.warning(self, '提示', '选择的合约数不能超过1个！！！', QMessageBox.Yes)
+            MyMessageBox.warning(self, '提示', '选择的合约数不能超过1个！！！', QMessageBox.Ok)
         pass
 
     def clear_choice(self):
@@ -1567,8 +1567,8 @@ class WebEngineView(QWebEngineView):
     def contentFromJS(self, file, text, confirm):
         try:
             if confirm and file in self.files:
-                reply = QMessageBox.question(self, '提示', '是否保存修改？', QMessageBox.Yes|QMessageBox.No)
-                if reply == QMessageBox.Yes:
+                reply = QMessageBox.question(self, '提示', '是否保存修改？', QMessageBox.Ok|QMessageBox.Cancel)
+                if reply == QMessageBox.Ok:
                     with open(file, mode='w', encoding='utf-8') as f:
                         f.write(text.replace('\r', ''))
                     self.files.remove(file)
@@ -1796,24 +1796,25 @@ class QuantApplication(QWidget):
     def save_edit_strategy(self):
         question = QMessageBox(self)
         if self.contentEdit.files:
-            check = QCheckBox('保存修改并退出')
-            check.setChecked(True)
-            question.setCheckBox(check)
-            question.setText('您确定退出本程序吗？\t\t\t\n')
+            question.setText('有策略被修改,\t\t\t\n程序退出前是否要保存这些策略？')
+            question.setStandardButtons(QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel)
         else:
             question.setText('您确定退出本程序吗？\t\t\t')
+            question.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
         question.setIcon(QMessageBox.Question)
         question.setWindowTitle('极星量化')
-        question.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+
         reply = question.exec_()
         if reply == QMessageBox.Yes:
             self.contentEdit.exit_flag = True
             self.contentEdit.exitSignal.connect(self.close_app)
-            if self.contentEdit.files and check.isChecked():
+            if self.contentEdit.files:
                 for file in self.contentEdit.files:
                     self.contentEdit.saveSignal.emit(file)
-            else:
-                self.close_app()
+        elif reply == QMessageBox.No or reply == QMessageBox.Ok:
+            self.close_app()
+        elif reply == QMessageBox.Cancel:
+            pass
 
 
     def closeEvent(self, event):
@@ -1922,8 +1923,8 @@ class QuantApplication(QWidget):
                 if fname:
                     _path = item_path + '/' + os.path.split(fname)[1]
                     if os.path.exists(_path):
-                        reply = MyMessageBox.question(self, '提示', '所选的分组中存在同名文件，是否覆盖？', QMessageBox.Yes | QMessageBox.No)
-                        if reply == QMessageBox.Yes:
+                        reply = MyMessageBox.question(self, '提示', '所选的分组中存在同名文件，是否覆盖？', QMessageBox.Ok | QMessageBox.Cancel)
+                        if reply == QMessageBox.Ok:
                             shutil.copy(fname, _path)
                     else:
                         shutil.copy(fname, _path)
@@ -1942,7 +1943,7 @@ class QuantApplication(QWidget):
                     else:
                         path = os.path.join(item_path, value.strip())
                     if os.path.exists(path) and ok:
-                        MyMessageBox.warning(self, '提示', '策略名%s在选择的分组已经存在！！！' % value.strip(), QMessageBox.Yes)
+                        MyMessageBox.warning(self, '提示', '策略名%s在选择的分组已经存在！！！' % value.strip(), QMessageBox.Ok)
                     elif not ok:
                         break
                     else:
@@ -1966,7 +1967,7 @@ class QuantApplication(QWidget):
                         path = os.path.join(os.path.split(item_path)[0], value.strip())
 
                     if os.path.exists(path) and ok:
-                        MyMessageBox.warning(self, '提示', '策略名在选择的分组%s已经存在！！！' % value, QMessageBox.Yes)
+                        MyMessageBox.warning(self, '提示', '策略名在选择的分组%s已经存在！！！' % value, QMessageBox.Ok)
                     elif not ok:
                         break
                     else:
@@ -1980,7 +1981,7 @@ class QuantApplication(QWidget):
                         self.model.directoryLoaded.connect(lambda: self.focus_tree_item(path))
                         break
             else:
-                MyMessageBox.warning(self, '提示', '请选择分组！！！', QMessageBox.Yes)
+                MyMessageBox.warning(self, '提示', '请选择分组！！！', QMessageBox.Ok)
 
         elif action == add_group:
             value = ''
@@ -1998,7 +1999,7 @@ class QuantApplication(QWidget):
                 else:
                     path = os.path.join(os.path.split(item_path)[0], value)
                 if os.path.exists(path) and ok:
-                    MyMessageBox.warning(self, '提示', '分组%s已经存在！！！' % value, QMessageBox.Yes)
+                    MyMessageBox.warning(self, '提示', '分组%s已经存在！！！' % value, QMessageBox.Ok)
                 elif not ok:
                     break
                 else:
@@ -2028,7 +2029,7 @@ class QuantApplication(QWidget):
                     else:
                         new_path = os.path.join(file_path, value.strip())
                     if os.path.exists(new_path) and ok:
-                        MyMessageBox.warning(self, '提示', '策略名%s在此分组中已经存在！！！' % value.strip(), QMessageBox.Yes)
+                        MyMessageBox.warning(self, '提示', '策略名%s在此分组中已经存在！！！' % value.strip(), QMessageBox.Ok)
                     elif not ok:
                         break
                     else:
@@ -2041,7 +2042,7 @@ class QuantApplication(QWidget):
                     value, ok = getText(self, '修改', '分组名称', dir_name)
                     new_path = os.path.join(dir_path, value)
                     if os.path.exists(new_path) and ok:
-                        MyMessageBox.warning(self, '提示', '分组%s已经存在！！！' % value, QMessageBox.Yes)
+                        MyMessageBox.warning(self, '提示', '分组%s已经存在！！！' % value, QMessageBox.Ok)
                     elif not ok:
                         break
                     else:
@@ -2052,13 +2053,13 @@ class QuantApplication(QWidget):
             model = index.model()  # 请注意这里可以获得model的对象
             item_path = model.filePath(index)
             if item_path and os.path.isdir(item_path):
-                reply = MyMessageBox.question(self, '提示', '确定删除分组及目录下的所有文件吗？', QMessageBox.Yes | QMessageBox.No)
-                if reply == QMessageBox.Yes:
+                reply = MyMessageBox.question(self, '提示', '确定删除分组及目录下的所有文件吗？', QMessageBox.Ok | QMessageBox.Cancel)
+                if reply == QMessageBox.Ok:
                     shutil.rmtree(item_path)
                     self.strategy_filter.remove(os.path.split(item_path)[1])
             elif item_path and not os.path.isdir(item_path):
-                reply = MyMessageBox.question(self, '提示', '确定删除策略%s吗？' % os.path.split(item_path)[1], QMessageBox.Yes | QMessageBox.No)
-                if reply == QMessageBox.Yes:
+                reply = MyMessageBox.question(self, '提示', '确定删除策略%s吗？' % os.path.split(item_path)[1], QMessageBox.Ok | QMessageBox.Cancel)
+                if reply == QMessageBox.Ok:
                     os.remove(item_path)
             else:
                 pass
@@ -2592,13 +2593,13 @@ class QuantApplication(QWidget):
             self.main_strategy_policy_win.show()
             self.strategy_policy_win.show()
         else:
-            MyMessageBox.warning(self, '提示', '请选择策略！！！', QMessageBox.Yes)
+            MyMessageBox.warning(self, '提示', '请选择策略！！！', QMessageBox.Ok)
 
     def save_strategy(self):
         if self.strategy_path:
             self.contentEdit.on_saveclick(self.strategy_path)
         else:
-            MyMessageBox.warning(self, '提示', '请选择策略！！！', QMessageBox.Yes)
+            MyMessageBox.warning(self, '提示', '请选择策略！！！', QMessageBox.Ok)
 
     def updateLogText(self):
         guiQueue = self._controller.get_logger().getGuiQ()
@@ -2669,7 +2670,7 @@ class QuantApplication(QWidget):
 
     def show_warn(self):
         """极星9.5退出时，弹出窗口槽函数"""
-        MyMessageBox.critical(self, "错误", "极星9.5退出", QMessageBox.Yes)
+        MyMessageBox.critical(self, "错误", "极星9.5退出", QMessageBox.Ok)
 
     def addExecute(self, dataDict):
         values = self._formatMonitorInfo(dataDict)

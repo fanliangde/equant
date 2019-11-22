@@ -495,10 +495,20 @@ QLineEdit:selected, QLineEdit:pressed, QLineEdit:focus {
 /* *****************************************QMessageBox**************************************/
 QMessageBox QPushButton[text="&Yes"] {
     min-width: 60px;
-    qproperty-text: "确定";
+    qproperty-text: "是";
 }
 
 QMessageBox QPushButton[text="&No"] {
+    min-width: 60px;
+    qproperty-text: "否";
+}
+
+QMessageBox QPushButton[text="OK"] {
+    min-width: 60px;
+    qproperty-text: "确定";
+}
+
+QMessageBox QPushButton[text="Cancel"] {
     min-width: 60px;
     qproperty-text: "取消";
 }
