@@ -150,8 +150,8 @@ function save_file(file, need_confirm) {
     //     'errtxt':''
     // }
     // senddata(data);
-    txt = datas[file];
-    Bridge.contentFromJS(file, txt, need_confirm);
+
+    Bridge.contentFromJS(file, datas[file], need_confirm);
 
     org_datas[file] = datas[file];
     on_modify(file, false)
@@ -271,10 +271,10 @@ function add_tab(name, value){
                 _tab = tab.previousElementSibling;
             switch_tab(_tab ? _tab.id : '');
         }
-        if (org_datas[tab.id] != datas[tab.id]){
-            on_modify(file, false)
-            save_file(tab.id, true)
-        }
+        if (org_datas[tab.id] != datas[tab.id])
+            save_file(tab.id, true);
+	else
+            on_modify(file, false);
         delete datas[tab.id];
         delete org_datas[tab.id];
         tab.remove();
