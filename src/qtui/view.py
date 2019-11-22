@@ -1791,9 +1791,10 @@ class QuantApplication(QWidget):
 
     def save_edit_strategy(self):
         question = QMessageBox(self)
-        check = QCheckBox('保存已修改策略')
-        check.setChecked(True)
-        question.setCheckBox(check)
+        if self.contentEdit.files:
+            check = QCheckBox('保存已修改策略')
+            check.setChecked(True)
+            question.setCheckBox(check)
         question.setIcon(QMessageBox.Question)
         question.setText('确定退出极星量化程序吗？\t\t\n')
         question.setWindowTitle('极星量化')
@@ -1802,7 +1803,7 @@ class QuantApplication(QWidget):
         if reply == QMessageBox.Yes:
             self.contentEdit.exit_flag = True
             self.contentEdit.exitSignal.connect(self.close_app)
-            if check.isChecked():
+            if self.contentEdit.files and check.isChecked():
                 for file in self.contentEdit.files:
                     self.contentEdit.saveSignal.emit(file)
             else:
