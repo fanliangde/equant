@@ -2905,7 +2905,6 @@ class QuantApplication(QWidget):
         save(data, runMode, stName)
 
         self.reportView.reportShowSig.emit(data)
-        print("HAHAHA")
         # TODO: 在这里展示报告会导致程序不响应，放到接收信号处展示
         # self.reportWnd.show()
         # self.reportWnd.raise_()

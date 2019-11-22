@@ -92,17 +92,18 @@ class TitleBar(QWidget):
             self.win.setStyleSheet("""""")
             self.win._widget.contentEdit.sendSetThemeSignal('vs')
 
-            style = CommonHelper.readQss(WHITESTYLE)
-            self.win.setStyleSheet(style)
-
-            self.theseState = THESE_STATE_WHITE
+            # style = CommonHelper.readQss(WHITESTYLE)
+            # self.win.setStyleSheet(style)
+            # self.theseState = THESE_STATE_WHITE
+            self.win.setWinThese(THESE_STATE_WHITE)
         elif self.theseState == THESE_STATE_WHITE:
             self.win.setStyleSheet("""""")
             self.win._widget.contentEdit.sendSetThemeSignal('vs-dark')
 
-            style = CommonHelper.readQss(DARKSTYLE)
-            self.win.setStyleSheet(style)
-            self.theseState = THESE_STATE_DARK
+            # style = CommonHelper.readQss(DARKSTYLE)
+            # self.win.setStyleSheet(style)
+            # self.theseState = THESE_STATE_DARK
+            self.win.setWinThese(THESE_STATE_DARK)
 
 
     def showMaximized(self):
