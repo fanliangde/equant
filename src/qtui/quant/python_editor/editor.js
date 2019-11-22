@@ -273,8 +273,9 @@ function add_tab(name, value){
         }
         if (org_datas[tab.id] != datas[tab.id])
             save_file(tab.id, true);
-	else
-            on_modify(file, false);
+	    else
+            on_modify(tab.id, false);
+        
         delete datas[tab.id];
         delete org_datas[tab.id];
         tab.remove();
