@@ -541,6 +541,15 @@ QMessageBox QPushButton[text="&No"] {
     qproperty-text: "取消";
 }
 
+/* *****************************************QInputDialog**************************************/
+QInputDialog QLineEdit{
+    min-width: 300px;
+}
+QInputDialog QPushButton {
+    min-width: 60px;
+}
+
+
 /***************************QToolTip********************/
 QToolTip {
     background-color: #FFFFFF;

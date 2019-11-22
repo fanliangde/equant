@@ -289,6 +289,7 @@ class StrategyPolicy(QWidget):
         self.contractTableWidget.setColumnCount(5)
         self.contractTableWidget.setHorizontalHeaderLabels(['合约', 'K线类型', 'K线周期', '运算起始点', 'data'])
         self.contractTableWidget.horizontalHeader().setStretchLastSection(True)
+        self.contractTableWidget.horizontalHeader().setHighlightSections(False)  # 关闭高亮头
         self.contractTableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
         left_layout.addWidget(self.contractTableWidget)
         right_layout = QVBoxLayout()
@@ -544,6 +545,7 @@ class StrategyPolicy(QWidget):
         self.paramsTableWidget.setHorizontalHeaderLabels(['参数', '当前值', '类型', '描述'])
         self.paramsTableWidget.verticalHeader().setVisible(False)  # 隐藏行号
         self.paramsTableWidget.horizontalHeader().setStretchLastSection(True)
+        self.paramsTableWidget.horizontalHeader().setHighlightSections(False)  # 关闭高亮头
         self.paramsTableWidget.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
         self.paramsTableWidget.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
         self.paramsTableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
@@ -1679,12 +1681,14 @@ class QuantApplication(QWidget):
 
     exitSignal = pyqtSignal()
     positionSignal = pyqtSignal(list)
+    pathSignal = pyqtSignal(str)
 
     def __init__(self, control, parent=None):
         super().__init__(parent)
 
         self.exitSignal.connect(self.show_warn)
         self.positionSignal.connect(self.updateSyncPosition)
+        self.pathSignal.connect(self.focus_tree_item)
         self.init_settings()
 
         # 初始化控制器
@@ -1792,11 +1796,13 @@ class QuantApplication(QWidget):
     def save_edit_strategy(self):
         question = QMessageBox(self)
         if self.contentEdit.files:
-            check = QCheckBox('保存已修改策略')
+            check = QCheckBox('保存修改并退出')
             check.setChecked(True)
             question.setCheckBox(check)
+            question.setText('您确定退出本程序吗？\t\t\t\n')
+        else:
+            question.setText('您确定退出本程序吗？\t\t\t')
         question.setIcon(QMessageBox.Question)
-        question.setText('确定退出极星量化程序吗？\t\t\n')
         question.setWindowTitle('极星量化')
         question.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         reply = question.exec_()
@@ -1872,6 +1878,15 @@ class QuantApplication(QWidget):
             style = f.read()
         return style
 
+    def focus_tree_item(self, path):
+        if os.path.exists(path):
+            index = self.model.index(path)
+            item_path = self.model.filePath(index)
+            self.strategy_tree.setCurrentIndex(index)
+            self.strategy_path = path
+            if not os.path.isdir(item_path):
+                self.contentEdit.sendContentToJS(item_path)
+
     # 策略右键菜单
     def strategy_tree_right_menu(self, point):
         self.strategy_tree.popMenu = QMenu()
@@ -1921,7 +1936,7 @@ class QuantApplication(QWidget):
             if item_path and os.path.isdir(item_path):
                 value = ''
                 while True:
-                    value, ok = getText('新增文件', '策略名称：')
+                    value, ok = getText(self, '新增', '策略名称：')
                     if not value.strip().endswith('.py'):
                         path = os.path.join(item_path, value.strip() + '.py')
                     else:
@@ -1932,12 +1947,19 @@ class QuantApplication(QWidget):
                         break
                     else:
                         with open(path, 'w', encoding='utf-8') as w:
-                            pass
+                            w.write('import talib\n'
+                                    '\n\n'
+                                    'def initialize(context): \n    pass\n\n\n'
+                                    'def handle_data(context):\n    pass\n\n\n'
+                                    'def hisover_callback(context):\n    pass\n\n\n'
+                                    'def exit_callback(context):\n    pass\n')
+                        self.model.directoryLoaded.connect(lambda: self.focus_tree_item(path))
+                        self.strategy_tree.expand(index)
                         break
             elif not os.path.isdir(item_path):
                 value = ''
                 while True:
-                    value, ok = getText('新建文件', '策略名称：')
+                    value, ok = getText(self, '新建', '策略名称：')
                     if not value.strip().endswith('.py'):
                         path = os.path.join(os.path.split(item_path)[0], value.strip() + '.py')
                     else:
@@ -1949,7 +1971,13 @@ class QuantApplication(QWidget):
                         break
                     else:
                         with open(path, 'w', encoding='utf-8') as w:
-                            pass
+                            w.write('import talib\n'
+                                    '\n\n'
+                                    'def initialize(context): \n    pass\n\n\n'
+                                    'def handle_data(context):\n    pass\n\n\n'
+                                    'def hisover_callback(context):\n    pass\n\n\n'
+                                    'def exit_callback(context):\n    pass\n')
+                        self.model.directoryLoaded.connect(lambda: self.focus_tree_item(path))
                         break
             else:
                 MyMessageBox.warning(self, '提示', '请选择分组！！！', QMessageBox.Yes)
@@ -1964,7 +1992,7 @@ class QuantApplication(QWidget):
                     index = self.strategy_tree.currentIndex()
                     model = index.model()  # 请注意这里可以获得model的对象
                     item_path = model.filePath(index)
-                value, ok = getText('新建分组', '分组名称：')
+                value, ok = getText(self, '新建', '分组名称：')
                 if os.path.isdir(item_path):
                     path = os.path.join(item_path, value)
                 else:
@@ -1977,6 +2005,7 @@ class QuantApplication(QWidget):
                     os.mkdir(path)
                     self.strategy_filter.append(os.path.split(path)[1])
                     self.model.setNameFilters(self.strategy_filter)
+                    self.model.directoryLoaded.connect(lambda: self.focus_tree_item(path))
                     break
 
         elif action == start_file:
@@ -1993,7 +2022,7 @@ class QuantApplication(QWidget):
                 value = ''
                 (file_path, filename) = os.path.split(item_path)
                 while True:
-                    value, ok = getText('修改%s策略名' % filename, '策略名称')
+                    value, ok = getText(self, '修改', '策略名称', filename)
                     if not value.strip().endswith('.py'):
                         new_path = os.path.join(file_path, value.strip() + '.py')
                     else:
@@ -2009,7 +2038,7 @@ class QuantApplication(QWidget):
                 value = ''
                 (dir_path, dir_name) = os.path.split(item_path)
                 while True:
-                    value, ok = getText('修改%s文件夹' % dir_name, '分组名称')
+                    value, ok = getText(self, '修改', '分组名称', dir_name)
                     new_path = os.path.join(dir_path, value)
                     if os.path.exists(new_path) and ok:
                         MyMessageBox.warning(self, '提示', '分组%s已经存在！！！' % value, QMessageBox.Yes)
@@ -2028,7 +2057,6 @@ class QuantApplication(QWidget):
                     shutil.rmtree(item_path)
                     self.strategy_filter.remove(os.path.split(item_path)[1])
             elif item_path and not os.path.isdir(item_path):
-                print(item_path)
                 reply = MyMessageBox.question(self, '提示', '确定删除策略%s吗？' % os.path.split(item_path)[1], QMessageBox.Yes | QMessageBox.No)
                 if reply == QMessageBox.Yes:
                     os.remove(item_path)
@@ -2284,6 +2312,7 @@ class QuantApplication(QWidget):
         self.strategy_table.verticalHeader().setVisible(False)
         self.strategy_table.setShowGrid(False)
         self.strategy_table.horizontalHeader().setStretchLastSection(True)  # 最后一行自适应长度，充满界面
+        self.strategy_table.horizontalHeader().setHighlightSections(False)  # 关闭高亮头
         self.strategy_table.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
         self.strategy_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)  # 第一列自适应长度，充满界面
         self.strategy_table.setSelectionMode(QAbstractItemView.SingleSelection)  # 设置只能选中一行
@@ -2396,6 +2425,7 @@ class QuantApplication(QWidget):
         self.pos_table.verticalHeader().setVisible(False)
         self.pos_table.setShowGrid(False)
         self.pos_table.horizontalHeader().setStretchLastSection(True)  # 最后一列自动拉伸充满界面
+        self.pos_table.horizontalHeader().setHighlightSections(False)  # 关闭水平头高亮
         self.pos_table.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)  # 所有列自动拉伸，充满界面
         self.pos_table.horizontalHeader().setObjectName("PosTableHeader")
         self.pos_table.setSelectionMode(QAbstractItemView.SingleSelection)  # 设置只能选中一行
