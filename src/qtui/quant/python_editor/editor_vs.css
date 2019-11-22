@@ -1,4 +1,4 @@
-html{
+﻿html{
     height: 100%; 
     width: 100%; 
     overflow: hidden;
@@ -66,6 +66,7 @@ body{
     color: #666;
     background: #f0f0f0;
     overflow: hidden;                           /*处理超出的内容*/
+    user-select: none;                          /*禁止选中标签栏文字*/
 }
 
 #tabs li{
