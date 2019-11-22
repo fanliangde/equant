@@ -171,7 +171,6 @@ function modify_nty(file, modified) {
     // }
     // senddata(data);
     
-    alert(file)
     on_modify(file, modified);
     Bridge.receiveFileStatus(file, modified);
 }
