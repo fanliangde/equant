@@ -12,6 +12,21 @@ class FileSystemModel(QFileSystemModel):
     def columnCount(self, parent: QModelIndex = ...):
         return 1
 
+    def data(self, index, role=Qt.DisplayRole):
+        # 鼠标悬停显示目录名称
+        if role == Qt.ToolTipRole:
+            filePath = self.filePath(index)
+            if filePath and not os.path.isdir(filePath):
+                return os.path.basename(filePath)
+        elif role == Qt.DisplayRole:
+            filePath = self.filePath(index)
+            return os.path.basename(filePath)
+
+    def flags(self, index):
+        if not index.isValid():
+            return Qt.NoItemFlags
+        return Qt.ItemIsSelectable
+
 
 class Dir(QTreeView):
     """The directory of report data"""
@@ -43,12 +58,10 @@ class Dir(QTreeView):
         self.setAnimated(False)
         self.setSortingEnabled(True)
 
-        self.setSelectionBehavior(QAbstractItemView.SelectRows)
-        # self.setAlternatingRowColors(True)
-
         self.setModel(self.model)
         # 需要加上这句setRootPath才生效
         self.setRootIndex(self.model.index(self._dirPath))
+
 
     def contextMenuEvent(self, evt):
         menu = QMenu(self)
