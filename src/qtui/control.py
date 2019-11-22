@@ -71,9 +71,6 @@ class Controller(object):
         self.mainWnd.titleBar.buttonClose.clicked.connect(self.app.save_edit_strategy)
         self.mainWnd.setWidget(self.app)
 
-        # 设置回测报告窗口的style
-        self._setReportWinStyle(style, theme)
-
         # 创建模块
         self.model = QuantModel(self.app, self._ui2egQueue, self._eg2uiQueue, self.logger)
         self.app.init_control()
@@ -90,24 +87,18 @@ class Controller(object):
         # self.update_mon()
 
     def _createReportWin(self):
-        # style = CommonHelper.readQss(WHITESTYLE)
         self.reportWnd = FramelessWindow()
         self.reportWnd.setObjectName("ReportWnd")
         self.reportWnd.resize(1000, 600)
         self.reportWnd.setMinimumSize(600, 600)
         self.reportWnd.setMaximumSize(1000, 600)
         self.reportWnd.hideTheseBtn()
-        # self.reportWnd.setStyleSheet(style)
+        self.reportWnd.disabledMaximumBtn()
         self.reportWnd.setWindowTitle("回测报告")
-        # self.reportWnd.setWinThese(THESE_STATE_WHITE)
         self.reportWnd.setWindowIcon(QIcon('icon/epolestar ix2.ico'))
-        self.reportView = ReportView()
+        self.reportView = ReportView(self.reportWnd)
         self.reportView.setObjectName("ReportView")
         self.reportWnd.setWidget(self.reportView)
-
-    def _setReportWinStyle(self, style, theme):
-        self.reportWnd.setStyleSheet(style)
-        self.reportWnd.setWinThese(theme)
 
     def get_logger(self):
         return self.logger

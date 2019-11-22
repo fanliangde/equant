@@ -19,6 +19,8 @@ Left, Top, Right, Bottom, LeftTop, RightTop, LeftBottom, RightBottom = range(8)
 
 class FramelessWindow(QWidget):
 
+    CObject = list()
+
     def __init__(self, *args, **kwargs):
         super(FramelessWindow, self).__init__(*args, **kwargs)
 
@@ -43,6 +45,7 @@ class FramelessWindow(QWidget):
 
         self.windowTitleChanged.connect(self.titleBar.setTitle)
         self.windowIconChanged.connect(self.titleBar.setIcon)
+        FramelessWindow.CObject.append(self)
 
     def closeWindow(self):
         self.close()
@@ -52,11 +55,25 @@ class FramelessWindow(QWidget):
         return self.titleBar.theseState
 
     def setWinThese(self, theme):
+        print("AA: ", theme)
         self.titleBar.theseState = theme
+        for win in FramelessWindow.CObject:
+            if theme == THESE_STATE_DARK:
+                style = CommonHelper.readQss(DARKSTYLE)
+                win.setStyleSheet("""""")
+                win.setStyleSheet(style)
+            elif theme == THESE_STATE_WHITE:
+                style = CommonHelper.readQss(WHITESTYLE)
+                win.setStyleSheet("""""")
+                win.setStyleSheet(style)
 
     def hideTheseBtn(self):
         """隐藏换肤按钮"""
         self.titleBar.theseSelect.hide()
+
+    def disabledMaximumBtn(self):
+        """禁用最大化图标"""
+        self.titleBar.buttonMaximum.setDisabled(True)
 
     def showTheseBtn(self):
         """显示换肤按钮"""
