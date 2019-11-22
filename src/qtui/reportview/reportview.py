@@ -13,8 +13,9 @@ class ReportView(QWidget):
     # 显示回测报告窗口信号
     reportShowSig = pyqtSignal(dict)
 
-    def __init__(self):
-        super(ReportView, self).__init__()
+    def __init__(self, parent=None):
+        super(ReportView, self).__init__(parent)
+        self.parent=parent
         self._windowTitle = "回测报告"
         self._iconPath = r"icon/epolestar ix2.ico"
         self.styleFile = r"qtui/reportview/style.qss"
@@ -58,5 +59,8 @@ class ReportView(QWidget):
         self._datas = datas
 
         self.tab.showData(self._datas)
+        print("BBB")
+        self.parent.show()
+        self.parent.raise_()
         # self.show()
 

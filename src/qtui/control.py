@@ -101,7 +101,7 @@ class Controller(object):
         self.reportWnd.setWindowTitle("回测报告")
         # self.reportWnd.setWinThese(THESE_STATE_WHITE)
         self.reportWnd.setWindowIcon(QIcon('icon/epolestar ix2.ico'))
-        self.reportView = ReportView()
+        self.reportView = ReportView(self.reportWnd)
         self.reportView.setObjectName("ReportView")
         self.reportWnd.setWidget(self.reportView)
 
