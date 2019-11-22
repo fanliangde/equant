@@ -658,25 +658,15 @@ TitleBar {
     border: 1px solid red;
 }
 
-/* 回测报告窗口属性设置 */
-#ReportView QLabel{
-    background-color: #2C6EAD;
+/***************回测窗口风格*********************/
+#ReportWnd #ReportView QWidget{
+    background-color: #FFFFFF;
+}
+
+#ReportWnd #ReportView QLabel {
+    background-color: #0E6393;
     color: #FFFFFF;
-    height: 20px;
+    min-height: 20px;
+    max-height: 20px;
 }
 
-
-/******* 没生效 *********/
-#StageIcon {
-    background-color: #0E6393:
-    border-style: flat;
-}
-
-#StageIcon:hover,
-#StageIcon:checked,
-#StageIcon:checked:selected,
-#StageIcon:checked:hover,
-#StageIcon:pressed
-#StageIcon:pressed:hover {
-    background-color: red;
-}
