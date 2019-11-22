@@ -25,7 +25,8 @@ new QWebChannel(qt.webChannelTransport,
 
         // 绑定自定义的信号customSignal
         Bridge.contentFromQt.connect(function (file, text) {
-            add_tab(file, text);
+            if (g_ready)
+                add_tab(file, text);
         });
         Bridge.saveSignal.connect(function (file){
             save_file(file, false)
@@ -48,7 +49,8 @@ new QWebChannel(qt.webChannelTransport,
 //当前代码编辑器所打开的文件，为空则为新建文件
 var g_model = null;
 var g_filename = "";
-var g_loading = false
+var g_loading = false;
+var g_ready = false;
 //编辑器实例
 var g_editor = null;
 
@@ -116,6 +118,8 @@ function init_editor(layoutid, code_str, theme) {
     window.onresize = editor_layout;
     //编辑器加载成功后创建websocket连接
     //window.onload = init_webskt;
+    
+    g_ready = true;
 }
 
 //自适应窗口大小
