@@ -10,10 +10,10 @@
 // 打开文件
 // {"cmd":"openfile", "file":"", "txt":""}
 // 保存文件
-// {"cmd":"savefile_req", "reqid":0, "file":""}
-// {"cmd":"savefile_rsp", "reqid":0, "file":"", "txt":"", "errtxt":""}
+// {"cmd":"savefile_req", "file":""}
+// {"cmd":"savefile_rsp", "file":"", "txt":""}
 // 文件修改通知
-// {"cmd":"modify_nty", "file":""}
+// {"cmd":"modify_nty", "file":"", "modified":true}
 //////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////
@@ -133,7 +133,10 @@ function set_theme(theme, fontsize) {
     if (ind < 0)
         return;
     fsize = 14 + 2 * ind;
-    g_editor.updateOptions({ fontSize: fsize, lineHeight: fsize + 10, });
+    lsize = Math.ceil(fsize * 1.7);
+    if (lsize % 2 == 1)
+        lsize -= 1;
+    g_editor.updateOptions({ fontSize: fsize, lineHeight: lsize, });
 }
 
 //设置代码文件
@@ -150,10 +153,8 @@ function save_file(file, need_confirm) {
         datas[file] = g_editor.getValue()
     // data = {
     //     'cmd':'savefile_rsp',
-    //     'reqid':reqid,
     //     'file':file,
-    //     'txt':datas[file],
-    //     'errtxt':''
+    //     'txt':datas[file]
     // }
     // senddata(data);
 
