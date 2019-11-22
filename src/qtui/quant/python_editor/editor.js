@@ -108,7 +108,7 @@ function init_editor(layoutid, code_str, theme) {
             }
         );
         g_editor.onDidChangeModelContent((v) => {
-            if (!g_loading)
+            if (!g_loading && g_filename)
                 modify_nty(g_filename, org_datas[g_filename] != g_editor.getValue())
         });
 
