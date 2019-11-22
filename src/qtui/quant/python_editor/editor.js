@@ -258,7 +258,6 @@ function add_tab(name, value){
     var btn = document.createElement("a");
     btn.href = "#";
     btn.innerHTML = "x";
-    btn.className = 'curr_btn'
 
     //添加按钮到标签上
     tab.appendChild(btn);
