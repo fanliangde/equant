@@ -10,10 +10,10 @@
 // 打开文件
 // {"cmd":"openfile", "file":"", "txt":""}
 // 保存文件
-// {"cmd":"savefile_req", "reqid":0, "file":""}
-// {"cmd":"savefile_rsp", "reqid":0, "file":"", "txt":"", "errtxt":""}
+// {"cmd":"savefile_req", "file":""}
+// {"cmd":"savefile_rsp", "file":"", "txt":""}
 // 文件修改通知
-// {"cmd":"modify_nty", "file":""}
+// {"cmd":"modify_nty", "file":"", "modified":true}
 //////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////
@@ -25,7 +25,8 @@ new QWebChannel(qt.webChannelTransport,
 
         // 绑定自定义的信号customSignal
         Bridge.contentFromQt.connect(function (file, text) {
-            add_tab(file, text);
+            if (g_ready)
+                add_tab(file, text);
         });
         Bridge.saveSignal.connect(function (file){
             save_file(file, false)
@@ -48,6 +49,8 @@ new QWebChannel(qt.webChannelTransport,
 //当前代码编辑器所打开的文件，为空则为新建文件
 var g_model = null;
 var g_filename = "";
+var g_loading = false;
+var g_ready = false;
 //编辑器实例
 var g_editor = null;
 
@@ -105,7 +108,8 @@ function init_editor(layoutid, code_str, theme) {
             }
         );
         g_editor.onDidChangeModelContent((v) => {
-            on_modify(g_filename, org_datas[g_filename] != g_editor.getValue())
+            if (!g_loading && g_filename)
+                modify_nty(g_filename, org_datas[g_filename] != g_editor.getValue())
         });
 
     });
@@ -114,6 +118,8 @@ function init_editor(layoutid, code_str, theme) {
     window.onresize = editor_layout;
     //编辑器加载成功后创建websocket连接
     //window.onload = init_webskt;
+    
+    g_ready = true;
 }
 
 //自适应窗口大小
@@ -131,33 +137,38 @@ function set_theme(theme, fontsize) {
     if (ind < 0)
         return;
     fsize = 14 + 2 * ind;
-    g_editor.updateOptions({ fontSize: fsize, lineHeight: fsize + 10, });
+    lsize = Math.ceil(fsize * 1.7);
+    if (lsize % 2 == 1)
+        lsize -= 1;
+    g_editor.updateOptions({ fontSize: fsize, lineHeight: lsize, });
 }
 
 //设置代码文件
 function load_file(file, txt) {
+    g_loading = true
     g_filename = file;
     g_editor.setValue(txt);
+    g_loading = false
 }
 
 //保存代码到本地文件, need_confirm为true时需要用户确认是否保存，否则不需要用户确认直接保存
 function save_file(file, need_confirm) {
+    if (file == g_filename)
+        datas[file] = g_editor.getValue()
     // data = {
     //     'cmd':'savefile_rsp',
-    //     'reqid':reqid,
     //     'file':file,
-    //     'txt':datas[file],
-    //     'errtxt':''
+    //     'txt':datas[file]
     // }
     // senddata(data);
 
-    Bridge.contentFromJS(file, datas[file], need_confirm);
-
     org_datas[file] = datas[file];
     on_modify(file, false)
+
+    Bridge.contentFromJS(file, datas[file], need_confirm);
 }
 //文件被修改
-function on_modify(file, modified) {
+function modify_nty(file, modified) {
     // data = {
     //     'cmd':'modify_nty',
     //     'file':file,
@@ -165,8 +176,11 @@ function on_modify(file, modified) {
     // }
     // senddata(data);
     
+    on_modify(file, modified);
     Bridge.receiveFileStatus(file, modified);
+}
 
+function on_modify(file, modified) {
     var tab = $(file);
     if (!tab)
         return;
@@ -205,32 +219,30 @@ function switch_tab(newtab) {
     if (newtab == currtab)
         return;
 
-    var n_tab = $(newtab.toString());
-    if (!n_tab && newtab != "")
+    var tab_new = $(newtab.toString());
+    if (!tab_new && newtab != "")
         return;
-    
-    if (n_tab){
-        n_tab.className = 'current';
-        var btn = n_tab.children[0];
-        if (btn && btn.className != 'modify_btn')
-            btn.className = 'curr_btn';
-    }
 
-    var c_tab = $(currtab.toString())
-    if (c_tab){
-        c_tab.className = '';
-        var btn = c_tab.children[0];
+    var tab_old = $(currtab.toString())
+    if (tab_old){
+        tab_old.className = '';
+        var btn = tab_old.children[0];
         if (btn && btn.className != 'modify_btn')
             btn.className = '';
 
-        datas[currtab] = g_editor.getValue();
-        org_datas[name] = g_editor.getValue();
+       datas[currtab] = g_editor.getValue();
     }
+    
+    currtab = newtab;
+    if (tab_new){
+        tab_new.className = 'current';
+        var n_btn = tab_new.children[0];
+        if (n_btn && n_btn.className != 'modify_btn')
+            n_btn.className = 'curr_btn';
+    }
+    load_file(currtab, tab_new ? datas[currtab] : '');
 
-    load_file(newtab, n_tab ? datas[newtab] : '');
-    currtab = newtab; 
-
-    Bridge.switchFile(newtab);
+    Bridge.switchFile(currtab);
 }
 
 // 添加标签
@@ -251,7 +263,6 @@ function add_tab(name, value){
     var btn = document.createElement("a");
     btn.href = "#";
     btn.innerHTML = "x";
-    btn.className = 'curr_btn'
 
     //添加按钮到标签上
     tab.appendChild(btn);
@@ -273,9 +284,7 @@ function add_tab(name, value){
         }
         if (org_datas[tab.id] != datas[tab.id])
             save_file(tab.id, true);
-	    else
-            on_modify(tab.id, false);
-        
+
         delete datas[tab.id];
         delete org_datas[tab.id];
         tab.remove();
@@ -292,6 +301,7 @@ function add_tab(name, value){
         if (btn && btn.className != 'curr_btn' && btn.className != 'modify_btn')
             btn.className = '';
     }
+
 
     //添加标签关联的数据
     datas[name] = value;
@@ -312,7 +322,6 @@ function add_tab(name, value){
 //     if ('WebSocket' in window)
 //         ws = new WebSocket("ws://localhost:8765");
 //     else {
-//         alert("error, WebSocket not exist!");
 //         return;
 //     }
 //
@@ -336,7 +345,6 @@ function add_tab(name, value){
 //
 //     //接收web socket服务端数据时触发
 //     ws.onmessage = function (evt) {
-//         //alert(evt.data);
 //         data = JSON.parse(evt.data);
 //         if (data.cmd == 'openfile') {
 //             add_tab(data.file, data.txt);
@@ -354,5 +362,4 @@ function add_tab(name, value){
 //     //init_webskt();
 //     json_str = JSON.stringify(data);
 //     ws.send(json_str);
-//     //alert(json_str);
 // }
