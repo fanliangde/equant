@@ -65,7 +65,9 @@ class Controller(object):
         screen = QDesktopWidget().screenGeometry()
         self.mainWnd.setGeometry(screen.width() * 0.1, screen.height() * 0.1, screen.width() * 0.8,
                                  screen.height() * 0.8)
-        self.mainWnd.titleBar.buttonClose.clicked.connect(self.quitThread)
+        # self.mainWnd.titleBar.buttonClose.clicked.connect(self.quitThread)
+        self.mainWnd.titleBar.buttonClose.clicked.disconnect(self.mainWnd.titleBar.closeWindow)
+        self.mainWnd.titleBar.buttonClose.clicked.connect(self.app.save_edit_strategy)
         self.mainWnd.setWidget(self.app)
 
         # 创建模块
