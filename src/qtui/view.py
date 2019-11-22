@@ -2866,5 +2866,7 @@ class QuantApplication(QWidget):
         save(data, runMode, stName)
 
         self.reportView.reportShowSig.emit(data)
+        print("HAHAHA")
         self.reportWnd.show()
+        self.reportWnd.raise_()
 

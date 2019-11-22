@@ -503,6 +503,15 @@ QMessageBox QPushButton[text="&No"] {
     qproperty-text: "取消";
 }
 
+/***************************QToolTip********************/
+QToolTip {
+    background-color: #FFFFFF;
+    border: 1px solid #767676;
+    color: #575757;
+    padding: 0px;
+    opacity: 230;
+}
+
 /***************************************************************************/
 
 /* 函数检索输入框*/
@@ -639,4 +648,27 @@ TitleBar {
 #Framless {
 
     border: 1px solid red;
+}
+
+/* 回测报告窗口属性设置 */
+#ReportView QLabel{
+    background-color: #2C6EAD;
+    color: #FFFFFF;
+    height: 20px;
+}
+
+
+/******* 没生效 *********/
+#StageIcon {
+    background-color: #0E6393:
+    border-style: flat;
+}
+
+#StageIcon:hover,
+#StageIcon:checked,
+#StageIcon:checked:selected,
+#StageIcon:checked:hover,
+#StageIcon:pressed
+#StageIcon:pressed:hover {
+    background-color: red;
 }

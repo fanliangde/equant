@@ -44,20 +44,9 @@ class Controller(object):
         font.setPixelSize(pointsize * 90 / 72)
         self.mainApp.setFont(font)
 
-        ###############回测报告#####################
-        style = CommonHelper.readQss(DARKSTYLE)
-        self.reportWnd = FramelessWindow()
-        self.reportWnd.resize(1000, 600)
-        self.reportWnd.setMinimumSize(600, 600)
-        self.reportWnd.setMaximumSize(1000, 600)
-        self.reportWnd.setStyleSheet(style)
-        self.reportWnd.setWindowTitle("回测报告")
-        self.reportWnd.setWinThese(THESE_STATE_DARK)
-        self.reportWnd.setWindowIcon(QIcon('icon/epolestar ix2.ico'))
-        self.reportView = ReportView()
-        # self.reportWnd.setWidget(self.reportView)
-
-        ##############################################
+        ################创建回测报告####################
+        self._createReportWin()
+        ################################################
 
         self.app = QuantApplication(self)
         if self.app.settings.contains('theme') and self.app.settings.value('theme') == 'vs-dark':
@@ -66,7 +55,7 @@ class Controller(object):
         else:
             qss_path = WHITESTYLE
             theme = THESE_STATE_WHITE
-        # 回测报告窗口（主线程中创建)
+
         self.mainWnd = FramelessWindow()
         style = CommonHelper.readQss(qss_path)
         self.mainWnd.setStyleSheet(style)
@@ -95,6 +84,21 @@ class Controller(object):
         # 设置日志更新
         # self.update_log()
         # self.update_mon()
+
+    def _createReportWin(self, *args):
+        style = CommonHelper.readQss(WHITESTYLE)
+        self.reportWnd = FramelessWindow()
+        self.reportWnd.resize(1000, 600)
+        self.reportWnd.setMinimumSize(600, 600)
+        self.reportWnd.setMaximumSize(1000, 600)
+        self.reportWnd.hideTheseBtn()
+        self.reportWnd.setStyleSheet(style)
+        self.reportWnd.setWindowTitle("回测报告")
+        self.reportWnd.setWinThese(THESE_STATE_WHITE)
+        self.reportWnd.setWindowIcon(QIcon('icon/epolestar ix2.ico'))
+        self.reportView = ReportView()
+        self.reportView.setObjectName("ReportView")
+        self.reportWnd.setWidget(self.reportView)
 
     def get_logger(self):
         return self.logger
