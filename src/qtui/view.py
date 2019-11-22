@@ -1787,7 +1787,7 @@ class QuantApplication(QWidget):
         self.timer.start(1000)
 
     def init_settings(self):
-        self.settings = QSettings('settings.ini', QSettings.IniFormat)
+        self.settings = QSettings('config/settings.ini', QSettings.IniFormat)
 
     def close_app(self):
         self._controller.quitThread()
@@ -2200,7 +2200,7 @@ class QuantApplication(QWidget):
         self.content_layout.addWidget(self.save_btn, 0, 2, 1, 1)
         self.content_layout.addWidget(self.contentEdit, 2, 0, 20, 3)
         self.content_vbox.setLayout(self.content_layout)
-        self.run_btn.clicked.connect(self.emit_custom_signal)
+        self.run_btn.clicked.connect(self.emit_custom_signal)  # 改为提示用户保存当前的文件
         self.run_btn.clicked.connect(lambda: self.create_strategy_policy_win({}, self.strategy_path, False))
         self.save_btn.clicked.connect(self.emit_custom_signal)
         self.save_btn.setShortcut("Ctrl+S")  # ctrl + s 快捷保存
@@ -2217,7 +2217,8 @@ class QuantApplication(QWidget):
         self.run_btn.setEnabled(status)
 
     def emit_custom_signal(self):
-        self.contentEdit.sendSaveSignal(self.strategy_path)
+        if self.strategy_path in self.contentEdit.files:
+            self.contentEdit.sendSaveSignal(self.strategy_path)
 
     def create_func_tab(self):
         # 函数列表
