@@ -189,6 +189,14 @@ def getText(parent,title, label, text=None):
     return value, ok
 
 
+class EmptyDelegate(QItemDelegate):
+    def __init__(self, parent):
+        super(EmptyDelegate, self).__init__(parent)
+
+    def createEditor(self, QWidget, QStyleOptionViewItem, QModelIndex):
+        return None
+
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 

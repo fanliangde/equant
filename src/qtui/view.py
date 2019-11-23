@@ -22,7 +22,8 @@ from report.fieldConfigure import RunMode, StrategyStatus
 from api.base_api import BaseApi
 from api.api_func import _all_func_
 from capi.com_types import *
-from qtui.utils import parseStrategtParam, Tree, get_strategy_filters, FileIconProvider, MyMessageBox, getText
+from qtui.utils import parseStrategtParam, Tree, get_strategy_filters, FileIconProvider, MyMessageBox, getText, \
+    EmptyDelegate
 from utils.utils import save
 
 from utils.window.framelesswindow import FramelessWindow, CommonHelper
@@ -541,7 +542,10 @@ class StrategyPolicy(QWidget):
         label.setObjectName("ParamLabel")
         self.set_label_size_policy(label)
         self.paramsTableWidget = QTableWidget()
+        self.paramsTableWidget.setSelectionMode(QAbstractItemView.NoSelection)
         self.paramsTableWidget.setColumnCount(4)
+        self.paramsTableWidget.setItemDelegateForColumn(0, EmptyDelegate(self))  # 设置第一列不可编辑
+        self.paramsTableWidget.setItemDelegateForColumn(2, EmptyDelegate(self))  # 设置第三列不可编辑
         self.paramsTableWidget.setHorizontalHeaderLabels(['参数', '当前值', '类型', '描述'])
         self.paramsTableWidget.verticalHeader().setVisible(False)  # 隐藏行号
         self.paramsTableWidget.horizontalHeader().setStretchLastSection(True)
@@ -954,7 +958,13 @@ class StrategyPolicy(QWidget):
         for i in range(self.paramsTableWidget.rowCount()):
             paramValues = []
             for j in range(self.paramsTableWidget.columnCount()):
-                paramValues.append(self.paramsTableWidget.item(i, j).text())
+                if j == 1:
+                    if self.paramsTableWidget.item(i, 2).text() == 'bool':
+                        paramValues.append(self.paramsTableWidget.cells[i].currentText())
+                    else:
+                        paramValues.append(self.paramsTableWidget.cells[i].text())
+                else:
+                    paramValues.append(self.paramsTableWidget.item(i, j).text())
             temp = paramValues[1]
             if paramValues[2] == "bool":
                 if paramValues[1] == "True":
@@ -2576,20 +2586,37 @@ class QuantApplication(QWidget):
             for i in range(len(self._userNo)):
                 self.strategy_policy_win.userComboBox.addItem(self._userNo[i]['UserNo'])
                 self.strategy_policy_win.userComboBox.setCurrentIndex(0)
+            self.strategy_policy_win.paramsTableWidget.cells = []
             for i, item in enumerate(g_params.items()):
                 param_type = ''
+                validator = ''
+                cell = QLineEdit()
                 if isinstance(item[1][0], str):
                     param_type = 'str'
+                    cell.setText(item[1][0])
                 if isinstance(item[1][0], int):
                     param_type = 'int'
+                    validator = QtGui.QIntValidator()
+                    cell.setText(str(item[1][0]))
                 if isinstance(item[1][0], float):
                     param_type = 'float'
+                    validator = QtGui.QDoubleValidator()
+                    cell.setText(str(item[1][0]))
                 if isinstance(item[1][0], bool):
                     param_type = 'bool'
+                    cell = QComboBox()
+                    cell.addItems(['True', 'False'])
+                    index = 0 if item[0][1] == 'True' else 1
+                    cell.setCurrentIndex(index)
+                cell.setStyleSheet('border: none; min-height: 30px;')
+                self.strategy_policy_win.paramsTableWidget.cells.append(cell)
+
                 self.strategy_policy_win.paramsTableWidget.setItem(i, 0, QTableWidgetItem(str(item[0])))
-                self.strategy_policy_win.paramsTableWidget.setItem(i, 1, QTableWidgetItem(str(item[1][0])))
+                self.strategy_policy_win.paramsTableWidget.setCellWidget(i, 1, cell)
                 self.strategy_policy_win.paramsTableWidget.setItem(i, 2, QTableWidgetItem(param_type))
                 self.strategy_policy_win.paramsTableWidget.setItem(i, 3, QTableWidgetItem(str(item[1][1])))
+                if validator:
+                    cell.setValidator(validator)
             self.main_strategy_policy_win.setWindowModality(Qt.ApplicationModal)  # 设置阻塞父窗口
             self.main_strategy_policy_win.show()
             self.strategy_policy_win.show()
