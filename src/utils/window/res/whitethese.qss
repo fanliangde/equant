@@ -531,6 +531,15 @@ QToolTip {
 }
 
 /***************************************************************************/
+#Strategy {
+    background-color: #FFFFFF;
+        border-right: 1px solid #DBDBDB;
+}
+
+#StrategyTree {
+    background-color: #FFFFFF;
+    border-right: 1px solid #DBDBDB;
+}
 
 /* 函数检索输入框*/
 #SearchLine {
@@ -627,6 +636,10 @@ QToolTip {
     border: 1px solid #CCCCCC;
 }
 
+#ContractSelectWin QTreeView {
+    background-color: #FFFFFF;
+}
+
 /* *****************************************标题栏相关*************************************/
 /*标题栏*/
 TitleBar {
@@ -664,7 +677,6 @@ TitleBar {
 
 /*自定义标题栏窗口边框颜色*/
 #Framless {
-
     border: 1px solid red;
 }
 
