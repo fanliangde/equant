@@ -2181,7 +2181,7 @@ class QuantApplication(QWidget):
         self.run_btn = QPushButton('运行')
         self.run_btn.setMaximumWidth(100)
         self.save_btn.setMaximumWidth(100)
-        # self.run_btn.setEnabled(False)
+        self.run_btn.setEnabled(False)
         # self.contentEdit = MainFrmQt("localhost", 8765, "pyeditor", os.path.join(os.getcwd(), 'quant\python_editor\editor.htm'))
         self.contentEdit = WebEngineView()
         self.contentEdit.setObjectName('contentEdit')
@@ -2309,6 +2309,7 @@ class QuantApplication(QWidget):
         self.strategy_table.verticalHeader().setMinimumSectionSize(5)
         self.strategy_table.verticalHeader().setDefaultSectionSize(20)
         self.strategy_table.horizontalHeader().setDefaultSectionSize(100)
+        self.strategy_table.setColumnWidth(0, 40)
         self.strategy_table.setColumnWidth(2, 130)
         self.strategy_table.setColumnWidth(3, 150)
         self.strategy_table.verticalHeader().setVisible(False)
@@ -2316,7 +2317,6 @@ class QuantApplication(QWidget):
         self.strategy_table.horizontalHeader().setStretchLastSection(True)  # 最后一行自适应长度，充满界面
         self.strategy_table.horizontalHeader().setHighlightSections(False)  # 关闭高亮头
         self.strategy_table.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
-        self.strategy_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)  # 第一列自适应长度，充满界面
         self.strategy_table.setSelectionMode(QAbstractItemView.SingleSelection)  # 设置只能选中一行
         self.strategy_table.setEditTriggers(QTableView.NoEditTriggers)  # 不可编辑
         self.strategy_table.setSelectionBehavior(QAbstractItemView.SelectRows)  # 设置只有行选中
@@ -2622,15 +2622,9 @@ class QuantApplication(QWidget):
             return
         else:
             if usrData:
-                if self.user_log_widget.verticalScrollBar().maximum() - \
-                        self.user_log_widget.verticalScrollBar().sliderPosition() in [4, 0] and self.auto_scroll:
-                    self.user_log_widget.insertPlainText(usrData)
-                    cursor = self.user_log_widget.textCursor()
-                    self.user_log_widget.moveCursor(cursor.End)
-                else:
-                    self.user_log_widget.insertPlainText(usrData)
+                self.user_log_widget.append(usrData.strip())
             if errData:
-                self.error_info_widget.insertPlainText(errData)
+                self.error_info_widget.append(errData.strip())
                 self.tab_widget.setCurrentIndex(2)
             # if sigData:
             #     self.signal_log_widget.append(sigData)
