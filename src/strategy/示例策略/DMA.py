@@ -32,6 +32,7 @@ def tim_trigger(ma1, ma2):
         A_SendOrder(Enum_Sell(), Enum_Entry(), qty, prc)  
 
 def handle_data(context):
+    LogInfo("AAAAAAAA")
     if len(Close()) < p2:
         return;
         

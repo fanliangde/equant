@@ -2538,14 +2538,16 @@ class QuantApplication(QWidget):
         if item.parent():
             item_text = globals()['BaseApi'].__dict__.get(item.text(0), None).__doc__
             text = item_text.lstrip("\n") if item_text else ''
-            self.func_content.setText(text.replace(' ', ''))
+            # self.func_content.setText(text.replace(' ', ''))
+            self.func_content.setText(text.replace("        ", ""))
             self.func_doc_line.setText(item.text(0))
 
     def search_tree_clicked(self):
         item = self.search_tree.currentItem()
         item_text = globals()['BaseApi'].__dict__.get(item.text(0), None).__doc__
         text = item_text.lstrip("\n") if item_text else ''
-        self.func_content.setText(text.replace(' ', ''))
+        # self.func_content.setText(text.replace(' ', ''))
+        self.func_content.setText(text.replace("        ", ""))
         self.func_doc_line.setText(item.text(0))
 
     def search(self, word):
