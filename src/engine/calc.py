@@ -2016,7 +2016,9 @@ class CalcCenter(object):
             statis["MeanReturns"] = 0.0
         elif statis["WinTimes"] != 0:
             if statis["LoseTimes"] == 0:
-                statis["MeanReturns"] = float("inf")
+                # statis["MeanReturns"] = float("inf")
+                # TODO: 亏损次数是0的时候，亏损率置为1
+                statis["MeanReturns"] = (statis["TotalWin"] / statis["WinTimes"])
             else:
                 statis["MeanReturns"] = (statis["TotalWin"] * statis["LoseTimes"]) / (
                         statis["WinTimes"] * statis["TotalLose"])

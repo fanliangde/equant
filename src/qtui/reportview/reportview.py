@@ -11,7 +11,7 @@ from qtui.reportview.tab import Tab
 class ReportView(QWidget):
 
     # 显示回测报告窗口信号
-    reportShowSig = pyqtSignal(dict)
+    reportShowSig = pyqtSignal(list)
 
     def __init__(self, parent=None):
         super(ReportView, self).__init__(parent)
@@ -24,10 +24,6 @@ class ReportView(QWidget):
 
         self.setWindowTitle(self._windowTitle)
         self.setWindowIcon(QIcon(self._iconPath))
-        # self.resize(1000, 600)
-        # self.setMinimumSize(600, 600)
-        # self.setMaximumSize(1000, 600)
-        # self.setObjectName(self._objName)
 
         # 初始化界面
         self._initUI()
@@ -35,8 +31,6 @@ class ReportView(QWidget):
         self.reportShowSig.connect(self.showCallback)
 
     def _initUI(self):
-        # style = CommonHelper.readQss(self.styleFile)
-        # self.setStyleSheet(style)
 
         vLayout = QHBoxLayout()
         vLayout.setContentsMargins(0, 0, 0, 0)
@@ -44,10 +38,10 @@ class ReportView(QWidget):
 
         self.tab = Tab()
         self.tab.setObjectName("ReportTab")
-        dir = Dir(self)
+        self.dir = Dir(self)
 
         vLayout.addSpacing(0)
-        vLayout.addWidget(dir)
+        vLayout.addWidget(self.dir)
         vLayout.setSpacing(1)
         vLayout.addWidget(self.tab)
         vLayout.setSpacing(2)
@@ -56,11 +50,19 @@ class ReportView(QWidget):
 
     def showCallback(self, datas):
         # 传入回测数据
-        self._datas = datas
+        self._datas = datas[0]
+        path = datas[1]
 
         self.tab.showData(self._datas)
-        print("BBB")
+        self.selectReportItem(path)
+
         self.parent.show()
         self.parent.raise_()
         # self.show()
+
+    def selectReportItem(self, path):
+        """定位报告位置"""
+        index = self.dir.model.index(path)
+        self.dir.expand(index.parent())
+        self.dir.setCurrentIndex(index)
 
