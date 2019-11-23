@@ -13,7 +13,9 @@
 // {"cmd":"savefile_req", "file":""}
 // {"cmd":"savefile_rsp", "file":"", "txt":""}
 // 文件修改通知
-// {"cmd":"modify_nty", "file":"", "modified":true}
+// {"cmd":"modifyfile_nty", "file":"", "modified":true}
+// 标签切换
+// {"cmd":"switchfile_nty", "file":""}
 //////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////
@@ -155,6 +157,10 @@ function load_file(file, txt) {
 function save_file(file, need_confirm) {
     if (file == g_filename)
         datas[file] = g_editor.getValue()
+	
+    org_datas[file] = datas[file];
+    on_modify(file, false)
+    
     // data = {
     //     'cmd':'savefile_rsp',
     //     'file':file,
@@ -162,13 +168,21 @@ function save_file(file, need_confirm) {
     // }
     // senddata(data);
 
-    org_datas[file] = datas[file];
-    on_modify(file, false)
-
     Bridge.contentFromJS(file, datas[file], need_confirm);
+}
+function switch_file(file){
+    // data = {
+    //     'cmd':'switch_file',
+    //     'file':file
+    // }
+    // senddata(data);
+
+    Bridge.switchFile(currtab);
 }
 //文件被修改
 function modify_nty(file, modified) {
+    on_modify(file, modified);
+    
     // data = {
     //     'cmd':'modify_nty',
     //     'file':file,
@@ -176,7 +190,6 @@ function modify_nty(file, modified) {
     // }
     // senddata(data);
     
-    on_modify(file, modified);
     Bridge.receiveFileStatus(file, modified);
 }
 
@@ -236,13 +249,12 @@ function switch_tab(newtab) {
     currtab = newtab;
     if (tab_new){
         tab_new.className = 'current';
-        var n_btn = tab_new.children[0];
-        if (n_btn && n_btn.className != 'modify_btn')
-            n_btn.className = 'curr_btn';
+        var btn = tab_new.children[0];
+        if (btn && btn.className != 'modify_btn')
+            btn.className = 'curr_btn';
     }
     load_file(currtab, tab_new ? datas[currtab] : '');
-
-    Bridge.switchFile(currtab);
+    switch_file(currtab);
 }
 
 // 添加标签
