@@ -92,19 +92,12 @@ class TitleBar(QWidget):
             self.win.setStyleSheet("""""")
             self.win._widget.contentEdit.sendSetThemeSignal('vs')
 
-            # style = CommonHelper.readQss(WHITESTYLE)
-            # self.win.setStyleSheet(style)
-            # self.theseState = THESE_STATE_WHITE
             self.win.setWinThese(THESE_STATE_WHITE)
         elif self.theseState == THESE_STATE_WHITE:
             self.win.setStyleSheet("""""")
             self.win._widget.contentEdit.sendSetThemeSignal('vs-dark')
 
-            # style = CommonHelper.readQss(DARKSTYLE)
-            # self.win.setStyleSheet(style)
-            # self.theseState = THESE_STATE_DARK
             self.win.setWinThese(THESE_STATE_DARK)
-
 
     def showMaximized(self):
         """最大化、还原"""
@@ -152,7 +145,8 @@ class TitleBar(QWidget):
 
     def mouseDoubleClickEvent(self, event):
         """双击标题栏事件"""
-        if self.titleLabel == '极星量化':
+        #TODO:
+        if self.titleLabel.text() == '极星量化':
             self.showMaximized()
         return QWidget().mouseDoubleClickEvent(event)
 

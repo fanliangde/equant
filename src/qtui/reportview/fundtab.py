@@ -146,7 +146,6 @@ class CustomViewBox(pg.ViewBox):
         pg.ViewBox.mousePressEvent(self, event)
 
     def mouseDragEvent(self, ev, axis=None):
-
         # if ev.start==True and ev.finish==False: ##判断拖拽事件是否结束
         pos = ev.pos()
         lastPos = ev.lastPos()
@@ -160,8 +159,8 @@ class CustomViewBox(pg.ViewBox):
         self.parent.index = max(self.parent.index, 60)
         xMax = self.parent.index + self.parent.count
         xMin = self.parent.index - self.parent.count
-        if xMin < 0:
-            xMin = 0
+        # if xMin < 0:
+        #     xMin = 0
 
         pg.ViewBox.mouseDragEvent(self, ev, axis)
 

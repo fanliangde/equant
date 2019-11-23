@@ -50,16 +50,11 @@ class Controller(object):
 
         self.app = QuantApplication(self)
         if self.app.settings.contains('theme') and self.app.settings.value('theme') == 'vs-dark':
-            qss_path = DARKSTYLE
             theme = THESE_STATE_DARK
         else:
-            qss_path = WHITESTYLE
             theme = THESE_STATE_WHITE
 
-
         self.mainWnd = FramelessWindow()
-        style = CommonHelper.readQss(qss_path)
-        self.mainWnd.setStyleSheet(style)
         self.mainWnd.setWindowTitle('极星量化')
         self.mainWnd.setWinThese(theme)
         self.mainWnd.setWindowIcon(QIcon('icon/epolestar ix2.ico'))
@@ -165,7 +160,9 @@ class Controller(object):
         self.receiveEgThread.join()
 
         self.logger.info("before app.close")
-        self.app.close()
+        self.reportWnd.close()
+        self.mainApp.quit()
+        # sys.exit(self.mainApp.exec_())
         self.logger.info("after app.close")
 
     def run(self):

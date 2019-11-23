@@ -64,6 +64,8 @@ def save(data, runMode, fileName):
         with open(fileName, 'wb') as f:
             pickle.dump(data, f)
 
+    return fileName
+
 
 def formatExecuteType(flag):
     if flag:

@@ -55,7 +55,6 @@ class FramelessWindow(QWidget):
         return self.titleBar.theseState
 
     def setWinThese(self, theme):
-        print("AA: ", theme)
         self.titleBar.theseState = theme
         for win in FramelessWindow.CObject:
             if theme == THESE_STATE_DARK:
@@ -74,6 +73,10 @@ class FramelessWindow(QWidget):
     def disabledMaximumBtn(self):
         """禁用最大化图标"""
         self.titleBar.buttonMaximum.setDisabled(True)
+
+    def disabledMinimunBtn(self):
+        """禁用最小化图标"""
+        self.titleBar.buttonMinimum.setDisabled(True)
 
     def showTheseBtn(self):
         """显示换肤按钮"""

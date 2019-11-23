@@ -13,6 +13,7 @@ class FileSystemModel(QFileSystemModel):
         return 1
 
     def data(self, index, role=Qt.DisplayRole):
+        # super(FileSystemModel).data(index, role)
         if role == Qt.ToolTipRole:
             filePath = self.filePath(index)
             if filePath and not os.path.isdir(filePath):
@@ -21,10 +22,10 @@ class FileSystemModel(QFileSystemModel):
             filePath = self.filePath(index)
             return os.path.basename(filePath)
 
-    def flags(self, index):
-        if not index.isValid():
-            return Qt.NoItemFlags
-        return Qt.ItemIsSelectable
+    # def flags(self, index):
+    #     if not index.isValid():
+    #         return Qt.NoItemFlags
+    #     return Qt.ItemIsSelectable
 
 
 class Dir(QTreeView):

@@ -4,11 +4,12 @@ import threading
 import copy
 import traceback
 import queue
-from tkinter import messagebox
 
 from utils.utils import load_file
 from capi.com_types import *
 from capi.event import Event
+
+from PyQt5.QtWidgets import QMessageBox
 
 
 class QuantModel(object):
@@ -288,7 +289,8 @@ class GetEgData(object):
 
         tempResult = data["Result"]
         if not tempResult["Fund"]:
-            messagebox.showinfo("提示", "回测数据为空！")
+            self._logger.info(f"[UI][{id}]: Report data is empty!")
+            # QMessageBox.information(None, '提示', '回测数据为空！', QMessageBox.Yes)
             return
 
         self._reportData = tempResult

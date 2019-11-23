@@ -4,10 +4,11 @@ from PyQt5.QtGui import *
 import pyqtgraph as pg
 from pyqtgraph import QtGui, QtCore
 from functools import partial
+from pyqtgraph.Point import Point
+from dateutil.parser import parse
 
 
 from qtui.reportview.fundtab import KeyWraper, MyStringAxis, CustomViewBox
-from qtui.reportview.crosshair import Crosshair
 
 
 DIR = {
@@ -32,6 +33,168 @@ GRAPHTYPE = {
     "MeanReturns" : "柱状图",
     "IncSpeed"    : "立体"
 }
+
+
+########################################################################
+# 十字光标支持
+########################################################################
+class GCrosshair(QtCore.QObject):
+    """
+    此类给pg.PlotWidget()添加crossHair功能,PlotWidget实例需要初始化时传入
+    """
+    signal = QtCore.pyqtSignal(type(tuple([])))
+
+    # ----------------------------------------------------------------------
+    def __init__(self, parent, master):
+        """Constructor"""
+        self.__view = parent
+        self.master = master
+        super(GCrosshair, self).__init__()
+
+        self.xAxis = 0
+        self.yAxis = 0
+
+        # 文字信息是否显示标志位
+        self.flags = False
+
+        self.datas = None
+
+        self.yAxises = 0
+        self.leftX = 0
+        self.showHLine = False
+
+        self.view = parent.centralWidget.getItem(1, 0)
+        self.rect = self.view.sceneBoundingRect()
+        self.vLines = pg.InfiniteLine(angle=90, movable=False)
+        self.hLines = pg.InfiniteLine(angle=0, movable=False)
+
+        # mid 在y轴动态跟随最新价显示资金信息和最新时间
+        self.__textInfo = pg.TextItem('lastBarInfo')
+
+        # 堆叠顺序置于下层
+        self.__textInfo.setZValue(1)
+        self.__textInfo.border = pg.mkPen(color=(181, 181, 181, 255), width=1.2)
+
+        self.__texts = [self.__textInfo]
+
+        self.vLines.setPos(0)
+        self.hLines.setPos(0)
+        self.view.addItem(self.vLines)
+        self.view.addItem(self.hLines)
+
+        self.view.addItem(self.__textInfo, ignoreBounds=True)
+
+        self.__setVisibileOrNot(self.flags)
+
+        self.proxy = pg.SignalProxy(self.__view.scene().sigMouseMoved, rateLimit=60, slot=self.__mouseMoved)
+        self.click_slot = pg.SignalProxy(self.__view.scene().sigMouseClicked, rateLimit=60, slot=self.__mouseClicked)
+        # 跨线程刷新界面支持
+        self.signal.connect(self.update)
+
+    def __setVisibileOrNot(self, flags):
+        """Set the text visiblity"""
+        self.vLines.setVisible(flags)
+        self.hLines.setVisible(flags)
+
+        for obj in self.__texts:
+            obj.setVisible(flags)
+
+    # ----------------------------------------------------------------------
+    def update(self, pos):
+        """刷新界面显示"""
+        xAxis, yAxis = pos
+        xAxis, yAxis = (self.xAxis, self.yAxis) if xAxis is None else (xAxis, yAxis)
+        if self.datas is None:
+            return
+        self.moveTo(xAxis, yAxis, pos)
+
+    # ----------------------------------------------------------------------
+    def __mouseMoved(self, evt):
+        """鼠标移动回调"""
+        if self.datas is None:
+            return
+        pos = evt[0]
+        self.rect = self.view.sceneBoundingRect()
+
+        self.showHLine = False
+        if self.rect.contains(pos):
+            mousePoint = self.view.vb.mapSceneToView(pos)
+            xAxis = mousePoint.x()
+            yAxis = mousePoint.y()
+            self.yAxises = yAxis
+            self.showHLine = True
+            self.moveTo(xAxis, yAxis, pos)
+
+    # ----------------------------------------------------------------------
+    def __mouseClicked(self):
+        self.__setVisibileOrNot(not self.flags)
+        self.flags = not self.flags
+
+    # ----------------------------------------------------------------------
+    def moveTo(self, xAxis, yAxis, pos):
+        xAxis, yAxis = (self.xAxis, self.yAxis) if xAxis is None else (xAxis, yAxis)
+        self.rect = self.view.sceneBoundingRect()
+        if not xAxis or not yAxis:
+            return
+        self.xAxis = xAxis
+        self.yAxis = yAxis
+        self.vhLinesSetXY(xAxis, yAxis)
+        self.plotInfo(xAxis, yAxis)
+
+    # ----------------------------------------------------------------------
+    def vhLinesSetXY(self, xAxis, yAxis):
+        """水平和竖线位置设置"""
+        self.vLines.setPos(xAxis)
+        if self.showHLine:
+            self.hLines.setPos(yAxis)
+        else:
+            topLeft = self.view.vb.mapSceneToView(QtCore.QPointF(self.rect.left(), self.rect.top()))
+            self.hLines.setPos(topLeft.y() + abs(topLeft.y()))
+
+    # ----------------------------------------------------------------------
+    def plotInfo(self, xAxis, yAxis):
+        """
+        被嵌入的plotWidget在需要的时候通过调用此方法显示K线信息
+        """
+        xPos = xAxis
+        xAxis = round(xAxis)
+        if self.datas is None:
+            return
+        try:
+            # 获取数据
+            value = self.datas[int(xAxis)]
+        except Exception as e:
+            return
+
+        Time = self.master.xTime[int(xAxis)]
+        sTime = str(Time)
+        title = self.master.gTitle
+        t = parse(str(Time))
+
+        if (title[:1] == '年'):
+            timeText = '{0}年'.format(t.year)
+        elif (title[:1] == '季'):
+            quarter = int(t.month / 3 if t.month % 3 == 0 else t.month / 3 + 1)
+            timeText = '{0}年第{1}季度'.format(t.year, quarter)
+        elif (title[:1] == '月'):
+            timeText = '{0}年{1}月'.format(t.year, t.month)
+        else:
+            timeText = '{0}年{1}月{2}日'.format(sTime[0:4], sTime[4:6], sTime[6:])
+
+        self.__textInfo.setHtml(
+            '<div style="text-align: right;">\
+                    <span style="color: yellow; font-size: 12px;">\
+                      %s %s %.2f\
+                    </span>\
+                </div>' \
+            % (timeText, title, value))
+
+        self.__textInfo.setPos(xPos, yAxis)
+
+        if xAxis > self.master.index:
+            self.__textInfo.anchor = Point((1, 0))
+        else:
+            self.__textInfo.anchor = Point((0, 0))
 
 
 class DirTree(QTreeWidget):
@@ -77,7 +240,7 @@ class DirTree(QTreeWidget):
             flag = item.text(1)
             x, y = self.getPlotData(rootKey, flag)
 
-            self._graph.loadData(y)
+            self._graph.loadData({'Title': key, 'Time': x, 'Data': y})
             self._graph.update()
 
     def setInitialGraph(self, data):
@@ -85,7 +248,8 @@ class DirTree(QTreeWidget):
         # self._graph.clear()
         x, y = self.getPlotData("年度分析", 'Equity')
 
-        self._graph.loadData(y)
+        self._grpah.pw.clear()
+        self._graph.loadData({'Title': '年度权益', 'Time': x, 'Data': y})
         self._parent.layout().addWidget(self._graph)
 
     def showGraphDatas(self, datas):
@@ -93,7 +257,7 @@ class DirTree(QTreeWidget):
         # self._graph.clear()
         x, y = self.getPlotData("年度分析", 'Equity')
 
-        self._graph.loadData(y)
+        self._graph.loadData({'Title': '年度权益', 'Time': x, 'Data': y})
         self._parent.layout().addWidget(self._graph)
 
 
@@ -136,6 +300,8 @@ class GraphWidget(KeyWraper):
 
         self.parent = parent
         self.datas = None
+        self.gTitle = ''
+        self.xTime = 0
 
         self.count = 90
         self.index = None
@@ -158,9 +324,9 @@ class GraphWidget(KeyWraper):
         xdict = {}
         self.axisTime = MyStringAxis(xdict, orientation='bottom')
         # 初始化资金曲线
-        self.initPlotFund()
+        self.initPlotGraph()
         # 十字光标
-        self.crosshair = Crosshair(self.pw, self)
+        self.crosshair = GCrosshair(self.pw, self)
 
         self.vbox = QVBoxLayout()
         self.vbox.addWidget(self.pw)
@@ -188,9 +354,9 @@ class GraphWidget(KeyWraper):
 
         return plotItem
 
-    def initPlotFund(self):
+    def initPlotGraph(self):
         """初始化资金曲线图"""
-        self.pwFund = self.makePI('PlotFund')
+        self.pwFund = self.makePI('PlotGraph')
         self.fund = BarGraph([1, 2, 3, 4, 5, 6, 7])
         self.pwFund.addItem(self.fund)
         self.pwFund.setMinimumHeight(12)
@@ -199,20 +365,23 @@ class GraphWidget(KeyWraper):
         self.layout.addItem(self.pwFund)
         self.layout.adjustSize()
 
-    def plotFund(self, xmin=0, xmax=-1):
+    def plotGraph(self, xmin=0, xmax=-1):
         """重画资金曲线"""
         if self.initCompleted:
             self.fund.generatePicture(self.datas[xmin:xmax] + [0])
 
     def refresh(self):
         """
-        刷新资金曲线的现实范围
+        刷新曲线的现实范围
         """
         datas = self.datas
         minutes = int(self.count / 2)
         xmin = max(0, self.index - minutes)
         xmax = xmin + 2 * minutes
         self.pwFund.setRange(xRange=(xmin, xmax))
+        ymin = min(datas)
+        ymax = max(datas)
+        self.pwFund.setRange(yRange=(ymin, ymax))
 
     def onDown(self):
         """放大显示区间"""
@@ -240,7 +409,7 @@ class GraphWidget(KeyWraper):
 
     def onLeft(self):
         """向左移动"""
-        if len(self.datas) > 0 and int(self.crosshair.xAxis) > 2:
+        if len(self.datas) > 0 and int(self.crosshair.xAxis) >= 0:
             x = int(self.crosshair.xAxis) - 1
             y = self.datas[x]
             if x <= self.index - self.count / 2 + 2 and self.index > 1:
@@ -289,7 +458,9 @@ class GraphWidget(KeyWraper):
         """载入数据"""
         self.index = 0
 
-        self.datas = datas
+        self.gTitle = datas['Title']
+        self.xTime = datas['Time']
+        self.datas = datas['Data']
 
         self.axisTime.xdict = {}
         xdict = dict(enumerate(datas))
@@ -305,10 +476,8 @@ class GraphWidget(KeyWraper):
             self.index = int((xmax + xmin) / 2)
 
         self.pwFund.setLimits(xMin=xMin, xMax=xMax)
-        self.plotFund(0, len(self.datas))
+        self.plotGraph(0, len(self.datas))
         self.refresh()
-
-
 
 class GraphTab(QWidget):
 

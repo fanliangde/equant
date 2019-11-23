@@ -88,6 +88,7 @@ class Label(QWidget):
         self.setLayout(hbox)
 
     def _toggle(self):
+        '''
         pHeight = self._parent.height()
         pLayout = self._parent.layout()
         fixheight = 100 + 75
@@ -100,6 +101,7 @@ class Label(QWidget):
         print("CCCCC: ", width)
         # self._table.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         # self._table.setFixedHeight(pHeight - fixheight)
+        '''
 
         if self._isOpend:
             self.icon.setIcon(QIcon(self._pixDn))

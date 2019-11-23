@@ -2897,9 +2897,9 @@ class QuantApplication(QWidget):
         runMode = stData["Config"]["RunMode"]["SendOrder2Actual"]
 
         # 保存报告数据
-        save(data, runMode, stName)
+        reportPath = save(data, runMode, stName)
 
-        self.reportView.reportShowSig.emit(data)
+        self.reportView.reportShowSig.emit([data, reportPath])
         # TODO: 在这里展示报告会导致程序不响应，放到接收信号处展示
         # self.reportWnd.show()
         # self.reportWnd.raise_()
