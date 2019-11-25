@@ -435,7 +435,8 @@ class StrategyTrade(TradeModel):
             
         realUserNo = self.getUserNoByOrderId(orderId)
         if realUserNo not in self._userInfo:
-            self.logger.error('user(%s) not login!'%realUserNo)
+            if not realUserNo:
+                self.logger.error('user(%s) not login!'%realUserNo)
             return ret
 
         order = self._userInfo[realUserNo].getOrderDict()
@@ -712,7 +713,8 @@ class StrategyTrade(TradeModel):
             
         realUserNo = self.getUserNoByOrderId(orderId)
         if realUserNo not in self._userInfo:
-            self.logger.error('user(%s) not login!'%realUserNo)
+            if not realUserNo:
+                self.logger.error('user(%s) not login!'%realUserNo)
             return False
 
         return self.deleteOrderByOrderId(realUserNo, orderId)
@@ -766,7 +768,8 @@ class StrategyTrade(TradeModel):
         #    return False
         
         if realUserNo not in self._userInfo:
-            self.logger.error('user(%s) not login!'%realUserNo)
+            if not realUserNo:
+                self.logger.error('user(%s) not login!'%realUserNo)
             return False
 
         userInfoModel = self._userInfo[realUserNo]
