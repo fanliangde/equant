@@ -8,7 +8,6 @@ import time
 import traceback
 from multiprocessing import Process, Queue
 
-from PyQt5.QtCore import QSharedMemory
 from PyQt5.QtWidgets import QApplication, QMessageBox
 
 from engine.engine import StrategyEngine
