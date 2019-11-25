@@ -118,7 +118,8 @@ class StrategyPolicy(QWidget):
         self.main_contractWin.setFixedSize(410, 335)
         self.main_contractWin.hideTheseBtn()
         self.main_contractWin.titleBar.iconLabel.hide()
-        self.main_contractWin.titleBar.buttonMaximum.setEnabled(False)
+        self.main_contractWin.disabledMaximumBtn()
+        self.main_contractWin.disabledMinimunBtn()
         self.main_contractWin.setWindowTitle('合约设置')
         self.main_contractWin.titleBar.buttonClose.clicked.connect(self.main_contractWin.close)
         self.main_contractWin.setWidget(self.contractWin)
@@ -603,11 +604,13 @@ class StrategyPolicy(QWidget):
 
     def contractSelect(self, exchange, commodity, contract):
         self.contractSelectWin = ContractSelect(exchange, commodity, contract)
+        self.contractSelectWin.setObjectName("ContractSelectWin")
         self.main_contractSelectWin = FramelessWindow()
         self.main_contractSelectWin.setFixedSize(750, 550)
         self.main_contractSelectWin.titleBar.theseSelect.hide()
         self.main_contractSelectWin.titleBar.iconLabel.hide()
-        self.main_contractSelectWin.titleBar.buttonMaximum.setEnabled(False)
+        self.main_contractSelectWin.disabledMaximumBtn()
+        self.main_contractSelectWin.disabledMinimunBtn()
         self.main_contractSelectWin.setWindowTitle('选择合约')
         self.main_contractSelectWin.titleBar.buttonClose.clicked.connect(self.main_contractSelectWin.close)
         self.main_contractSelectWin.setWidget(self.contractSelectWin)
@@ -1432,20 +1435,22 @@ class ContractSelect(QWidget):
         layout1.addWidget(self.contract_tree)
         layout1.addWidget(self.contract_child_tree)
         layout1.addWidget(self.choice_tree)
+        layout1.setSpacing(1)
 
         layout2 = QHBoxLayout()
         self.confirm = QPushButton('确定')
         self.confirm.setMinimumWidth(60)
         self.cancel = QPushButton('取消')
         self.cancel.setMinimumWidth(60)
-        layout2.setSpacing(10)
-        layout2.setContentsMargins(0, 10, 20, 20)
+        layout2.setSpacing(0)
+        layout2.setContentsMargins(0, 10, 20, 0)
         layout2.addItem(h_spacerItem)
         layout2.addWidget(self.confirm)
         layout2.addWidget(self.cancel)
 
         main_layout.addLayout(layout1)
         main_layout.addLayout(layout2)
+        main_layout.setContentsMargins(0, 0, 0, 10)
 
         self.setLayout(main_layout)
         self.contract_tree.setColumnCount(2)
@@ -1848,12 +1853,14 @@ class QuantApplication(QWidget):
         # 策略树
         self.strategy_vbox = QFrame()
         label = QLabel('策略')
+        label.setObjectName("Strategy")
         label.setContentsMargins(0, 0, 0, 0)
         self.strategy_layout = QVBoxLayout()
         self.strategy_layout.setContentsMargins(0, 0, 0, 0)
         self.strategy_layout.setSpacing(0)
         self.model = QFileSystemModel()
         self.strategy_tree = Tree(self.model, self.strategy_filter)
+        self.strategy_tree.setObjectName("StrategyTree")
         # self.strategy_tree = Tree(strategy_path)
         self.model.setRootPath(QtCore.QDir.rootPath())
         self.strategy_tree.setEditTriggers(QAbstractItemView.NoEditTriggers)
@@ -2531,14 +2538,16 @@ class QuantApplication(QWidget):
         if item.parent():
             item_text = globals()['BaseApi'].__dict__.get(item.text(0), None).__doc__
             text = item_text.lstrip("\n") if item_text else ''
-            self.func_content.setText(text.replace(' ', ''))
+            # self.func_content.setText(text.replace(' ', ''))
+            self.func_content.setText(text.replace("        ", ""))
             self.func_doc_line.setText(item.text(0))
 
     def search_tree_clicked(self):
         item = self.search_tree.currentItem()
         item_text = globals()['BaseApi'].__dict__.get(item.text(0), None).__doc__
         text = item_text.lstrip("\n") if item_text else ''
-        self.func_content.setText(text.replace(' ', ''))
+        # self.func_content.setText(text.replace(' ', ''))
+        self.func_content.setText(text.replace("        ", ""))
         self.func_doc_line.setText(item.text(0))
 
     def search(self, word):
@@ -2565,7 +2574,8 @@ class QuantApplication(QWidget):
             self.main_strategy_policy_win.setBaseSize(580, 620)
             self.main_strategy_policy_win.hideTheseBtn()
             self.main_strategy_policy_win.titleBar.iconLabel.hide()
-            self.main_strategy_policy_win.titleBar.buttonMaximum.setEnabled(False)
+            self.main_strategy_policy_win.disabledMinimunBtn()
+            self.main_strategy_policy_win.disabledMaximumBtn()
             self.main_strategy_policy_win.setWindowTitle('属性设置')
             self.main_strategy_policy_win.titleBar.buttonClose.clicked.connect(self.strategy_policy_win.close)
             self.main_strategy_policy_win.setWidget(self.strategy_policy_win)
@@ -2667,27 +2677,27 @@ class QuantApplication(QWidget):
 
     def setConnect(self, src):
         if src == 'Q':
-            self.statusBar.setText("即时行情连接成功")
+            self.statusBar.setText("  即时行情连接成功")
         if src == 'H':
-            self.statusBar.setText("历史行情连接成功")
+            self.statusBar.setText("  历史行情连接成功")
 
         if src == 'T':
-            self.statusBar.setText("交易服务连接成功")
+            self.statusBar.setText("  交易服务连接成功")
 
         if src == 'S':
-            self.statusBar.setText("极星9.5连接成功")
+            self.statusBar.setText("  极星9.5连接成功")
 
     def setDisconnect(self, src):
         if src == 'Q':
-            self.statusBar.setText("即时行情断连")
+            self.statusBar.setText("  即时行情断连")
         if src == 'H':
-            self.statusBar.setText("历史行情断连")
+            self.statusBar.setText("  历史行情断连")
 
         if src == 'T':
-            self.statusBar.setText("交易服务断连")
+            self.statusBar.setText("  交易服务断连")
 
         if src == 'S':
-            self.statusBar.setText("极星9.5退出")
+            self.statusBar.setText("  极星9.5退出")
             self.exitSignal.emit()
 
     def show_warn(self):
