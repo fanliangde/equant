@@ -1,11 +1,10 @@
 import sys
 from PyQt5.QtCore import QSize
 from PyQt5.QtWidgets import QApplication
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QDesktopWidget
+from PyQt5.QtWidgets import QWidget, QVBoxLayout
 
 import ctypes
 
-from utils.window.res.default import *
 from utils.window.titlebar import *
 
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("myappid")
@@ -44,15 +43,6 @@ class FramelessWindow(QWidget):
         self.windowTitleChanged.connect(self.titleBar.setTitle)
         self.windowIconChanged.connect(self.titleBar.setIcon)
         FramelessWindow.CObject.append(self)
-
-    def closeWindow(self):
-        self.close()
-
-        # 接收报告显示信号
-        self.closeSig.connect(self.closeWindow)
-
-    def __del__(self):
-        self.close()
 
     def closeWindow(self):
         self.close()
