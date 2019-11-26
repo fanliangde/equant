@@ -344,6 +344,7 @@ class BaseApi(object):
 
         【备注】
               第一个Bar返回值为0，其他Bar递增
+              当无数据时，不存在当前Bar，返回-1
 
         【示例】
               无
