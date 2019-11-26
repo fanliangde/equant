@@ -387,15 +387,15 @@ QAbstractSpinBox:focus, clicked {
 QAbstractSpinBox::up-arrow, QAbstractSpinBox::up-arrow:disabled, QAbstractSpinBox::up-arrow:off {
     background-color: #F3F3F3;
     image: url(./utils/window/res/up-arrow-w.png);
-    height: 8px;
-    width: 8px;
+    height: 7px;
+    width: 7px;
 }
 
 QAbstractSpinBox::down-arrow, QAbstractSpinBox::down-arrow:disabled, QAbstractSpinBox::down-arrow:off {
     background-color: #F3F3F3;
     image: url(./utils/window/res/down-arrow-w.png);
-    height: 8px;
-    width: 8px;
+    height: 7px;
+    width: 7px;
 }
 
 /* ************************QComboBox************************/

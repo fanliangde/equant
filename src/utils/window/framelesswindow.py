@@ -1,9 +1,7 @@
 import sys
 from PyQt5.QtCore import QSize
 from PyQt5.QtWidgets import QApplication
-from PyQt5.QtCore import Qt, QPoint
-from PyQt5.QtGui import QFont, QEnterEvent, QPainter, QColor, QPen, QIcon
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QSpacerItem, QSizePolicy, QPushButton
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QDesktopWidget
 
 import ctypes
 

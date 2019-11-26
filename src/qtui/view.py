@@ -65,8 +65,6 @@ class StrategyPolicy(QWidget):
         self.main_layout.addLayout(layout1)
         self.main_layout.addLayout(layout2)
         self.setLayout(self.main_layout)
-        # self.setMinimumSize(580, 600)
-        # self.setBaseSize(580, 600)
 
         self.contractTableWidget.hideColumn(4)
         self.contractTableWidget.verticalHeader().setVisible(False)
@@ -105,10 +103,7 @@ class StrategyPolicy(QWidget):
 
         # 设置属性值
         self.setDefaultConfigure()
-        # 设置无边框
-        # self.setWindowFlags(Qt.FramelessWindowHint)
-        # print('--------------------------------')
-        # print(self.style())
+
         self.contractWin = ContractWin()
         self.contractWin.setObjectName("ContractWin")
         self.contractWin.confirm_signal.connect(self.add_contract)
@@ -133,6 +128,19 @@ class StrategyPolicy(QWidget):
 
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().setSpacing(0)
+
+    def center(self):
+        if self.parent:
+            qr = self.parent.geometry()
+
+            x_ = qr.x() + qr.width() / 2
+            y_ = qr.y() + qr.height() / 2
+            width = 560
+            height = 640
+            x = x_ - width
+            y = y_ - height
+            # self.setGeometry(x, y, width, height)
+            self.setGeometry(0, 0, 500, 500)
 
     def change_line_edit(self):
         if self.defaultOrderComboBox.currentIndex() == 0:
@@ -992,10 +1000,12 @@ class StrategyPolicy(QWidget):
         # print("-----------: ", self.config)
 
         # -------------保存用户配置--------------------------
-        # strategyPath = self._control.getEditorText()["path"]
+        # 将绝对路径转为相对路径
         strategyPath = self._strategyPath
+        cwdPath = os.getcwd()
+        path_ = os.path.relpath(strategyPath, cwdPath)
         userConfig = {
-            strategyPath: {
+            path_: {
                 VUser: user,
                 VInitFund: initFund,
                 VDefaultType: defaultType,
@@ -1082,8 +1092,8 @@ class StrategyPolicy(QWidget):
 
     def readPositionConfig(self):
         """读取持仓配置文件"""
-        if os.path.exists(r"./config/loadpositionon.json"):
-            with open(r"./config/loadpositionon.json", "r", encoding="utf-8") as f:
+        if os.path.exists(r"./config/loadposition.json"):
+            with open(r"./config/loadposition.json", "r", encoding="utf-8") as f:
                 try:
                     result = json.loads(f.read())
                 except json.decoder.JSONDecodeError:
@@ -1091,7 +1101,7 @@ class StrategyPolicy(QWidget):
                 else:
                     return result
         else:
-            filePath = os.path.abspath(r"./config/loadpositionon.json")
+            filePath = os.path.abspath(r"./config/loadposition.json")
             f = open(filePath, 'w')
             f.close()
 
@@ -2570,8 +2580,9 @@ class QuantApplication(QWidget):
         if path:
             self.strategy_policy_win = StrategyPolicy(self._controller, path, param=param, flag=flag)
             self.main_strategy_policy_win = FramelessWindow()
-            self.main_strategy_policy_win.setGeometry((self.width - 580)/2, (self.height - 620)/2, 580, 620)
-            self.main_strategy_policy_win.setBaseSize(580, 620)
+            # self.main_strategy_policy_win.setGeometry((self.width - 580)/2, (self.height - 620)/2, 580, 620)
+            self.main_strategy_policy_win.resize(560, 580)
+
             self.main_strategy_policy_win.hideTheseBtn()
             self.main_strategy_policy_win.titleBar.iconLabel.hide()
             self.main_strategy_policy_win.disabledMinimunBtn()
@@ -2846,8 +2857,8 @@ class QuantApplication(QWidget):
 
     def readPositionConfig(self):
         """读取配置文件"""
-        if os.path.exists(r"./config/loadpositionon.json"):
-            with open(r"./config/loadpositionon.json", "r", encoding="utf-8") as f:
+        if os.path.exists(r"./config/loadposition.json"):
+            with open(r"./config/loadposition.json", "r", encoding="utf-8") as f:
                 try:
                     result = json.loads(f.read())
                 except json.decoder.JSONDecodeError:
@@ -2855,7 +2866,7 @@ class QuantApplication(QWidget):
                 else:
                     return result
         else:
-            filePath = os.path.abspath(r"./config/loadpositionon.json")
+            filePath = os.path.abspath(r"./config/loadposition.json")
             f = open(filePath, 'w')
             f.close()
 
@@ -2873,7 +2884,7 @@ class QuantApplication(QWidget):
         else:
             config = configure
 
-        with open(r"./config/loadpositionon.json", "w", encoding="utf-8") as f:
+        with open(r"./config/loadposition.json", "w", encoding="utf-8") as f:
             f.write(json.dumps(config, indent=4))
 
     def change_connection(self):
