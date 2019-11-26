@@ -163,7 +163,7 @@ class StrategyModel(object):
         multiContKey = self.getKey(contNo, kLineType, kLineValue)
         curBar = self._hisModel.getCurBar(multiContKey)
         if not curBar:
-            return None
+            return -1
         return curBar['KLineIndex']
 
     def getCurrentBarEntity(self, contNo, kLineType, kLineValue):
