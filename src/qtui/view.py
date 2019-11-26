@@ -129,19 +129,6 @@ class StrategyPolicy(QWidget):
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().setSpacing(0)
 
-    def center(self):
-        if self.parent:
-            qr = self.parent.geometry()
-
-            x_ = qr.x() + qr.width() / 2
-            y_ = qr.y() + qr.height() / 2
-            width = 560
-            height = 640
-            x = x_ - width
-            y = y_ - height
-            # self.setGeometry(x, y, width, height)
-            self.setGeometry(0, 0, 500, 500)
-
     def change_line_edit(self):
         if self.defaultOrderComboBox.currentIndex() == 0:
             self.defaultOrderLineEdit.setText('1')
@@ -2582,7 +2569,6 @@ class QuantApplication(QWidget):
         if path:
             self.strategy_policy_win = StrategyPolicy(self._controller, path, param=param, flag=flag)
             self.main_strategy_policy_win = FramelessWindow()
-            # self.main_strategy_policy_win.setGeometry((self.width - 580)/2, (self.height - 620)/2, 580, 620)
             self.main_strategy_policy_win.resize(560, 580)
 
             self.main_strategy_policy_win.hideTheseBtn()
