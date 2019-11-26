@@ -256,6 +256,12 @@ class DirTree(QTreeWidget):
 
             self.addTopLevelItem(root)
 
+        # 设置初始选中：年度权益
+        item = self.model().index(0, 0)
+        self.expand(item)
+        selected = item.child(0, 0)
+        self.setCurrentIndex(selected)
+
         self.itemClicked.connect(self.itemClickedCallback)
 
     def getPlotData(self, key, tag):
