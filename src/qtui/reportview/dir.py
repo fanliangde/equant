@@ -62,7 +62,6 @@ class Dir(QTreeView):
         # 需要加上这句setRootPath才生效
         self.setRootIndex(self.model.index(self._dirPath))
 
-
     def contextMenuEvent(self, evt):
         menu = QMenu(self)
 

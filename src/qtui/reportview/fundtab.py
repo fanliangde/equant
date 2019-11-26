@@ -164,7 +164,6 @@ class CustomViewBox(pg.ViewBox):
 
         pg.ViewBox.mouseDragEvent(self, ev, axis)
 
-    # 重载方法resizeEvent(self, ev)
     def resizeEvent(self, ev):
         self.linkedXChanged()
         self.linkedYChanged()

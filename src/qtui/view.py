@@ -2823,6 +2823,7 @@ class QuantApplication(QWidget):
             item = QTableWidgetItem(str(StrategyStatus[status]))
             item.setTextAlignment(Qt.AlignCenter)
             self.strategy_table.setItem(row, 5, item)
+        self.strategy_table.update()
 
     def updateRunMode(self, strategyId, status):
         """更新策略运行模式"""
