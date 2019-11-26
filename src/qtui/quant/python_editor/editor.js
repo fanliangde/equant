@@ -119,15 +119,26 @@ function init_editor(layoutid, code_str, theme) {
     //自适应大小，可以不要
     window.onresize = editor_layout;
     //编辑器加载成功后创建websocket连接
-    //window.onload = init_webskt;
-    
-    g_ready = true;
+    window.onload = do_load;
 }
 
 //自适应窗口大小
 function editor_layout() {
     if (g_editor)
         g_editor.layout()
+}
+
+function do_load() {
+    // 屏蔽Ctrl+F搜索框
+    g_editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_F, () => {});
+    // Ctrl + S 保存当前文件   
+    //editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S, () => {
+    //　　save_file(currtab, false);
+    //});
+
+    //init_webskt();
+
+    g_ready = true;
 }
 
 //设置主题风格 theme:vs-dark vs hc-black, fontsize:S M L XL XXL
