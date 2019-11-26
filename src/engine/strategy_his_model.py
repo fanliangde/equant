@@ -1293,16 +1293,28 @@ class StrategyHisQuote(object):
         isStopLoseBuyTrigger = False
         isStopWinSellTrigger = False
         isStopLoseSellTrigger = False
+        
+        orderStopWinType = otLimit
+        orderStopLoseType = otLimit
+
 
         # 买方向，价格上涨，需要止盈，价格下跌需要止损
         # 卖方向，价格下跌，需要止盈，价格上涨需要止损
         # self.logger.debug('AAAA:%s,%s,%f'%(latestPos, stopWinParams, curPrice))
         if stopWinParams:
+            priceStopWinType = stopWinParams["CoverPosOrderType"]
+            if priceStopWinType == 3:
+                orderStopWinType = otMarket
+                
             if latestBuyPos:
                 isStopWinBuyTrigger = highPrice-latestBuyPos["OrderPrice"]-stopWinParams["StopPoint"]*priceTick>-1e-6
             if latestSellPos:
                 isStopWinSellTrigger = latestSellPos["OrderPrice"]-lowPrice-stopWinParams["StopPoint"]*priceTick>-1e-6
         if stopLoseParams:
+            priceStopLoseType = stopLoseParams["CoverPosOrderType"]
+            if priceStopLoseType == 3:
+                orderStopLoseType = otMarket
+
             if latestBuyPos:
                 isStopLoseBuyTrigger = latestBuyPos["OrderPrice"]-lowPrice-stopLoseParams["StopPoint"]*priceTick>-1e-6
             if latestSellPos:
@@ -1331,16 +1343,6 @@ class StrategyHisQuote(object):
                 self.logger.info(f"{contractNo} 的即时行情触发了SellPos止损, High: {highPrice}, Low: {lowPrice}")
     
         allPos = self._calc.getPositionInfo(contractNo)
-
-        priceStopWinType = stopWinParams["CoverPosOrderType"]
-        orderStopWinType = otLimit
-        if priceStopWinType == 3:
-            orderStopWinType = otMarket
-            
-        priceStopLoseType = stopLoseParams["CoverPosOrderType"]
-        orderStopLoseType = otLimit
-        if priceStopLoseType == 3:
-            orderStopLoseType = otMarket
 
         if isStopWinBuyTrigger:
             coverPosPrice = self.getCoverPosPrice(isHis, data, latestBuyPos["OrderPrice"], stopWinParams, priceTick, dSell)
