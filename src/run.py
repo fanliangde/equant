@@ -3,8 +3,6 @@ import sys
 path = os.path.dirname(os.path.abspath(__file__))
 os.chdir(os.path.abspath(path))
 
-#记录工作路径
-WORKPATH = os.getcwd()
 
 import platform
 import time
@@ -76,6 +74,10 @@ def checkUpdate(logger):
 
 
 def saveMainPid(pid=""):
+    path = os.getcwd()
+    logDir = os.path.join(path, "log")
+    if not os.path.exists(logDir):
+        os.makedirs(logDir)
     with open("log/mainpid.log", 'w') as f:
         f.write(str(pid))
 
