@@ -1117,7 +1117,8 @@ class StrategyPolicy(QWidget):
             configure = None
 
         # key = self._control.getEditorText()["path"]
-        key = self._strategyPath
+        cwdPath = os.getcwd()
+        key = os.path.relpath(self._strategyPath, cwdPath)
         if configure:
             if key in configure:
                 return configure[key]
