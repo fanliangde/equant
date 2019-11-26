@@ -37,6 +37,7 @@ class Controller(object):
         # 高分辨率支持
         QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
         qInstallMessageHandler(lambda x, y, z: None)
+
         self.mainApp = QApplication(sys.argv)
 
         # 根据分辨率调整字体
