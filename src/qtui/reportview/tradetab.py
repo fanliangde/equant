@@ -75,7 +75,6 @@ class TradeTab(QTableWidget):
         self.verticalHeader().setVisible(False)
 
     def addTradeDatas(self, orders, kLineInfo):
-        print("11111: ", len(orders))
         self.setRowCount(len(orders))
         for eo, row in zip(orders, range(self.rowCount())):
             time = formatOrderTime(kLineInfo, eo["Order"])
