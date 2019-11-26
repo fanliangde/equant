@@ -1237,6 +1237,7 @@ class ContractWin(QWidget):
         h_layout1 = QHBoxLayout()
         label1 = QLabel('商品代码：')
         self.contractCodeLineEdit = QLineEdit()
+        self.contractCodeLineEdit.setFixedWidth(200)
         self.select = QPushButton('选择')
         self.select.setFixedWidth(60)
         h_layout1.addWidget(label1)
