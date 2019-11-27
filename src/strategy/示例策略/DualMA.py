@@ -4,7 +4,7 @@ p1=5
 p2=20
 
 def initialize(context): 
-    SetOrderWay(2).
+    SetOrderWay(2)
 
 def handle_data(context):
     if len(Close()) < p2:

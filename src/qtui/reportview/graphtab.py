@@ -138,7 +138,6 @@ class GCrosshair(QtCore.QObject):
         xAxis, yAxis = (self.xAxis, self.yAxis) if xAxis is None else (xAxis, yAxis)
         if self.datas is None:
             return
-        print("BBB: ", xAxis, yAxis)
         self.moveTo(xAxis, yAxis, pos)
 
     # ----------------------------------------------------------------------

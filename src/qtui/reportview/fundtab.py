@@ -297,7 +297,7 @@ class LineWidget(KeyWraper):
         """重画资金曲线"""
         if self.initCompleted:
             self.fund.setData(self.datas.DynamicEquity[xmin:xmax] + [0],
-                              name="fund", symbol='o')
+                              name="fund")
 
     def refresh(self):
         """

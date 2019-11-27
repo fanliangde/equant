@@ -6,6 +6,8 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
+WORKPATH = os.getcwd()
+
 
 class FileSystemModel(QFileSystemModel):
     """Overwrite columnCount"""
@@ -34,7 +36,7 @@ class Dir(QTreeView):
         super(Dir, self).__init__(parent)
 
         self._win = parent
-        self._dirPath = r"./reportdata"
+        self._dirPath = os.path.join(WORKPATH, "reportdata")
         self._initUI()
         self.setHeaderHidden(True)
         self.sizeHint()
@@ -53,6 +55,8 @@ class Dir(QTreeView):
 
     def _initUI(self):
         self.model = FileSystemModel()
+        if not os.path.exists(self._dirPath):
+            os.makedirs(self._dirPath)
         self.model.setRootPath(self._dirPath)
 
         self.setAnimated(False)

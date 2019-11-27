@@ -285,9 +285,12 @@ class StrategyPolicy(QWidget):
         self.contractTableWidget.setObjectName("ContractTableWidget")
         self.contractTableWidget.setColumnCount(5)
         self.contractTableWidget.setHorizontalHeaderLabels(['合约', 'K线类型', 'K线周期', '运算起始点', 'data'])
-        self.contractTableWidget.horizontalHeader().setStretchLastSection(True)
+        # self.contractTableWidget.horizontalHeader().setStretchLastSection(True)
         self.contractTableWidget.horizontalHeader().setHighlightSections(False)  # 关闭高亮头
         self.contractTableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
+
+        self.contractTableWidget.setColumnWidth(0, 150)
+
         left_layout.addWidget(self.contractTableWidget)
         right_layout = QVBoxLayout()
         self.addContract = QPushButton('增加')
@@ -544,7 +547,7 @@ class StrategyPolicy(QWidget):
         self.paramsTableWidget.setItemDelegateForColumn(2, EmptyDelegate(self))  # 设置第三列不可编辑
         self.paramsTableWidget.setHorizontalHeaderLabels(['参数', '当前值', '类型', '描述'])
         self.paramsTableWidget.verticalHeader().setVisible(False)  # 隐藏行号
-        self.paramsTableWidget.horizontalHeader().setStretchLastSection(True)
+        # self.paramsTableWidget.horizontalHeader().setStretchLastSection(True)
         self.paramsTableWidget.horizontalHeader().setHighlightSections(False)  # 关闭高亮头
         self.paramsTableWidget.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
         self.paramsTableWidget.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
@@ -1851,7 +1854,7 @@ class QuantApplication(QWidget):
     def create_stragety_vbox(self):
         # 策略树
         self.strategy_vbox = QFrame()
-        label = QLabel('  策略')
+        label = QLabel(' 策略')
         label.setObjectName("Strategy")
         label.setContentsMargins(0, 0, 0, 0)
         self.strategy_layout = QVBoxLayout()
@@ -2210,7 +2213,7 @@ class QuantApplication(QWidget):
         self.contentEdit.switchSignal.connect(self.switch_strategy_path)
         self.statusBar = QLabel()
         self.statusBar.setText("  极星9.5连接失败，请重启后重试！")
-        self.statusBar.setStyleSheet('color: red;')
+        self.statusBar.setStyleSheet('color: #0062A3;')
 
         self.content_layout.addWidget(self.statusBar, 0, 0, 1, 1)
         self.content_layout.addWidget(self.run_btn, 0, 1, 1, 1)
@@ -2442,7 +2445,7 @@ class QuantApplication(QWidget):
         self.pos_table.setColumnWidth(1, 150)
         self.pos_table.verticalHeader().setVisible(False)
         self.pos_table.setShowGrid(False)
-        self.pos_table.horizontalHeader().setStretchLastSection(True)  # 最后一列自动拉伸充满界面
+        # self.pos_table.horizontalHeader().setStretchLastSection(True)  # 最后一列自动拉伸充满界面
         self.pos_table.horizontalHeader().setHighlightSections(False)  # 关闭水平头高亮
         self.pos_table.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)  # 所有列自动拉伸，充满界面
         self.pos_table.horizontalHeader().setObjectName("PosTableHeader")
@@ -2684,6 +2687,7 @@ class QuantApplication(QWidget):
 
         if src == 'S':
             self.statusBar.setText("  极星9.5连接成功")
+        self.statusBar.setStyleSheet("""""")
 
     def setDisconnect(self, src):
         if src == 'Q':
@@ -2698,7 +2702,7 @@ class QuantApplication(QWidget):
         if src == 'S':
             self.statusBar.setText("  极星9.5退出")
             self.exitSignal.emit()
-        self.statusBar.setStyleSheet('color: red')
+        self.statusBar.setStyleSheet('color: #0062A3')
 
     def show_warn(self):
         """极星9.5退出时，弹出窗口槽函数"""
