@@ -2323,17 +2323,16 @@ class QuantApplication(QWidget):
         self.strategy_table.setRowCount(0)  # 行数
         self.strategy_table.setColumnCount(12)  # 列数
         self.strategy_table.verticalHeader().setMinimumSectionSize(5)
-        self.strategy_table.verticalHeader().setDefaultSectionSize(20)
+        self.strategy_table.verticalHeader().setDefaultSectionSize(25)
         self.strategy_table.horizontalHeader().setDefaultSectionSize(100)
         self.strategy_table.setColumnWidth(0, 40)
         self.strategy_table.setColumnWidth(2, 130)
         self.strategy_table.setColumnWidth(3, 150)
         self.strategy_table.verticalHeader().setVisible(False)
         self.strategy_table.setShowGrid(False)
-        self.strategy_table.horizontalHeader().setStretchLastSection(True)  # 最后一行自适应长度，充满界面
+        # self.strategy_table.horizontalHeader().setStretchLastSection(True)  # 最后一行自适应长度，充满界面
         self.strategy_table.horizontalHeader().setHighlightSections(False)  # 关闭高亮头
         self.strategy_table.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
-        self.strategy_table.setSelectionMode(QAbstractItemView.SingleSelection)  # 设置只能选中一行
         self.strategy_table.setEditTriggers(QTableView.NoEditTriggers)  # 不可编辑
         self.strategy_table.setSelectionBehavior(QAbstractItemView.SelectRows)  # 设置只有行选中
         self.strategy_table.setSelectionMode(QAbstractItemView.ExtendedSelection)
@@ -2436,7 +2435,7 @@ class QuantApplication(QWidget):
         self.pos_table.setRowCount(0)  # 行数
         self.pos_table.setColumnCount(13)  # 列数
         self.pos_table.verticalHeader().setMinimumSectionSize(5)
-        self.pos_table.verticalHeader().setDefaultSectionSize(20)  # 设置行高
+        self.pos_table.verticalHeader().setDefaultSectionSize(25)  # 设置行高
         self.pos_table.horizontalHeader().setDefaultSectionSize(80)
         self.pos_table.setColumnWidth(0, 150)
         self.pos_table.setColumnWidth(1, 150)
@@ -2446,7 +2445,6 @@ class QuantApplication(QWidget):
         self.pos_table.horizontalHeader().setHighlightSections(False)  # 关闭水平头高亮
         self.pos_table.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)  # 所有列自动拉伸，充满界面
         self.pos_table.horizontalHeader().setObjectName("PosTableHeader")
-        self.pos_table.setSelectionMode(QAbstractItemView.SingleSelection)  # 设置只能选中一行
         self.pos_table.setEditTriggers(QTableView.NoEditTriggers)  # 不可编辑
         self.pos_table.setSelectionBehavior(QAbstractItemView.SelectRows)  # 设置只有行选中
         self.pos_table.setSelectionMode(QAbstractItemView.ExtendedSelection)
@@ -2722,10 +2720,10 @@ class QuantApplication(QWidget):
             self.strategy_table.setRowCount(row + 1)
             for j in range(len(values)):
                 item = QTableWidgetItem(str(values[j]))
-                if j in range(7):
-                    item.setTextAlignment(Qt.AlignCenter)  # 设置文本居中显示
-                else:
-                    item.setTextAlignment(Qt.AlignRight)
+                if isinstance(values[j], int) or isinstance(values[j], float):
+                    item.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
+                elif isinstance(values[j], str):
+                    item.setTextAlignment(Qt.AlignCenter)
                 self.strategy_table.setItem(row, j, item)
 
     def _formatMonitorInfo(self, dataDict):
@@ -2750,7 +2748,7 @@ class QuantApplication(QWidget):
             Status = StrategyStatus[dataDict["StrategyState"]]
             InitFund = dataDict['InitialFund']
 
-            Available = "{:.2f}".format(InitFund)
+            Available = eval("{:.2f}".format(InitFund))
             MaxRetrace = 0.0
             TotalProfit = 0.0
             WinRate = 0.0
@@ -2789,15 +2787,16 @@ class QuantApplication(QWidget):
             10: "{:.2f}".format(dataDict["NetProfit"]),
             11: "{:.2f}".format(dataDict["WinRate"])
         }
+
         row = self.get_row_from_strategy_id(strategyId)
         if row != -1:
             for k, v in colValues.items():
                 try:
-                    item = QTableWidgetItem(v)
-                    if k in range(7):
-                        item.setTextAlignment(Qt.AlignCenter)  # 设置文本居中显示
-                    else:
-                        item.setTextAlignment(Qt.AlignRight)
+                    item = QTableWidgetItem(str(v))
+                    if isinstance(eval(v), int) or isinstance(eval(v), float):
+                        item.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
+                    elif isinstance(eval(v), str):
+                        item.setTextAlignment(Qt.AlignCenter)
                     self.strategy_table.setItem(row, k, item)
                 except Exception as e:
                     self._logger.error(f"[UI][{strategyId}]: 更新策略执行数据时出错，执行列表中该策略已删除！")
@@ -2909,12 +2908,13 @@ class QuantApplication(QWidget):
     def updateSyncPosition(self, positions):
         self.pos_table.setRowCount(len(positions))
         for i in range(len(positions)):
+            print("AAAAAAAAA: ", positions[i])
             for j in range(len(positions[i])):
                 item = QTableWidgetItem(str(positions[i][j]))
-                if j in range(2):
+                if isinstance(positions[i][j], int) or isinstance(positions[i][j], float):
+                    item.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
+                elif isinstance(positions[i][j], str):
                     item.setTextAlignment(Qt.AlignCenter)
-                else:
-                    item.setTextAlignment(Qt.AlignRight)
                 self.pos_table.setItem(i, j, item)
 
     def reportDisplay(self, data, id):
