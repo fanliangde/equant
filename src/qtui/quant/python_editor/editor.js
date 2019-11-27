@@ -109,7 +109,7 @@ function init_editor(layoutid, code_str, theme) {
                 },
             }
         );
-        g_editor.onDidChangeModelContent((v) => {
+        g_editor.onDidChangeModelContent(function(v) {
             if (!g_loading && g_filename)
                 modify_nty(g_filename, org_datas[g_filename] != g_editor.getValue())
         });
@@ -130,9 +130,9 @@ function editor_layout() {
 
 function do_load() {
     // 屏蔽Ctrl+F搜索框
-    g_editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_F, () => {});
+    g_editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_F, function(){});
     // Ctrl + S 保存当前文件   
-    //editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S, () => {
+    //editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S, function(){
     //　　save_file(currtab, false);
     //});
 
