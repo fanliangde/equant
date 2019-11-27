@@ -447,10 +447,10 @@ class GraphWidget(KeyWraper):
 
     def onLeft(self):
         """向左移动"""
-        if len(self.datas) > 0 and int(self.crosshair.xAxis) >= 0:
+        if len(self.datas) > 0 and int(self.crosshair.xAxis) > 0:
             x = int(self.crosshair.xAxis) - 1
             y = self.datas[x]
-            if x <= self.index - self.count / 2 + 2 and self.index > 1:
+            if x <= self.index - self.count / 2 + 2 and self.index >= 1:
                 self.index -= 1
                 self.refresh()
             self.crosshair.signal.emit((x, y))

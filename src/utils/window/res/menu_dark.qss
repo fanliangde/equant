@@ -38,5 +38,5 @@ QMenu::right-arrow {
     margin: 5px;
     height: 12px;
     width: 12px;
-    image: url(./utils/window/res/right_arrow.png);
+    image: url(./utils/window/res/rc/right_arrow.png);
 }
