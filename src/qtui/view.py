@@ -2212,7 +2212,7 @@ class QuantApplication(QWidget):
                 QUrl.fromLocalFile(os.path.abspath(r'qtui/quant/python_editor/editor_vs.htm')))
         self.contentEdit.switchSignal.connect(self.switch_strategy_path)
         self.statusBar = QLabel()
-        self.statusBar.setText("  极星9.5连接失败，请重启后重试！")
+        self.statusBar.setText("  极星9.5连接失败，请重新打开极星量化！")
         self.statusBar.setStyleSheet('color: #0062A3;')
 
         self.content_layout.addWidget(self.statusBar, 0, 0, 1, 1)
