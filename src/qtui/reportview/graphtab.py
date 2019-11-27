@@ -138,6 +138,7 @@ class GCrosshair(QtCore.QObject):
         xAxis, yAxis = (self.xAxis, self.yAxis) if xAxis is None else (xAxis, yAxis)
         if self.datas is None:
             return
+        print("BBB: ", xAxis, yAxis)
         self.moveTo(xAxis, yAxis, pos)
 
     # ----------------------------------------------------------------------
@@ -166,8 +167,8 @@ class GCrosshair(QtCore.QObject):
     def moveTo(self, xAxis, yAxis, pos):
         xAxis, yAxis = (self.xAxis, self.yAxis) if xAxis is None else (xAxis, yAxis)
         self.rect = self.view.sceneBoundingRect()
-        if not xAxis or not yAxis:
-            return
+        # if not xAxis or not yAxis:
+        #     return
         self.xAxis = xAxis
         self.yAxis = yAxis
         self.vhLinesSetXY(xAxis, yAxis)
@@ -447,12 +448,22 @@ class GraphWidget(KeyWraper):
 
     def onLeft(self):
         """向左移动"""
+        # if len(self.datas) > 0 and int(self.crosshair.xAxis) > 0:
+        #     x = int(self.crosshair.xAxis) - 1
+        #     y = self.datas[x]
+        #     print("AAAAAAAAA: ", self.index - self.count / 2 + 2, self.index, self.count)
+        #     if x <= self.index - self.count / 2 + 2 and self.index >= 1:
+        #         self.index -= 1
+        #         self.refresh()
+        #     print(x, y)
+        #     self.crosshair.signal.emit((x, y))
         if len(self.datas) > 0 and int(self.crosshair.xAxis) > 0:
             x = int(self.crosshair.xAxis) - 1
             y = self.datas[x]
-            if x <= self.index - self.count / 2 + 2 and self.index >= 1:
-                self.index -= 1
-                self.refresh()
+
+            self.index -= 1
+            # self.refresh()
+
             self.crosshair.signal.emit((x, y))
 
     def onRight(self):

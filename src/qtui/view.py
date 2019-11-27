@@ -1851,7 +1851,7 @@ class QuantApplication(QWidget):
     def create_stragety_vbox(self):
         # 策略树
         self.strategy_vbox = QFrame()
-        label = QLabel('策略')
+        label = QLabel('  策略')
         label.setObjectName("Strategy")
         label.setContentsMargins(0, 0, 0, 0)
         self.strategy_layout = QVBoxLayout()
@@ -2209,7 +2209,8 @@ class QuantApplication(QWidget):
                 QUrl.fromLocalFile(os.path.abspath(r'qtui/quant/python_editor/editor_vs.htm')))
         self.contentEdit.switchSignal.connect(self.switch_strategy_path)
         self.statusBar = QLabel()
-        self.statusBar.setStyleSheet('border: none;')
+        self.statusBar.setText("  极星9.5连接失败，请重启后重试！")
+        self.statusBar.setStyleSheet('color: red;')
 
         self.content_layout.addWidget(self.statusBar, 0, 0, 1, 1)
         self.content_layout.addWidget(self.run_btn, 0, 1, 1, 1)
@@ -2687,6 +2688,7 @@ class QuantApplication(QWidget):
     def setDisconnect(self, src):
         if src == 'Q':
             self.statusBar.setText("  即时行情断连")
+
         if src == 'H':
             self.statusBar.setText("  历史行情断连")
 
@@ -2696,6 +2698,7 @@ class QuantApplication(QWidget):
         if src == 'S':
             self.statusBar.setText("  极星9.5退出")
             self.exitSignal.emit()
+        self.statusBar.setStyleSheet('color: red')
 
     def show_warn(self):
         """极星9.5退出时，弹出窗口槽函数"""
@@ -2908,7 +2911,6 @@ class QuantApplication(QWidget):
     def updateSyncPosition(self, positions):
         self.pos_table.setRowCount(len(positions))
         for i in range(len(positions)):
-            print("AAAAAAAAA: ", positions[i])
             for j in range(len(positions[i])):
                 item = QTableWidgetItem(str(positions[i][j]))
                 if isinstance(positions[i][j], int) or isinstance(positions[i][j], float):
