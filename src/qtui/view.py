@@ -1807,6 +1807,7 @@ class QuantApplication(QWidget):
         self.settings = QSettings('config/settings.ini', QSettings.IniFormat)
 
     def close_app(self):
+        self.save_settings()
         self._controller.quitThread()
         self._controller.mainWnd.titleBar.closeWindow()
 
@@ -1834,16 +1835,14 @@ class QuantApplication(QWidget):
             pass
 
 
-    def closeEvent(self, event):
-        # 退出子线程和主线程
+    def save_settings(self):
+        """保存界面设置"""
         self.settings.setValue('left_top_splitter', self.left_top_splitter.saveState())
         self.settings.setValue('left_splitter', self.left_splitter.saveState())
         self.settings.setValue('right_splitter', self.right_splitter.saveState())
         self.settings.setValue('main_splitter', self.main_splitter.saveState())
         self.settings.setValue(
             'theme', 'vs' if self._controller.mainWnd.getWinThese() == '浅色' else 'vs-dark')
-        # self._controller.sendExitRequest()
-        # self._controller.quitThread()
 
     def init_control(self):
         self._exchange = self._controller.model.getExchange()
