@@ -65,8 +65,6 @@ class StrategyPolicy(QWidget):
         self.main_layout.addLayout(layout1)
         self.main_layout.addLayout(layout2)
         self.setLayout(self.main_layout)
-        # self.setMinimumSize(580, 600)
-        # self.setBaseSize(580, 600)
 
         self.contractTableWidget.hideColumn(4)
         self.contractTableWidget.verticalHeader().setVisible(False)
@@ -105,10 +103,7 @@ class StrategyPolicy(QWidget):
 
         # 设置属性值
         self.setDefaultConfigure()
-        # 设置无边框
-        # self.setWindowFlags(Qt.FramelessWindowHint)
-        # print('--------------------------------')
-        # print(self.style())
+
         self.contractWin = ContractWin()
         self.contractWin.setObjectName("ContractWin")
         self.contractWin.confirm_signal.connect(self.add_contract)
@@ -290,9 +285,12 @@ class StrategyPolicy(QWidget):
         self.contractTableWidget.setObjectName("ContractTableWidget")
         self.contractTableWidget.setColumnCount(5)
         self.contractTableWidget.setHorizontalHeaderLabels(['合约', 'K线类型', 'K线周期', '运算起始点', 'data'])
-        self.contractTableWidget.horizontalHeader().setStretchLastSection(True)
+        # self.contractTableWidget.horizontalHeader().setStretchLastSection(True)
         self.contractTableWidget.horizontalHeader().setHighlightSections(False)  # 关闭高亮头
         self.contractTableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
+
+        self.contractTableWidget.setColumnWidth(0, 150)
+
         left_layout.addWidget(self.contractTableWidget)
         right_layout = QVBoxLayout()
         self.addContract = QPushButton('增加')
@@ -549,7 +547,7 @@ class StrategyPolicy(QWidget):
         self.paramsTableWidget.setItemDelegateForColumn(2, EmptyDelegate(self))  # 设置第三列不可编辑
         self.paramsTableWidget.setHorizontalHeaderLabels(['参数', '当前值', '类型', '描述'])
         self.paramsTableWidget.verticalHeader().setVisible(False)  # 隐藏行号
-        self.paramsTableWidget.horizontalHeader().setStretchLastSection(True)
+        # self.paramsTableWidget.horizontalHeader().setStretchLastSection(True)
         self.paramsTableWidget.horizontalHeader().setHighlightSections(False)  # 关闭高亮头
         self.paramsTableWidget.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
         self.paramsTableWidget.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
@@ -992,10 +990,12 @@ class StrategyPolicy(QWidget):
         # print("-----------: ", self.config)
 
         # -------------保存用户配置--------------------------
-        # strategyPath = self._control.getEditorText()["path"]
+        # 将绝对路径转为相对路径
         strategyPath = self._strategyPath
+        cwdPath = os.getcwd()
+        path_ = os.path.relpath(strategyPath, cwdPath)
         userConfig = {
-            strategyPath: {
+            path_: {
                 VUser: user,
                 VInitFund: initFund,
                 VDefaultType: defaultType,
@@ -1082,8 +1082,8 @@ class StrategyPolicy(QWidget):
 
     def readPositionConfig(self):
         """读取持仓配置文件"""
-        if os.path.exists(r"./config/loadpositionon.json"):
-            with open(r"./config/loadpositionon.json", "r", encoding="utf-8") as f:
+        if os.path.exists(r"./config/loadposition.json"):
+            with open(r"./config/loadposition.json", "r", encoding="utf-8") as f:
                 try:
                     result = json.loads(f.read())
                 except json.decoder.JSONDecodeError:
@@ -1091,7 +1091,7 @@ class StrategyPolicy(QWidget):
                 else:
                     return result
         else:
-            filePath = os.path.abspath(r"./config/loadpositionon.json")
+            filePath = os.path.abspath(r"./config/loadposition.json")
             f = open(filePath, 'w')
             f.close()
 
@@ -1107,7 +1107,8 @@ class StrategyPolicy(QWidget):
             configure = None
 
         # key = self._control.getEditorText()["path"]
-        key = self._strategyPath
+        cwdPath = os.getcwd()
+        key = os.path.relpath(self._strategyPath, cwdPath)
         if configure:
             if key in configure:
                 return configure[key]
@@ -1226,6 +1227,7 @@ class ContractWin(QWidget):
         h_layout1 = QHBoxLayout()
         label1 = QLabel('商品代码：')
         self.contractCodeLineEdit = QLineEdit()
+        self.contractCodeLineEdit.setFixedWidth(200)
         self.select = QPushButton('选择')
         self.select.setFixedWidth(60)
         h_layout1.addWidget(label1)
@@ -1852,7 +1854,7 @@ class QuantApplication(QWidget):
     def create_stragety_vbox(self):
         # 策略树
         self.strategy_vbox = QFrame()
-        label = QLabel('策略')
+        label = QLabel(' 策略')
         label.setObjectName("Strategy")
         label.setContentsMargins(0, 0, 0, 0)
         self.strategy_layout = QVBoxLayout()
@@ -2210,7 +2212,8 @@ class QuantApplication(QWidget):
                 QUrl.fromLocalFile(os.path.abspath(r'qtui/quant/python_editor/editor_vs.htm')))
         self.contentEdit.switchSignal.connect(self.switch_strategy_path)
         self.statusBar = QLabel()
-        self.statusBar.setStyleSheet('border: none;')
+        self.statusBar.setText("  极星9.5连接失败，请重新打开极星量化！")
+        self.statusBar.setStyleSheet('color: #0062A3;')
 
         self.content_layout.addWidget(self.statusBar, 0, 0, 1, 1)
         self.content_layout.addWidget(self.run_btn, 0, 1, 1, 1)
@@ -2324,17 +2327,16 @@ class QuantApplication(QWidget):
         self.strategy_table.setRowCount(0)  # 行数
         self.strategy_table.setColumnCount(12)  # 列数
         self.strategy_table.verticalHeader().setMinimumSectionSize(5)
-        self.strategy_table.verticalHeader().setDefaultSectionSize(20)
+        self.strategy_table.verticalHeader().setDefaultSectionSize(25)
         self.strategy_table.horizontalHeader().setDefaultSectionSize(100)
         self.strategy_table.setColumnWidth(0, 40)
         self.strategy_table.setColumnWidth(2, 130)
         self.strategy_table.setColumnWidth(3, 150)
         self.strategy_table.verticalHeader().setVisible(False)
         self.strategy_table.setShowGrid(False)
-        self.strategy_table.horizontalHeader().setStretchLastSection(True)  # 最后一行自适应长度，充满界面
+        # self.strategy_table.horizontalHeader().setStretchLastSection(True)  # 最后一行自适应长度，充满界面
         self.strategy_table.horizontalHeader().setHighlightSections(False)  # 关闭高亮头
         self.strategy_table.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
-        self.strategy_table.setSelectionMode(QAbstractItemView.SingleSelection)  # 设置只能选中一行
         self.strategy_table.setEditTriggers(QTableView.NoEditTriggers)  # 不可编辑
         self.strategy_table.setSelectionBehavior(QAbstractItemView.SelectRows)  # 设置只有行选中
         self.strategy_table.setSelectionMode(QAbstractItemView.ExtendedSelection)
@@ -2437,17 +2439,16 @@ class QuantApplication(QWidget):
         self.pos_table.setRowCount(0)  # 行数
         self.pos_table.setColumnCount(13)  # 列数
         self.pos_table.verticalHeader().setMinimumSectionSize(5)
-        self.pos_table.verticalHeader().setDefaultSectionSize(20)  # 设置行高
+        self.pos_table.verticalHeader().setDefaultSectionSize(25)  # 设置行高
         self.pos_table.horizontalHeader().setDefaultSectionSize(80)
         self.pos_table.setColumnWidth(0, 150)
         self.pos_table.setColumnWidth(1, 150)
         self.pos_table.verticalHeader().setVisible(False)
         self.pos_table.setShowGrid(False)
-        self.pos_table.horizontalHeader().setStretchLastSection(True)  # 最后一列自动拉伸充满界面
+        # self.pos_table.horizontalHeader().setStretchLastSection(True)  # 最后一列自动拉伸充满界面
         self.pos_table.horizontalHeader().setHighlightSections(False)  # 关闭水平头高亮
         self.pos_table.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)  # 所有列自动拉伸，充满界面
         self.pos_table.horizontalHeader().setObjectName("PosTableHeader")
-        self.pos_table.setSelectionMode(QAbstractItemView.SingleSelection)  # 设置只能选中一行
         self.pos_table.setEditTriggers(QTableView.NoEditTriggers)  # 不可编辑
         self.pos_table.setSelectionBehavior(QAbstractItemView.SelectRows)  # 设置只有行选中
         self.pos_table.setSelectionMode(QAbstractItemView.ExtendedSelection)
@@ -2570,8 +2571,8 @@ class QuantApplication(QWidget):
         if path:
             self.strategy_policy_win = StrategyPolicy(self._controller, path, param=param, flag=flag)
             self.main_strategy_policy_win = FramelessWindow()
-            self.main_strategy_policy_win.setGeometry((self.width - 580)/2, (self.height - 620)/2, 580, 620)
-            self.main_strategy_policy_win.setBaseSize(580, 620)
+            self.main_strategy_policy_win.resize(560, 580)
+
             self.main_strategy_policy_win.hideTheseBtn()
             self.main_strategy_policy_win.titleBar.iconLabel.hide()
             self.main_strategy_policy_win.disabledMinimunBtn()
@@ -2686,10 +2687,12 @@ class QuantApplication(QWidget):
 
         if src == 'S':
             self.statusBar.setText("  极星9.5连接成功")
+        self.statusBar.setStyleSheet("""""")
 
     def setDisconnect(self, src):
         if src == 'Q':
             self.statusBar.setText("  即时行情断连")
+
         if src == 'H':
             self.statusBar.setText("  历史行情断连")
 
@@ -2699,6 +2702,7 @@ class QuantApplication(QWidget):
         if src == 'S':
             self.statusBar.setText("  极星9.5退出")
             self.exitSignal.emit()
+        self.statusBar.setStyleSheet('color: #0062A3')
 
     def show_warn(self):
         """极星9.5退出时，弹出窗口槽函数"""
@@ -2723,10 +2727,10 @@ class QuantApplication(QWidget):
             self.strategy_table.setRowCount(row + 1)
             for j in range(len(values)):
                 item = QTableWidgetItem(str(values[j]))
-                if j in range(7):
-                    item.setTextAlignment(Qt.AlignCenter)  # 设置文本居中显示
-                else:
-                    item.setTextAlignment(Qt.AlignRight)
+                if isinstance(values[j], int) or isinstance(values[j], float):
+                    item.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
+                elif isinstance(values[j], str):
+                    item.setTextAlignment(Qt.AlignCenter)
                 self.strategy_table.setItem(row, j, item)
 
     def _formatMonitorInfo(self, dataDict):
@@ -2751,7 +2755,7 @@ class QuantApplication(QWidget):
             Status = StrategyStatus[dataDict["StrategyState"]]
             InitFund = dataDict['InitialFund']
 
-            Available = "{:.2f}".format(InitFund)
+            Available = eval("{:.2f}".format(InitFund))
             MaxRetrace = 0.0
             TotalProfit = 0.0
             WinRate = 0.0
@@ -2790,15 +2794,16 @@ class QuantApplication(QWidget):
             10: "{:.2f}".format(dataDict["NetProfit"]),
             11: "{:.2f}".format(dataDict["WinRate"])
         }
+
         row = self.get_row_from_strategy_id(strategyId)
         if row != -1:
             for k, v in colValues.items():
                 try:
-                    item = QTableWidgetItem(v)
-                    if k in range(7):
-                        item.setTextAlignment(Qt.AlignCenter)  # 设置文本居中显示
-                    else:
-                        item.setTextAlignment(Qt.AlignRight)
+                    item = QTableWidgetItem(str(v))
+                    if isinstance(eval(v), int) or isinstance(eval(v), float):
+                        item.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
+                    elif isinstance(eval(v), str):
+                        item.setTextAlignment(Qt.AlignCenter)
                     self.strategy_table.setItem(row, k, item)
                 except Exception as e:
                     self._logger.error(f"[UI][{strategyId}]: 更新策略执行数据时出错，执行列表中该策略已删除！")
@@ -2810,6 +2815,7 @@ class QuantApplication(QWidget):
             item = QTableWidgetItem(str(StrategyStatus[status]))
             item.setTextAlignment(Qt.AlignCenter)
             self.strategy_table.setItem(row, 5, item)
+        self.strategy_table.update()
 
     def updateRunMode(self, strategyId, status):
         """更新策略运行模式"""
@@ -2846,8 +2852,8 @@ class QuantApplication(QWidget):
 
     def readPositionConfig(self):
         """读取配置文件"""
-        if os.path.exists(r"./config/loadpositionon.json"):
-            with open(r"./config/loadpositionon.json", "r", encoding="utf-8") as f:
+        if os.path.exists(r"./config/loadposition.json"):
+            with open(r"./config/loadposition.json", "r", encoding="utf-8") as f:
                 try:
                     result = json.loads(f.read())
                 except json.decoder.JSONDecodeError:
@@ -2855,7 +2861,7 @@ class QuantApplication(QWidget):
                 else:
                     return result
         else:
-            filePath = os.path.abspath(r"./config/loadpositionon.json")
+            filePath = os.path.abspath(r"./config/loadposition.json")
             f = open(filePath, 'w')
             f.close()
 
@@ -2873,7 +2879,7 @@ class QuantApplication(QWidget):
         else:
             config = configure
 
-        with open(r"./config/loadpositionon.json", "w", encoding="utf-8") as f:
+        with open(r"./config/loadposition.json", "w", encoding="utf-8") as f:
             f.write(json.dumps(config, indent=4))
 
     def change_connection(self):
@@ -2911,10 +2917,10 @@ class QuantApplication(QWidget):
         for i in range(len(positions)):
             for j in range(len(positions[i])):
                 item = QTableWidgetItem(str(positions[i][j]))
-                if j in range(2):
+                if isinstance(positions[i][j], int) or isinstance(positions[i][j], float):
+                    item.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
+                elif isinstance(positions[i][j], str):
                     item.setTextAlignment(Qt.AlignCenter)
-                else:
-                    item.setTextAlignment(Qt.AlignRight)
                 self.pos_table.setItem(i, j, item)
 
     def reportDisplay(self, data, id):

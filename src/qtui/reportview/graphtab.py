@@ -7,8 +7,7 @@ from functools import partial
 from pyqtgraph.Point import Point
 from dateutil.parser import parse
 
-
-from qtui.reportview.fundtab import KeyWraper, MyStringAxis, CustomViewBox
+from qtui.reportview.fundtab import KeyWraper, MyStringAxis
 
 
 DIR = {
@@ -25,14 +24,47 @@ DIR = {
 }
 
 
-GRAPHTYPE = {
-    "Equity"      : "柱状图",
-    "NetProfit"   : "立体",
-    "Returns"     : "立体",
-    "WinRate"     : "柱状图",
-    "MeanReturns" : "柱状图",
-    "IncSpeed"    : "立体"
-}
+class CustomViewBox(pg.ViewBox):
+    # ----------------------------------------------------------------------
+    def __init__(self, parent, *args, **kwds):
+        pg.ViewBox.__init__(self, *args, **kwds)
+        self.parent = parent
+        # 拖动放大模式
+        # self.setMouseMode(self.RectMode)
+
+    def mouseClickEvent(self, ev):
+        if ev.button() == QtCore.Qt.RightButton:
+            pass
+
+    def mousePressEvent(self, event):
+        pg.ViewBox.mousePressEvent(self, event)
+
+    def mouseDragEvent(self, ev, axis=None):
+        # if ev.start==True and ev.finish==False: ##判断拖拽事件是否结束
+        pos = ev.pos()
+        lastPos = ev.lastPos()
+        dif = pos - lastPos
+
+        rect = self.sceneBoundingRect()
+
+        pianyi = dif.x() * self.parent.count * 2 / rect.width()
+
+        self.parent.index -= int(pianyi)
+        self.parent.index = max(self.parent.index, 60)
+
+        pg.ViewBox.mouseDragEvent(self, ev, axis)
+        self.parent.refresh()
+
+    def resizeEvent(self, ev):
+        self.linkedXChanged()
+        self.linkedYChanged()
+        self.updateAutoRange()
+        self.updateViewRange()
+        self._matrixNeedsUpdate = True
+        self.sigStateChanged.emit(self)
+        self.background.setRect(self.rect())
+        self.sigResized.emit(self)
+        # self.parent.refreshHeight()
 
 
 ########################################################################
@@ -134,8 +166,8 @@ class GCrosshair(QtCore.QObject):
     def moveTo(self, xAxis, yAxis, pos):
         xAxis, yAxis = (self.xAxis, self.yAxis) if xAxis is None else (xAxis, yAxis)
         self.rect = self.view.sceneBoundingRect()
-        if not xAxis or not yAxis:
-            return
+        # if not xAxis or not yAxis:
+        #     return
         self.xAxis = xAxis
         self.yAxis = yAxis
         self.vhLinesSetXY(xAxis, yAxis)
@@ -223,6 +255,12 @@ class DirTree(QTreeWidget):
                 child.setText(1, item[1])
 
             self.addTopLevelItem(root)
+
+        # 设置初始选中：年度权益
+        item = self.model().index(0, 0)
+        self.expand(item)
+        selected = item.child(0, 0)
+        self.setCurrentIndex(selected)
 
         self.itemClicked.connect(self.itemClickedCallback)
 
@@ -409,12 +447,22 @@ class GraphWidget(KeyWraper):
 
     def onLeft(self):
         """向左移动"""
-        if len(self.datas) > 0 and int(self.crosshair.xAxis) >= 0:
+        # if len(self.datas) > 0 and int(self.crosshair.xAxis) > 0:
+        #     x = int(self.crosshair.xAxis) - 1
+        #     y = self.datas[x]
+        #     print("AAAAAAAAA: ", self.index - self.count / 2 + 2, self.index, self.count)
+        #     if x <= self.index - self.count / 2 + 2 and self.index >= 1:
+        #         self.index -= 1
+        #         self.refresh()
+        #     print(x, y)
+        #     self.crosshair.signal.emit((x, y))
+        if len(self.datas) > 0 and int(self.crosshair.xAxis) > 0:
             x = int(self.crosshair.xAxis) - 1
             y = self.datas[x]
-            if x <= self.index - self.count / 2 + 2 and self.index > 1:
-                self.index -= 1
-                self.refresh()
+
+            self.index -= 1
+            # self.refresh()
+
             self.crosshair.signal.emit((x, y))
 
     def onRight(self):

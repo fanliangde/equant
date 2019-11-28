@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
+from dateutil.parser import parse
 
 LABELS = [
     "年度分析",
@@ -88,21 +89,6 @@ class Label(QWidget):
         self.setLayout(hbox)
 
     def _toggle(self):
-        '''
-        pHeight = self._parent.height()
-        pLayout = self._parent.layout()
-        fixheight = 100 + 75
-        print("AAAAA: ", self._table.rowCount())
-        print("BBBBB: ", self._table.verticalHeader().width)
-        space = pHeight - fixheight
-        rowCount = self._table.rowCount()
-        width = self._table.verticalHeader().height()
-        width = 45
-        print("CCCCC: ", width)
-        # self._table.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        # self._table.setFixedHeight(pHeight - fixheight)
-        '''
-
         if self._isOpend:
             self.icon.setIcon(QIcon(self._pixDn))
             self._table.hide()
@@ -161,12 +147,27 @@ class StageTab(QWidget):
         self.setLayout(vbox)
 
     def addStageDatas(self, datas):
-        tables = (self.ytable, self.qtable, self.mtable, self.wtable, self.dtable)
-        for table, data in zip(tables, datas.values()):
+        tables = {"年度分析": self.ytable, "季度分析": self.qtable, "月度分析": self.mtable, "周分析": self.wtable,
+                  "日分析": self.dtable}
+        for key in tables:
+            data = datas[key]
+            table = tables[key]
             table.setRowCount(len(data))
             row = 0
+
             for d in data:
-                cell1 = BaseCell(d['Time'])
+                ret = parse(str(d['Time']))
+                if key == "年度分析":
+                    time = str(ret.year) + '年'
+                elif key == "季度分析":
+                    time = str(ret.year) + '年第' + str((ret.month - 1) // 3 + 1) + "季度"
+                elif key == "月季度分析":
+                    time = str(ret.year) + '年' + str(ret.month) + '月'
+                elif key == "周分析":
+                    time = str(ret.year) + '年第' + str(ret.isocalendar()[1]) + "周"
+                elif key == "日分析":
+                    time = str(d['Time'])
+                cell1 = BaseCell(time)
                 cell2 = BaseCell('{:.2f}'.format(float(d['Equity'])))
                 cell3 = BaseCell('{:.2f}'.format(float(d['NetProfit'])))
                 cell4 = BaseCell('{:.2%}'.format(float(d['Returns'])))

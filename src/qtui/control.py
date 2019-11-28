@@ -6,6 +6,7 @@ import importlib
 import traceback
 import re
 
+
 from PyQt5.QtCore import Qt, qInstallMessageHandler
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import QApplication, QMessageBox, QDesktopWidget
@@ -36,6 +37,7 @@ class Controller(object):
         # 高分辨率支持
         QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
         qInstallMessageHandler(lambda x, y, z: None)
+
         self.mainApp = QApplication(sys.argv)
 
         # 根据分辨率调整字体

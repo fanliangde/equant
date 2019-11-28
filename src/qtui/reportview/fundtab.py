@@ -164,7 +164,6 @@ class CustomViewBox(pg.ViewBox):
 
         pg.ViewBox.mouseDragEvent(self, ev, axis)
 
-    # 重载方法resizeEvent(self, ev)
     def resizeEvent(self, ev):
         self.linkedXChanged()
         self.linkedYChanged()
@@ -275,7 +274,7 @@ class LineWidget(KeyWraper):
         # 设置采样模式
         plotItem.setDownsampling(mode='peak')
         plotItem.setRange(xRange=(0, 1), yRange=(0, 1))
-        plotItem.getAxis('right').setWidth(60)
+        plotItem.getAxis('right').setWidth(70)
         plotItem.getAxis('right').setStyle(tickFont=QtGui.QFont('Roman times', 10, QtGui.QFont.Bold))
         plotItem.getAxis('right').setPen(color=(255, 255, 255, 255), width=0.8)
         plotItem.showGrid(True, True)
@@ -298,7 +297,7 @@ class LineWidget(KeyWraper):
         """重画资金曲线"""
         if self.initCompleted:
             self.fund.setData(self.datas.DynamicEquity[xmin:xmax] + [0],
-                              name="fund", symbol='o')
+                              name="fund")
 
     def refresh(self):
         """

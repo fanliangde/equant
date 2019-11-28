@@ -76,7 +76,7 @@ class TradeTab(QTableWidget):
 
     def addTradeDatas(self, orders, kLineInfo):
         self.setRowCount(len(orders))
-        for eo, row in zip(orders, range(self.columnCount())):
+        for eo, row in zip(orders, range(self.rowCount())):
             time = formatOrderTime(kLineInfo, eo["Order"])
             direct = DirectDict[eo["Order"]["Direct"]]
             offset = OffsetDict[eo["Order"]["Offset"]]
@@ -89,7 +89,8 @@ class TradeTab(QTableWidget):
             liqProfit = '{:.1f}'.format(float(eo['LiquidateProfit']))
             cost = '{:.1f}'.format(float(eo['Cost']))
             slippage = '{:.1f}'.format(float(eo["SlippageLoss"]))
-            contents = [time, cont, tradeType, orderType, orderQty, orderPrice, turnover, orderQty, liqProfit, cost, slippage]
+            contents = [time, cont, tradeType, orderType, orderQty, orderPrice, turnover, orderQty, liqProfit, cost,
+                        slippage]
             for index, content in enumerate(contents):
                 cell = BaseCell(content)
                 self.setItem(row, index, cell)
