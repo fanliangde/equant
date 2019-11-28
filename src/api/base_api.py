@@ -1271,7 +1271,7 @@ class BaseApi(object):
               产生一个多头建仓操作
 
         【语法】
-              Bool Buy(int share=0, float price=0, string contractNo=None, bool needCover = True, string userNo='')
+              void Buy(int share=0, float price=0, string contractNo=None, bool needCover = True, string userNo='')
 
         【参数】
               share 买入数量，为整型值，默认为0；
@@ -1281,7 +1281,7 @@ class BaseApi(object):
               userNo 用户编号，为字符串，默认使用界面选定用户编号。
 
         【备注】
-              产生一个多头建仓操作，返回值为布尔型，执行成功返回True，否则返回False。
+              产生一个多头建仓操作，无返回值。
               该函数仅用于多头建仓，其处理规则如下：
               如果当前持仓状态为持平，该函数按照参数进行多头建仓。
               如果当前持仓状态为空仓，该函数平掉所有空仓，同时按照参数进行多头建仓，两个动作同时发出。
@@ -1307,7 +1307,7 @@ class BaseApi(object):
               产生一个空头平仓操作
 
         【语法】
-              Bool BuyToCover(int share=0, float price=0, string contractNo=None, string userNo='', char coverFlag = 'A')
+              void BuyToCover(int share=0, float price=0, string contractNo=None, string userNo='', char coverFlag = 'A')
 
         【参数】
               share 买入数量，为整型值，默认为0；
@@ -1320,7 +1320,7 @@ class BaseApi(object):
                         若平今，则需设置为'T'
 
         【备注】
-              产生一个空头平仓操作，返回值为布尔型，执行成功返回True，否则返回False。
+              产生一个空头平仓操作，无返回值。
               该函数仅用于空头平仓，其处理规则如下：
               如果当前持仓状态为持平，该函数不执行任何操作。
               如果当前持仓状态为多仓，该函数不执行任何操作。
@@ -1343,7 +1343,7 @@ class BaseApi(object):
               产生一个多头平仓操作
 
         【语法】
-              Bool Sell(int share=0, float price=0, string contractNo=None, string userNo='', char coverFlag = 'A')
+              void Sell(int share=0, float price=0, string contractNo=None, string userNo='', char coverFlag = 'A')
 
         【参数】
               share 买入数量，为整型值，默认为0；
@@ -1356,7 +1356,7 @@ class BaseApi(object):
                         若平今，则需设置为'T'
 
         【备注】
-              产生一个多头平仓操作，返回值为布尔型，执行成功返回True，否则返回False。
+              产生一个多头平仓操作，无返回值。
               该函数仅用于多头平仓，其处理规则如下：
               如果当前持仓状态为持平，该函数不执行任何操作。
               如果当前持仓状态为空仓，该函数不执行任何操作。
@@ -1379,7 +1379,7 @@ class BaseApi(object):
               产生一个空头建仓操作
 
         【语法】
-              Bool SellShort(int share=0, float price=0, string contractNo=None, bool needCover = True, string userNo='')
+              void SellShort(int share=0, float price=0, string contractNo=None, bool needCover = True, string userNo='')
 
         【参数】
               share 买入数量，为整型值，默认为0；
@@ -1389,7 +1389,7 @@ class BaseApi(object):
               userNo 用户编号，为字符串，默认使用界面选定用户编号。
 
         【备注】
-              产生一个空头建仓操作，返回值为布尔型，执行成功返回True，否则返回False。
+              产生一个空头建仓操作，无返回值。
               该函数仅用于空头建仓，其处理规则如下：
               如果当前持仓状态为持平，该函数按照参数进行空头建仓。
               如果当前持仓状态为多仓，该函数平掉所有多仓，同时按照参数进行空头建仓，两个动作同时发出
