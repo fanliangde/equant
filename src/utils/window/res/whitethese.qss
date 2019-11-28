@@ -366,7 +366,7 @@ QCheckBox QWidget:disabled {
 /* checkbox 小方块设置 */
 QCheckBox::indicator {
     background-color: #FFFFFF;
-    border: 1px solid #CECECE;
+    border: 1px solid #707070;
     height: 12px;
     width: 12px;
 }
@@ -397,13 +397,13 @@ QRadioButton::indicator {
 
 /***********************************************************/
 QRadioButton::indicator:unchecked {
-  image: url(./utils/window/res/rc/radio_unchecked.png);
+  image: url(./utils/window/res/rc/radio_unchecked_w.png);
 }
 
 QRadioButton::indicator:unchecked:hover, QRadioButton::indicator:unchecked:focus, QRadioButton::indicator:unchecked:pressed {
   border: none;
   outline: none;
-  image: url(./utils/window/res/rc/radio_unchecked.png);
+  image: url(./utils/window/res/rc/radio_unchecked_w.png);
 }
 
 QRadioButton::indicator:unchecked:disabled {
@@ -414,7 +414,7 @@ QRadioButton::indicator:unchecked:disabled {
 QRadioButton::indicator:checked {
     border: none;
     outline: none;
-    image: url(./utils/window/res/rc/radio_checked);
+    image: url(./utils/window/res/rc/radio_checked_w);
 }
 
 QRadioButton::indicator:checked:focus, QRadioButton::indicator:checked:pressed {

@@ -56,10 +56,8 @@ def checkUpdate(logger):
             rvl = rvstr.split('.')[:-1]
             rmv = '.'.join(rvl)
 
-        logger.info("Start epolestar, version info, equant local version: %s, remote version: %s!" % (VERSION, rvstr))
-
         if (len(lmv) == len(rmv) > 0 and rmv > lmv) or (0 < len(lmv) != len(rmv)):
-            logger.info("Version need update local: %s, remote: %s" % (lmv, rmv))
+            logger.info("Equant version need update local: %s, remote: %s" % (lmv, rmv))
             time.sleep(3)
             cmdstr = '"start %s %s.0"' % (os.path.abspath("..") + "\\update.bat ", rmv)
             logger.info("Update cmdstr:%s" % cmdstr)
@@ -68,7 +66,7 @@ def checkUpdate(logger):
             os.system(cmdstr)
             os.chdir(curDir)
         else:
-            logger.info("Version don't need update, local:%s, remote:%s" % (lmv, rmv))
+            logger.info("Equant version don't need update, local:%s, remote:%s" % (lmv, rmv))
     except Exception as e:
         logger.error("checkUpdate Error:%s" % (traceback.format_exc()))
 

@@ -2,7 +2,7 @@
 import talib
 
 def initialize(context):
-    SetBarInterval('NYMEX|F|CL|1907', 'M',1)
+    SetBarInterval('NYMEX|F|CL|2001', 'M',1)
     SetTriggerType(1, None)
 
 def handle_data(context):

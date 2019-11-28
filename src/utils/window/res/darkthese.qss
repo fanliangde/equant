@@ -405,8 +405,8 @@ QCheckBox QWidget:disabled {
 
 /* checkbox 小方块设置 */
 QCheckBox::indicator {
-    background-color: #3C3C3C;
-    border: 1px solid #252526;
+    background-color: #252526;
+    border: 1px solid #CECECE;
     height: 12px;
     width: 12px;
 }
@@ -416,7 +416,7 @@ QCheckBox::indicator:focus {
 }
 
 QCheckBox::indicator:checked {
-    background-color: #3C3C3C;
+    background-color: #252526;
     image: url(./utils/window/res/rc/check.png);
 }
 

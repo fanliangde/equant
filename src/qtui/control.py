@@ -41,7 +41,7 @@ class Controller(object):
         self.mainApp = QApplication(sys.argv)
 
         # 根据分辨率调整字体
-        font = QFont("Microsoft YaHei UI", 10)
+        font = QFont("Microsoft YaHei UI", 11)
         pointsize = font.pointSize()
         font.setPixelSize(pointsize * 90 / 72)
         self.mainApp.setFont(font)
