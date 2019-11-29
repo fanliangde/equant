@@ -112,14 +112,3 @@ def main():
         log_process.join()
     atexit.register(exitHandler)
 
-
-if __name__ == '__main__':
-    sys.excepthook = excepthook_
-    # ------------任务栏显示app的图标-----------------
-    if 'Windows' == platform.system():
-        import ctypes
-        myappid = 'equant.ui.view.QuantApplication'  # app路径
-        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
-    # ------------------------------------------------
-    main()
-

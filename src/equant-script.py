@@ -10,8 +10,8 @@ from equant import excepthook_
 
 
 if __name__ == '__main__':
-    sys.argv[0] = re.sub(r'(equant-script\.pyw?|\.exe)?$', '', sys.argv[0])
-    os.chdir(os.path.abspath(sys.argv[0]))
+    path = os.path.dirname(os.path.abspath(__file__))
+    os.chdir(os.path.abspath(path))
 
     sys.excepthook = excepthook_
     # ------------任务栏显示app的图标-----------------
