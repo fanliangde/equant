@@ -2594,7 +2594,7 @@ class QuantApplication(QWidget):
             # ----------------------解析g_params参数----------------------------
             g_params = parseStrategtParam(path)
             if g_params == -1:
-                MyMessageBox.warning(self, '提示', '策略不存在！！！', QMessageBox.Ok | QMessageBox.Cancel)
+                MyMessageBox.warning(self, '提示', '策略不存在！！！', QMessageBox.Ok)
                 return
             self.strategy_policy_win.paramsTableWidget.setRowCount(len(g_params))
             for i in range(len(self._userNo)):
@@ -2703,13 +2703,13 @@ class QuantApplication(QWidget):
             self.statusBar.setText("  交易服务断连")
 
         if src == 'S':
-            self.statusBar.setText("  极星9.5退出")
+            self.statusBar.setText("  极星9.5客户端退出")
             self.exitSignal.emit()
         self.statusBar.setStyleSheet('color: #0062A3')
 
     def show_warn(self):
         """极星9.5退出时，弹出窗口槽函数"""
-        MyMessageBox.critical(self, "错误", "极星9.5退出", QMessageBox.Ok)
+        MyMessageBox.warning(self, "警告", "极星9.5客户端已退出!", QMessageBox.Ok)
 
     def addExecute(self, dataDict):
         values = self._formatMonitorInfo(dataDict)
