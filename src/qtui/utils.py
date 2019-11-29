@@ -5,14 +5,15 @@ import sys
 import re
 import shutil
 
-from PyQt5.QtCore import QDir, QFileInfo, QFile, QSize, Qt, pyqtSignal, QPoint, QSortFilterProxyModel
+from PyQt5.QtCore import QDir, QFileInfo, QFile, QSize, Qt, pyqtSignal, QPoint, QSortFilterProxyModel, QUrl
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QFont, QEnterEvent, QPainter, QColor, QPen, QIcon
 
 
 class Tree(QTreeView):
-    def __init__(self, model, strategy_filters):
+    def __init__(self, model, strategy_filters, quantWin):
         QTreeView.__init__(self)
+        self._win = quantWin
         # model.setReadOnly(False)
 
         # self.setSelectionMode(self.SingleSelection)
@@ -24,6 +25,8 @@ class Tree(QTreeView):
         self.setDropIndicatorShown(True)
 
     def dragEnterEvent(self, event):
+        event.ignore()
+        return
         m = event.mimeData()
         if m.hasUrls():
             for url in m.urls():
@@ -33,6 +36,8 @@ class Tree(QTreeView):
         event.ignore()
 
     def dropEvent(self, event):
+        event.ignore()
+        return
         if event.source():
             QTreeView.dropEvent(self, event)
         else:
@@ -61,6 +66,9 @@ class Tree(QTreeView):
                                 shutil.rmtree(n_path)
                                 shutil.copytree(o_path, n_path)
                         else:
+                            print(o_path)
+                            for file in os.walk(o_path):
+                                print(file)
                             shutil.copytree(o_path, n_path)
                             self.strategy_filters.append(os.path.split(n_path)[1])
                             self._model.setNameFilters(self.strategy_filters)
@@ -92,6 +100,8 @@ def get_strategy_filters(root_path):
 def parseStrategtParam(strategyPath):
     """解析策略中的用户参数"""
     g_params = {}
+    if not os.path.exists(strategyPath):
+        return -1 # 策略文件不存在， -1错误码
     with open(strategyPath, 'r', encoding="utf-8") as f:
         content = [line.strip() for line in f]
         for c in content:

@@ -1860,13 +1860,14 @@ class QuantApplication(QWidget):
         self.strategy_layout.setContentsMargins(0, 0, 0, 0)
         self.strategy_layout.setSpacing(0)
         self.model = QFileSystemModel()
-        self.strategy_tree = Tree(self.model, self.strategy_filter)
+        self.strategy_tree = Tree(self.model, self.strategy_filter, self)
         self.strategy_tree.setObjectName("StrategyTree")
         # self.strategy_tree = Tree(strategy_path)
         self.model.setRootPath(QtCore.QDir.rootPath())
         self.strategy_tree.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.strategy_tree.setModel(self.model)
-        self.strategy_tree.setDragDropMode(QAbstractItemView.InternalMove)
+        # TODO: 拖动！！
+        # self.strategy_tree.setDragDropMode(QAbstractItemView.InternalMove)
         self.strategy_tree.setRootIndex(self.model.index(strategy_path))
         # self.strategy_tree.setColumnCount(1)
         self.model.setReadOnly(False)
@@ -2592,6 +2593,9 @@ class QuantApplication(QWidget):
 
             # ----------------------解析g_params参数----------------------------
             g_params = parseStrategtParam(path)
+            if g_params == -1:
+                MyMessageBox.warning(self, '提示', '策略不存在！！！', QMessageBox.Ok | QMessageBox.Cancel)
+                return
             self.strategy_policy_win.paramsTableWidget.setRowCount(len(g_params))
             for i in range(len(self._userNo)):
                 self.strategy_policy_win.userComboBox.addItem(self._userNo[i]['UserNo'])
