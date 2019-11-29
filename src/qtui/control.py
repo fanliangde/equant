@@ -163,8 +163,8 @@ class Controller(object):
 
         self.logger.info("before app.close")
         self.reportWnd.close()
-        self.mainApp.quit()
-        # sys.exit(self.mainApp.exec_())
+        # self.mainApp.quit()
+        self.mainApp.closeAllWindows()
         self.logger.info("after app.close")
 
     def run(self):
