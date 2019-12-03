@@ -5681,7 +5681,7 @@ class BaseApi(object):
     def SetMargin(self, type, value, contractNo):
         '''
         【说明】
-              设置保证金参数，不设置取交易所公布参数
+              设置保证金参数，不设置或设置失败取界面设置的保证金比例
 
         【语法】
               int SetMargin(float type, float value=0, string contractNo='')

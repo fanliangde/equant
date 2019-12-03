@@ -477,10 +477,10 @@ class StrategyConfig_new(object):
         '''获取保证金类型'''
         if not contNo:
             contNo = self.getBenchmark()
-            
+
         if contNo not in self._metaData['Money']['Margin']:
             #raise Exception("请确保为合约%s设置了保证金类型！"%contNo)
-            return 0
+            return self._metaData['Money']['Margin']['']['Type']
 
         return self._metaData['Money']['Margin'][contNo]['Type']
 
@@ -488,10 +488,10 @@ class StrategyConfig_new(object):
         '''获取保证金比例值'''
         if not contNo:
             contNo = self.getBenchmark()
-            
+
         if contNo not in self._metaData['Money']['Margin']:
             #raise Exception("请确保为合约%s设置了保证金比例/额度！"%contNo)
-            return 0.08
+            return self._metaData['Money']['Margin']['']['Value']
 
         return self._metaData['Money']['Margin'][contNo]['Value']
 

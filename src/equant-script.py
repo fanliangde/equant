@@ -1,6 +1,5 @@
-﻿
-# -*- coding: utf-8 -*-
-import re
+﻿# -*- coding: utf-8 -*-
+
 import sys
 import os
 

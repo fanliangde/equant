@@ -1123,7 +1123,7 @@ class StrategyPolicy(QWidget):
             self.defaultOrderLineEdit.setText(conf[VDefaultQty]),
             self.miniOrderLineEdit.setText(conf[VMinQty]),
             # self.hedge.set(conf[VHedge]),
-            self.marginRateLineEdit.setText(conf[VMinQty]),
+            self.marginRateLineEdit.setText(conf[VMargin]),
 
             self.openTypeComboBox.setCurrentText(conf[VOpenType]),
             self.closeTypeComboBox.setCurrentText(conf[VCloseType]),
@@ -1971,8 +1971,7 @@ class QuantApplication(QWidget):
                                     '\n\n'
                                     'def initialize(context): \n    pass\n\n\n'
                                     'def handle_data(context):\n    pass\n\n\n'
-                                    'def hisover_callback(context):\n    pass\n\n\n'
-                                    'def exit_callback(context):\n    pass\n')
+                                    )
                         self.model.directoryLoaded.connect(lambda: self.focus_tree_item(path))
                         self.strategy_tree.expand(index)
                         break
@@ -1995,8 +1994,7 @@ class QuantApplication(QWidget):
                                     '\n\n'
                                     'def initialize(context): \n    pass\n\n\n'
                                     'def handle_data(context):\n    pass\n\n\n'
-                                    'def hisover_callback(context):\n    pass\n\n\n'
-                                    'def exit_callback(context):\n    pass\n')
+                                    )
                         self.model.directoryLoaded.connect(lambda: self.focus_tree_item(path))
                         break
             else:

@@ -699,7 +699,7 @@ class StrategyModel(object):
 
     def setMargin(self, type, value, contNo):
         if not contNo:
-            contNo =  self._cfgModel.getBenchmark()
+            contNo = self._cfgModel.getBenchmark()
             
         if type not in (0, 1):
             return -1
@@ -2088,7 +2088,7 @@ class StrategyModel(object):
     def getMarginRatio(self, contNo):
         if not contNo:
             contNo = self._cfgModel.getBenchmark()
-        
+
         marginValue = self._cfgModel.getMarginValue(contNo)
         return marginValue if marginValue else 0.08
 
