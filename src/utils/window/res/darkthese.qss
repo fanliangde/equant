@@ -524,6 +524,11 @@ QComboBox {
     padding-right: 4px;
 }
 
+QComboBox:disabled {
+    background: #252526;
+    border: 0px solid #363636;
+}
+
 QComboBox:on {
     border: 1px solid #175B89;
 }

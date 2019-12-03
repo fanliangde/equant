@@ -1340,9 +1340,11 @@ class ContractWin(QWidget):
 
     def valid(self, index):
         if index == 0:
+            self.kLinePeriodComboBox.setItemText(0, "0")
             self.kLinePeriodComboBox.setCurrentIndex(0)
             self.kLinePeriodComboBox.setEnabled(False)
         else:
+            self.kLinePeriodComboBox.setItemText(0, "1")
             self.kLinePeriodComboBox.setEnabled(True)
 
     def valid_contract(self):
