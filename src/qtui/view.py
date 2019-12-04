@@ -38,6 +38,8 @@ class StrategyPolicy(QWidget):
     def __init__(self, control, path, flag=False, master=None, param=None, parent=None):
         super().__init__(parent)
 
+        self._master = master  # 夫父窗口
+
         self.main_layout = QVBoxLayout()
         layout1 = QHBoxLayout()
         layout2 = QHBoxLayout()
@@ -785,6 +787,9 @@ class StrategyPolicy(QWidget):
         for t in time:
             if t:
                 timerFormatter.append(t)
+        if not initFund:
+            MyMessageBox.information(self, "极星量化", "初始资金不能为空", QMessageBox.Ok)
+            return
 
         if float(initFund) < 1000:
             MyMessageBox.warning(self, "极星量化", "初始资金不能小于1000元", QMessageBox.Ok)
@@ -832,18 +837,6 @@ class StrategyPolicy(QWidget):
             for j in range(self.contractTableWidget.columnCount()):
                 contValues.append(self.contractTableWidget.item(i, j).text())
             contsInfo.append(contValues)
-
-            # kLineTypeDict = {
-            #     "分时": 't',
-            #     "分笔": 'T',
-            #     "秒线": 'S',
-            #     "分钟": 'M',
-            #     "小时": 'H',
-            #     "日线": 'D',
-            #     "周线": 'W',
-            #     "月线": 'm',
-            #     "年线": 'Y'
-            # }
 
             kLineTypeDict = {
                 "分笔": 'T',
@@ -1058,7 +1051,7 @@ class StrategyPolicy(QWidget):
             else:
                 self._control._request.strategyParamRestart(self._paramFlag, config)
                 self._control.logger.info("Restarting strategy by new paramters")
-        self.close()
+        self._master.titleBar.closeWindow()
 
     def readConfig(self):
         """读取配置文件"""
@@ -1240,6 +1233,7 @@ class ContractWin(QWidget):
         label1 = QLabel('商品代码：')
         self.contractCodeLineEdit = QLineEdit()
         self.contractCodeLineEdit.setFixedWidth(200)
+        self.contractCodeLineEdit.setFocusPolicy(Qt.NoFocus)
         self.select = QPushButton('选择')
         self.select.setFixedWidth(60)
         h_layout1.addWidget(label1)
@@ -2603,9 +2597,10 @@ class QuantApplication(QWidget):
     def create_strategy_policy_win(self, param, path, flag):
         # 运行点击槽函数，弹出策略属性设置窗口
         if path:
-            self.strategy_policy_win = StrategyPolicy(self._controller, path, param=param, flag=flag)
             self.main_strategy_policy_win = FramelessWindow()
             self.main_strategy_policy_win.resize(560, 580)
+            self.strategy_policy_win = StrategyPolicy(self._controller, path, master=self.main_strategy_policy_win,
+                                                      param=param, flag=flag)
 
             self.main_strategy_policy_win.hideTheseBtn()
             self.main_strategy_policy_win.titleBar.iconLabel.hide()
@@ -2620,7 +2615,7 @@ class QuantApplication(QWidget):
                 style = CommonHelper.readQss(DARKSTYLE)
             self.main_strategy_policy_win.setStyleSheet('')
             self.main_strategy_policy_win.setStyleSheet(style)
-            self.strategy_policy_win.confirm.clicked.connect(self.main_strategy_policy_win.close)  # todo
+            # self.strategy_policy_win.confirm.clicked.connect(self.main_strategy_policy_win.close)  # todo
             self.strategy_policy_win.cancel.clicked.connect(self.main_strategy_policy_win.titleBar.closeWindow)
             self.strategy_policy_win.contractWin.select.clicked.connect(
                 lambda: self.strategy_policy_win.contractSelect(self._exchange, self._commodity, self._contract))
