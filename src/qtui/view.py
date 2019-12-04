@@ -9,6 +9,8 @@ import shutil
 import traceback
 import time
 
+from copy import deepcopy
+
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import Qt, QPoint, QUrl, pyqtSignal, pyqtSlot, QSharedMemory, QTimer, QDir, QSettings
 from PyQt5.QtGui import QTextCursor, QIcon, QKeySequence
@@ -655,9 +657,16 @@ class StrategyPolicy(QWidget):
             sample_dict_list = []
             for i in range(row):
                 sample_dict_list.append(json.loads(self.contractTableWidget.item(i, 4).text()))
-            if json.loads(items[4]) in sample_dict_list:
-                MyMessageBox.warning(self, '提示', '请勿添加重复合约设置！', QMessageBox.Ok)
-                return
+
+            # row不相同
+            d = json.loads(items[4])
+            d.pop('row')
+            for _items in deepcopy(sample_dict_list):
+                _items.pop('row')
+                if d == _items:
+                    MyMessageBox.warning(self, '提示', '请勿添加重复合约设置！', QMessageBox.Ok)
+                    return
+
             self.contractTableWidget.setRowCount(row + 1)
 
         for j in range(len(items)):
