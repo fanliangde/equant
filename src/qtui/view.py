@@ -1,4 +1,3 @@
-import datetime
 import json
 import os
 import threading
@@ -7,8 +6,9 @@ import pandas as pd
 import shutil
 # import sys
 import traceback
-import time
+from datetime import datetime
 
+from dateutil.parser import parse
 from copy import deepcopy
 
 from PyQt5 import QtCore, QtGui
@@ -705,7 +705,9 @@ class StrategyPolicy(QWidget):
             self.contractWin.AllkLineRadioButton.setChecked(True)
         elif sample_dict.get('BeginTime'):
             self.contractWin.startDateRadioButton.setChecked(True)
-            self.contractWin.startDateLineEdit.setText(sample_dict.get('BeginTime'))
+            temp = sample_dict.get('BeginTime')
+            text = "".join(temp.split("-"))
+            self.contractWin.startDateLineEdit.setText(text)
         elif sample_dict.get('UseSample'):  # TODO 确认条件True还是False时候执行
             self.contractWin.historyRadioButton.setChecked(True)
         elif sample_dict.get('KLineCount'):
@@ -860,7 +862,8 @@ class StrategyPolicy(QWidget):
             elif contValues[3] == "不执行历史K线":
                 samValue = 'N'
             elif json.loads(contValues[4]).get('BeginTime'):
-                samValue = json.loads(contValues[4]).get('BeginTime')
+                temp = json.loads(contValues[4]).get('BeginTime')
+                samValue = "".join(temp.split("-"))
             elif json.loads(contValues[4]).get('KLineCount'):
                 samValue = json.loads(contValues[4]).get('KLineCount')
 
@@ -1361,10 +1364,8 @@ class ContractWin(QWidget):
             MyMessageBox.warning(self, '提示', '请先选择合约！！！', QMessageBox.Ok)
             return
         if self.startDateRadioButton.isChecked():
-            try:
-                assert len(self.startDateLineEdit.text()) == 8
-            except:
-                MyMessageBox.warning(self, '提示', '输入的时间格式不合法，请重新输入！！！', QMessageBox.Ok)
+            dateFormat = self._isDateFormat(self.startDateLineEdit.text())
+            if not dateFormat:
                 return
         if self.qtyRadioButton.isChecked():
             try:
@@ -1374,6 +1375,29 @@ class ContractWin(QWidget):
                 return
         self.confirm_signal.emit(self.get_contract_policy())
         self.parent().close()
+
+    def _isDateFormat(self, date):
+        """
+        判断用户输入的日期格式是否正确，正确则将该日期返回，错误则给出提示信息
+        :param date: 标准格式：'YYYYMMDD'
+        :return:
+        """
+        if len(date) > 8 or len(date) < 8:
+            MyMessageBox.information(self, "提示", "日期应为8位长度", QMessageBox.Ok)
+            return
+        else:
+            # TODO: 还需要判断日期是否是合法日期
+            try:
+                time = parse(date)
+            except ValueError:
+                MyMessageBox.information(self, "提示", "日期为非法日期", QMessageBox.Ok)
+                return
+            else:
+                if time > datetime.now():
+                    MyMessageBox.information(self, "提示", "日期不能大于今天", QMessageBox.Ok)
+                    return
+                else:
+                    return date
 
     def get_contract_policy(self):
         """获取商品属性"""
@@ -1400,6 +1424,7 @@ class ContractWin(QWidget):
             allK = True
         elif self.startDateRadioButton.isChecked():
             beginTime = self.startDateLineEdit.text()
+            beginTime = parse(beginTime).strftime("%Y-%m-%d")
         elif self.qtyRadioButton.isChecked():
             kLineCount = int(self.qtylineEdit.text())
         elif self.historyRadioButton.isChecked():
