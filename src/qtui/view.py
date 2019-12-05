@@ -88,7 +88,7 @@ class StrategyPolicy(QWidget):
         self.closeFeeRateLineEdit.setValidator(feeLimit)  # 设置只能输入数字
         self.slippageLineEdit.setValidator(QtGui.QIntValidator())  # 设置只能输入数字
         self.isConOpenTimesLineEdit.setValidator(QtGui.QIntValidator(1, 100))  # 设置只能输入数字
-        self.openTimeslineEdit.setValidator(QtGui.QIntValidator(1, 100))  # 设置只能输入数字
+        self.openTimesLineEdit.setValidator(QtGui.QIntValidator(1, 100))  # 设置只能输入数字
         self.addTimerButton.clicked.connect(self.add_timer)
         self.deleteTimerButton.clicked.connect(self.delete_timer)
         self.addContract.clicked.connect(self.create_contract_win)
@@ -181,6 +181,7 @@ class StrategyPolicy(QWidget):
         self.cycleCheckBox = QCheckBox('每间隔')
         self.cycleCheckBox.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.cycleLineEdit = QLineEdit('200')
+        self.cycleCheckBox.stateChanged.connect(self._cycleCheckBoxStateChangedCallback)
         self.cycleLabel = QLabel('毫秒执行代码（100的整数倍）')
         self.cycleLabel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         h_layout4.addWidget(self.cycleCheckBox)
@@ -281,6 +282,12 @@ class StrategyPolicy(QWidget):
 
         self.runPolicy.setLayout(run_layout)
         self.strategyTabWidget.addTab(self.runPolicy, '运行方式')
+
+    def _cycleCheckBoxStateChangedCallback(self, state):
+        """周期触发checkbox回调"""
+        if state == Qt.Checked:
+            self.cycleLineEdit.setFocus()
+            self.cycleLineEdit.selectAll()
 
     def create_contract_policy(self):
         self.contractPolicy = QWidget()
@@ -400,6 +407,7 @@ class StrategyPolicy(QWidget):
         self.set_label_size_policy(label6)
         self.openTypeComboBox = QComboBox()
         self.openTypeComboBox.addItems(['固定值', '比例'])
+        self.openTypeComboBox.currentIndexChanged.connect(self._openTypeComboBoxSelectCall)
         h_layout6.addWidget(label6)
         h_layout6.addWidget(self.openTypeComboBox)
         h_layout6.addItem(h_spacerItem6)
@@ -409,11 +417,11 @@ class StrategyPolicy(QWidget):
         label7.setFixedWidth(100)
         self.set_label_size_policy(label7)
         self.openFeeRateLineEdit = QLineEdit('1')
-        label71 = QLabel('%')
-        self.set_label_size_policy(label71)
+        self.label71 = QLabel('%')
+        self.set_label_size_policy(self.label71)
         h_layout7.addWidget(label7)
         h_layout7.addWidget(self.openFeeRateLineEdit)
-        h_layout7.addWidget(label71)
+        h_layout7.addWidget(self.label71)
         h_layout7.addItem(h_spacerItem7)
 
         h_layout8 = QHBoxLayout()
@@ -422,6 +430,7 @@ class StrategyPolicy(QWidget):
         self.set_label_size_policy(label8)
         self.closeTypeComboBox = QComboBox()
         self.closeTypeComboBox.addItems(['固定值', '比例'])
+        self.closeTypeComboBox.currentIndexChanged.connect(self._closeTypeComboBoxSelectCall)
         h_layout8.addWidget(label8)
         h_layout8.addWidget(self.closeTypeComboBox)
         h_layout8.addItem(h_spacerItem8)
@@ -431,11 +440,11 @@ class StrategyPolicy(QWidget):
         label9.setFixedWidth(100)
         self.set_label_size_policy(label9)
         self.closeFeeRateLineEdit = QLineEdit('1')
-        label91 = QLabel('%')
-        self.set_label_size_policy(label91)
+        self.label91 = QLabel('%')
+        self.set_label_size_policy(self.label91)
         h_layout9.addWidget(label9)
         h_layout9.addWidget(self.closeFeeRateLineEdit)
-        h_layout9.addWidget(label91)
+        h_layout9.addWidget(self.label91)
         h_layout9.addItem(h_spacerItem9)
 
         h_layout10 = QHBoxLayout()
@@ -481,6 +490,19 @@ class StrategyPolicy(QWidget):
         self.moneyPolicy.setLayout(main_layout)
         self.strategyTabWidget.addTab(self.moneyPolicy, '资金设置')
 
+    def _openTypeComboBoxSelectCall(self, tag):
+        if tag == 0:
+            self.label71.hide()
+        else:
+            self.label71.show()
+
+    def _closeTypeComboBoxSelectCall(self, tag):
+        if tag == 0:
+            self.label91.hide()
+        else:
+            self.label91.show()
+
+
     def create_sample_policy(self):
         send_order_widget = QWidget()
         send_order_widget.setObjectName("SendOrderWidget")
@@ -504,11 +526,11 @@ class StrategyPolicy(QWidget):
 
         h_layout2 = QHBoxLayout()
         self.openTimesCheckBox = QCheckBox('每根K线同向开仓次数：')
-        self.openTimeslineEdit = QLineEdit('1')
+        self.openTimesLineEdit = QLineEdit('1')
         label2 = QLabel('次(1-100)')
         self.set_label_size_policy(label2)
         h_layout2.addWidget(self.openTimesCheckBox)
-        h_layout2.addWidget(self.openTimeslineEdit)
+        h_layout2.addWidget(self.openTimesLineEdit)
         h_layout2.addWidget(label2)
         h_layout2.addItem(h_spacerItem2)
 
@@ -531,7 +553,10 @@ class StrategyPolicy(QWidget):
         self.isConOpenTimesCheckBox.setFixedWidth(150)
         self.openTimesCheckBox.setFixedWidth(150)
         self.isConOpenTimesLineEdit.setFixedWidth(50)
-        self.openTimeslineEdit.setFixedWidth(50)
+        self.openTimesLineEdit.setFixedWidth(50)
+
+        self.isConOpenTimesCheckBox.stateChanged.connect(self._conCheckBoxStateChangedCallback)
+        self.openTimesCheckBox.stateChanged.connect(self._openCheckBoxStateChangedCallback)
 
         self.groupBox.setLayout(main_layout)
         send_order_layout.addWidget(self.groupBox)
@@ -539,6 +564,28 @@ class StrategyPolicy(QWidget):
         send_order_layout.addItem(v_spacerItem)
         send_order_widget.setLayout(send_order_layout)
         self.strategyTabWidget.addTab(send_order_widget, '样本设置')
+
+    def _conCheckBoxStateChangedCallback(self, state):
+        """最大连续同向开仓次数checkbox回调"""
+        if state == Qt.Unchecked:
+            self.isConOpenTimesLineEdit.setText("不限制")
+            self.isConOpenTimesLineEdit.setEnabled(False)
+        else:
+            self.isConOpenTimesLineEdit.setText("1")
+            self.isConOpenTimesLineEdit.setEnabled(True)
+            self.isConOpenTimesLineEdit.setFocus()
+            self.isConOpenTimesLineEdit.selectAll()
+
+    def _openCheckBoxStateChangedCallback(self, state):
+        """每根K线同向开仓次数checkbox回调"""
+        if state == Qt.Unchecked:
+            self.openTimesLineEdit.setText("不限制")
+            self.openTimesLineEdit.setEnabled(False)
+        else:
+            self.openTimesLineEdit.setText("1")
+            self.openTimesLineEdit.setEnabled(True)
+            self.openTimesLineEdit.setFocus()
+            self.openTimesLineEdit.selectAll()
 
     def create_param_policy(self):
         self.paramPolicy = QWidget()
@@ -777,7 +824,7 @@ class StrategyPolicy(QWidget):
         isPop = int(self.allowCheckBox.isChecked())  # 允许弹窗
         # isContinue = self.isContinue.get()
         isOpenTimes = int(self.openTimesCheckBox.isChecked())  # 每根K线同向开仓次数标志
-        openTimes = self.openTimeslineEdit.text()  # 每根K线同向开仓次数
+        openTimes = self.openTimesLineEdit.text()  # 每根K线同向开仓次数
 
         isConOpenTimes = int(self.isConOpenTimesCheckBox.isChecked())  # 最大连续同向开仓次数标志
 
@@ -1161,6 +1208,15 @@ class StrategyPolicy(QWidget):
             self.cycleCheckBox.setChecked(conf[VIsCycle]),
             self.cycleLineEdit.setText(conf[VCycle]),
 
+            if self.openTypeComboBox.currentText() == "固定值":
+                self.label71.hide()
+            else:
+                self.label71.show()
+            if self.closeTypeComboBox.currentText() == "固定值":
+                self.label91.hide()
+            else:
+                self.label91.show()
+
             # 定时触发通过函数设置
             if conf[VTimer] != '':
                 for t in conf[VTimer].split('\n'):
@@ -1192,11 +1248,17 @@ class StrategyPolicy(QWidget):
                 self.allowCheckBox.setChecked(0)
 
             self.openTimesCheckBox.setChecked(conf[VIsOpenTimes]),
-            self.openTimeslineEdit.setText(conf[VOpenTimes]),
+            self.openTimesLineEdit.setText(conf[VOpenTimes]),
             self.isConOpenTimesCheckBox.setChecked(conf[VIsConOpenTimes]),
             self.isConOpenTimesLineEdit.setText(conf[VConOpenTimes]),
             self.canCloseCheckBox.setChecked(conf[VCanClose]),
             self.canOpenCheckBox.setChecked(conf[VCanOpen]),
+            if self.isConOpenTimesCheckBox.checkState() == Qt.Unchecked:
+                self.isConOpenTimesLineEdit.setText("不限制")
+                self.isConOpenTimesLineEdit.setEnabled(False)
+            if self.openTimesCheckBox.checkState() == Qt.Unchecked:
+                self.openTimesLineEdit.setText("不限制")
+                self.openTimesLineEdit.setEnabled(False)
 
             # 用户配置参数信息
             # 若保存的设置中用户参数为空，则不对self._userParam赋值
