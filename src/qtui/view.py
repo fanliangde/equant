@@ -79,9 +79,13 @@ class StrategyPolicy(QWidget):
         self.initFundlineEdit.setValidator(QtGui.QIntValidator())  # 设置只能输入数字
         self.defaultOrderLineEdit.setValidator(QtGui.QIntValidator())  # 设置只能输入数字
         self.miniOrderLineEdit.setValidator(QtGui.QIntValidator(1, 1000))  # 设置只能输入数字
-        self.marginRateLineEdit.setValidator(QtGui.QIntValidator(1, 100))  # 设置只能输入数字
-        self.openFeeRateLineEdit.setValidator(QtGui.QIntValidator(1, 100))  # 设置只能输入数字
-        self.closeFeeRateLineEdit.setValidator(QtGui.QIntValidator(1, 100))  # 设置只能输入数字
+        reg = QtCore.QRegExp("^(((\\d{1,2})[.]((\\d{1,2})?))|100)$")
+        marginLimit = QtGui.QRegExpValidator(reg)
+        self.marginRateLineEdit.setValidator(marginLimit)  # 设置只能输入数字
+
+        feeLimit = QtGui.QRegExpValidator(reg)
+        self.openFeeRateLineEdit.setValidator(feeLimit)  # 设置只能输入数字
+        self.closeFeeRateLineEdit.setValidator(feeLimit)  # 设置只能输入数字
         self.slippageLineEdit.setValidator(QtGui.QIntValidator())  # 设置只能输入数字
         self.isConOpenTimesLineEdit.setValidator(QtGui.QIntValidator(1, 100))  # 设置只能输入数字
         self.openTimeslineEdit.setValidator(QtGui.QIntValidator(1, 100))  # 设置只能输入数字
@@ -787,13 +791,6 @@ class StrategyPolicy(QWidget):
         for t in time:
             if t:
                 timerFormatter.append(t)
-        if not initFund:
-            MyMessageBox.information(self, "极星量化", "初始资金不能为空", QMessageBox.Ok)
-            return
-
-        if float(initFund) < 1000:
-            MyMessageBox.warning(self, "极星量化", "初始资金不能小于1000元", QMessageBox.Ok)
-            return
 
         if cycle == "":
             MyMessageBox.warning(self, "极星量化", "定时触发周期不能为空", QMessageBox.Ok)
@@ -804,6 +801,22 @@ class StrategyPolicy(QWidget):
         else:
             pass
 
+        if not initFund:
+            MyMessageBox.warning(self, "极星量化", "初始资金不能为空", QMessageBox.Ok)
+            return
+
+        if float(initFund) < 1000:
+            MyMessageBox.warning(self, "极星量化", "初始资金不能小于1000元", QMessageBox.Ok)
+            return
+
+        if not defaultQty:
+            MyMessageBox.warning(self, "极星量化", "默认下单量不能为空", QMessageBox.Ok)
+            return
+
+        if not margin:
+            MyMessageBox.warning(self, "极星量化", "保证金率不能为空", QMessageBox.Ok)
+            return
+
         if minQty == "":
             MyMessageBox.warning(self, "极星量化", "最小下单量不能为空", QMessageBox.Ok)
             return
@@ -812,6 +825,14 @@ class StrategyPolicy(QWidget):
             return
         else:
             pass
+
+        if not openFee:
+            MyMessageBox.warning(self, "极星量化", "开仓手续费不能为空", QMessageBox.Ok)
+            return
+
+        if not closeFee:
+            MyMessageBox.warning(self, "极星量化", "平仓手续费不能为空", QMessageBox.Ok)
+            return
 
         if isConOpenTimes:
             if conOpenTimes == '' or int(conOpenTimes) < 1 or int(conOpenTimes) > 100:
