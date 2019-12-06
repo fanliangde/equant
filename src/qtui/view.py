@@ -2704,10 +2704,12 @@ class QuantApplication(QWidget):
                 lambda: self.strategy_policy_win.contractSelect(self._exchange, self._commodity, self._contract))
 
             # ----------------------解析g_params参数----------------------------
-            g_params = parseStrategtParam(path)
-            if g_params == -1:
-                MyMessageBox.warning(self, '提示', '策略不存在！！！', QMessageBox.Ok)
-                return
+            g_params = param
+            if not g_params:
+                g_params = parseStrategtParam(path)
+                if g_params == -1:
+                    MyMessageBox.warning(self, '提示', '策略不存在！！！', QMessageBox.Ok)
+                    return
             self.strategy_policy_win.paramsTableWidget.setRowCount(len(g_params))
             for i in range(len(self._userNo)):
                 self.strategy_policy_win.userComboBox.addItem(self._userNo[i]['UserNo'])
@@ -2732,7 +2734,7 @@ class QuantApplication(QWidget):
                     param_type = 'bool'
                     cell = QComboBox()
                     cell.addItems(['True', 'False'])
-                    index = 0 if item[0][1] == 'True' else 1
+                    index = 0 if item[1][0] is True else 1
                     cell.setCurrentIndex(index)
                 cell.setStyleSheet('border: none; min-height: 30px;')
                 self.strategy_policy_win.paramsTableWidget.cells.append(cell)
