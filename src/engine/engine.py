@@ -639,9 +639,27 @@ class StrategyEngine(object):
                 continue
                 
             exchgNo = contDict[contNo].getContract()['ExchangeNo']
+            commNo = contDict[contNo].getContract()['CommodityNo']
+            commNo = commNo.split('|')[-1]
             exchgDict = self._qteModel.getExchangeDict()
             if exchgNo not in exchgDict:
                 continue
+            else:
+                # 判断是否在交易时段
+                #self.logger.debug("CommStat:%s, commNo:%s" %(exchgDict[exchgNo].getExchange(), commNo))
+                commStat = exchgDict[exchgNo].getCommodityStatus(commNo)
+                exchgStat = exchgDict[exchgNo].getExchangeStatus()
+                if commStat and commStat != '3':
+                    continue
+                else:
+                    #self.logger.debug("111commNo Ok:%s" %commStat)
+                    pass
+                
+                if exchgStat != '3':
+                    continue
+                else:
+                    #self.logger.debug("222exchage Ok:%s" %exchgStat)
+                    pass
             
             stBuyPos = pos[5]
             stSellPos = pos[6]

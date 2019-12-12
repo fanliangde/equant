@@ -195,6 +195,7 @@ class ExchangeModel:
         return sys.strftime('%Y-%m-%d %H:%M:%S')
         
     def getExchangeStatus(self):
+        #self.logger.debug(self._metaData)
         return self._metaData['TradeState']
         
     def getCommodityStatus(self, commNo):

@@ -132,6 +132,7 @@ class StrategyQuote(QuoteModel):
         return self._exchangeData[exchangeNo].getExchangeTime()
         
     def getExchangeStatus(self, exchangeNo):
+        #self.logger.debug(str(self._exchangeData))
         if exchangeNo not in self._exchangeData:
             return ""
         return self._exchangeData[exchangeNo].getExchangeStatus()
