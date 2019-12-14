@@ -419,11 +419,11 @@ class BaseApi(object):
                 
               kLineType 指定周期类型，可选的枚举函数和相应含义为：
                 Enum_Period_Tick        : 周期类型_分笔
-                Enum_Period_Second      : 周期类型_秒线
                 Enum_Period_Min         : 周期类型_分钟
                 Enum_Period_Day         : 周期类型_日线
                 
               kLineValue 周期数， 如：5分钟线，周期数就是5；50秒线，周期数为50
+                                  要订阅秒线，周期类型选择Enum_Period_tick, 周期数选择大于等于1的整数
               contractNo 合约编号, 为空时取当前合约
               maxLength 定返回历史数据数组的最大长度，默认值为100
 
