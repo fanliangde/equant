@@ -118,7 +118,7 @@ class StrategyPolicy(QWidget):
         # self.contractWin.setStyle(self.style())
 
         self.main_contractWin = FramelessWindow()
-        self.main_contractWin.setFixedSize(410, 335)
+
         self.main_contractWin.hideTheseBtn()
         self.main_contractWin.titleBar.iconLabel.hide()
         self.main_contractWin.disabledMaximumBtn()
@@ -127,6 +127,11 @@ class StrategyPolicy(QWidget):
         self.main_contractWin.titleBar.buttonClose.clicked.connect(self.main_contractWin.close)
         self.main_contractWin.setWidget(self.contractWin)
         self.contractWin.cancel.clicked.connect(self.main_contractWin.close)
+        # 设置窗口的大小和位置
+        pGeometry = self._master.frameGeometry()
+        self.main_contractWin.resize(pGeometry.width() * 0.4, pGeometry.height() * 0.5)
+        self.main_contractWin.center(pGeometry)
+
         if self._control.mainWnd.titleBar.theseState == '浅色':
             style = CommonHelper.readQss(WHITESTYLE)
         else:
@@ -659,7 +664,11 @@ class StrategyPolicy(QWidget):
         self.contractSelectWin = ContractSelect(exchange, commodity, contract)
         self.contractSelectWin.setObjectName("ContractSelectWin")
         self.main_contractSelectWin = FramelessWindow()
-        self.main_contractSelectWin.setFixedSize(750, 550)
+        # self.main_contractSelectWin.setFixedSize(750, 550)
+        # 设置窗口的大小和位置
+        _pGeometry = self.main_contractWin.frameGeometry()
+        self.main_contractSelectWin.resize(_pGeometry.width() * 2, _pGeometry.height() * 2)
+        self.main_contractSelectWin.center(_pGeometry)
         self.main_contractSelectWin.titleBar.theseSelect.hide()
         self.main_contractSelectWin.titleBar.iconLabel.hide()
         self.main_contractSelectWin.disabledMaximumBtn()
@@ -1813,8 +1822,8 @@ class QuantApplication(QWidget):
     positionSignal = pyqtSignal(list)
     pathSignal = pyqtSignal(str)
 
-    def __init__(self, control, parent=None):
-        super().__init__(parent)
+    def __init__(self, control, master=None):
+        super().__init__(master)
 
         self.exitSignal.connect(self.show_warn)
         self.positionSignal.connect(self.updateSyncPosition)
@@ -1823,6 +1832,7 @@ class QuantApplication(QWidget):
 
         # 初始化控制器
         self._controller = control
+        self._master = master
         self._logger = self._controller.get_logger()
 
         self.reportView = self._controller.reportView
@@ -2332,7 +2342,8 @@ class QuantApplication(QWidget):
         self.content_layout.addWidget(self.contentEdit, 2, 0, 20, 3)
         self.content_vbox.setLayout(self.content_layout)
         self.run_btn.clicked.connect(self.emit_custom_signal)  # 改为提示用户保存当前的文件
-        self.run_btn.clicked.connect(lambda: self.create_strategy_policy_win({}, self.strategy_path, False))
+        self.run_btn.clicked.connect(
+            lambda: self.create_strategy_policy_win({}, self.strategy_path, False))
         self.save_btn.clicked.connect(self.emit_custom_signal)
         self.save_btn.setShortcut("Ctrl+S")  # ctrl + s 快捷保存
 
@@ -2680,8 +2691,11 @@ class QuantApplication(QWidget):
     def create_strategy_policy_win(self, param, path, flag):
         # 运行点击槽函数，弹出策略属性设置窗口
         if path:
+            pGeometry = self._controller.mainWnd.frameGeometry()
             self.main_strategy_policy_win = FramelessWindow()
-            self.main_strategy_policy_win.resize(560, 580)
+            self.main_strategy_policy_win.resize(pGeometry.width() * 0.4, pGeometry.height() * 0.7)
+            # self.main_strategy_policy_win.resize(560, 580)
+            self.main_strategy_policy_win.center(pGeometry)
             self.strategy_policy_win = StrategyPolicy(self._controller, path, master=self.main_strategy_policy_win,
                                                       param=param, flag=flag)
 
@@ -3058,6 +3072,9 @@ class QuantApplication(QWidget):
 
         # 保存报告数据
         reportPath = save(data, runMode, stName)
+        #
+        _pGeometry = self._master.frameGeometry()
+        self.reportWnd.center(_pGeometry)
 
         self.reportView.reportShowSig.emit([data, reportPath])
         # TODO: 在这里展示报告会导致程序不响应，放到接收信号处展示

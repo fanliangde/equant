@@ -50,23 +50,31 @@ class Controller(object):
         self._createReportWin()
         ################################################
 
-        self.app = QuantApplication(self)
+        self.mainWnd = FramelessWindow()
+        self.mainWnd.setWindowTitle('极星量化')
+
+        self.app = QuantApplication(self, master=self.mainWnd)
         if self.app.settings.contains('theme') and self.app.settings.value('theme') == 'vs-dark':
             theme = THESE_STATE_DARK
         else:
             theme = THESE_STATE_WHITE
 
-        self.mainWnd = FramelessWindow()
-        self.mainWnd.setWindowTitle('极星量化')
         self.mainWnd.setWinThese(theme)
         self.mainWnd.setWindowIcon(QIcon('icon/epolestar ix2.ico'))
         screen = QDesktopWidget().screenGeometry()
-        self.mainWnd.setGeometry(screen.width() * 0.1, screen.height() * 0.1, screen.width() * 0.8,
-                                 screen.height() * 0.8)
+        self.mainWnd.resize(screen.width() * 0.8, screen.height() * 0.8)
+        self.mainWnd.center()
+
         # self.mainWnd.titleBar.buttonClose.clicked.connect(self.quitThread)
         self.mainWnd.titleBar.buttonClose.clicked.disconnect(self.mainWnd.titleBar.closeWindow)
         self.mainWnd.titleBar.buttonClose.clicked.connect(self.app.save_edit_strategy)
         self.mainWnd.setWidget(self.app)
+
+        # 根据父窗口大小决定报告窗口大小
+        _pGeometry = self.mainWnd.frameGeometry()
+        self.reportWnd.resize(_pGeometry.width() * 0.6, _pGeometry.height() * 0.7)
+        self.reportWnd.setMinimumSize(_pGeometry.width() * 0.4, _pGeometry.height() * 0.7)
+        self.reportWnd.setMaximumSize(_pGeometry.width() * 0.6, _pGeometry.height() * 0.7)
 
         # 创建模块
         self.model = QuantModel(self.app, self._ui2egQueue, self._eg2uiQueue, self.logger)
@@ -86,9 +94,9 @@ class Controller(object):
     def _createReportWin(self):
         self.reportWnd = FramelessWindow()
         self.reportWnd.setObjectName("ReportWnd")
-        self.reportWnd.resize(1000, 600)
-        self.reportWnd.setMinimumSize(600, 600)
-        self.reportWnd.setMaximumSize(1000, 600)
+        # self.reportWnd.resize(1000, 600)
+        # self.reportWnd.setMinimumSize(600, 600)
+        # self.reportWnd.setMaximumSize(1000, 600)
         self.reportWnd.hideTheseBtn()
         self.reportWnd.disabledMaximumBtn()
         self.reportWnd.setWindowTitle("回测报告")
