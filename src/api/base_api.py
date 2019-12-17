@@ -428,7 +428,9 @@ class BaseApi(object):
               maxLength 定返回历史数据数组的最大长度，默认值为100
 
         【备注】
-              返回numpy数组，包括截止当前Bar的最多maxLength个指定的种类的历史数据
+              1. 获取前要使用SetBarInterval订阅指定合约，指定周期，指定数量的历史数据，否则HisData取不到数据
+              2. 返回numpy数组，获取订阅的maxLength个指定的种类的历史数据
+              
 
         【示例】
               closeList = HisData(Enum_Data_Close(), Enum_Period_Min(), 5, "ZCE|F|SR|906", 1000) # 获取合约ZCE|F|SR|906包含当前Bar在内的之前1000个5分钟线的收盘价
