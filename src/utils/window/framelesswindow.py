@@ -1,6 +1,6 @@
 import sys
 from PyQt5.QtCore import QSize
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication, QDesktopWidget
 from PyQt5.QtWidgets import QWidget, QVBoxLayout
 
 import ctypes
@@ -43,6 +43,24 @@ class FramelessWindow(QWidget):
         self.windowTitleChanged.connect(self.titleBar.setTitle)
         self.windowIconChanged.connect(self.titleBar.setIcon)
         FramelessWindow.CObject.append(self)
+
+    def center(self, pGeometry=None):
+        if pGeometry:
+            pr = pGeometry
+            x, y, w, h = pr.x(), pr.y(), pr.width(), pr.height()
+            # 父窗口的中心点坐标
+            cenPosX = x + w / 2
+            cenPosY = y + h / 2
+            size = self.size()
+            xPos = cenPosX - size.width() / 2
+            yPos = cenPosY - size.height() / 2
+            print("333: ", xPos, yPos, size)
+            self.move(xPos, yPos)
+        else:
+            qr = self.frameGeometry()
+            cp = QDesktopWidget().availableGeometry().center()
+            qr.moveCenter(cp)
+            self.move(qr.topLeft())
 
     def closeWindow(self):
         self.close()
