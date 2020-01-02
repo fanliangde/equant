@@ -1432,12 +1432,12 @@ class CalcCenter(object):
         self._fundInfo["MinAsset"] = self._profit["MinAssets"]
         self._fundInfo["TotalCost"] = self._profit["Cost"]
 
-        # TODO: 以下错误
-        startTime = self._fundRecords[0]["Time"]
-        endTime = self._fundRecords[-1]["Time"]
-        tradeDays = endTime - startTime
-        # 由tradeDays怎么能得到交易了多少天呢，直接相减肯定有问题，因为startTime和endTime是整形数据
-        self._profit["TradeDays"] = tradeDays
+        # # TODO: 以下错误
+        # startTime = self._fundRecords[0]["Time"]
+        # endTime = self._fundRecords[-1]["Time"]
+        # tradeDays = endTime - startTime
+        # # 由tradeDays怎么能得到交易了多少天呢，直接相减肯定有问题，因为startTime和endTime是整形数据
+        # self._profit["TradeDays"] = tradeDays
 
     def liquidateAll(self, bOrderReport=False):
         """
