@@ -48,4 +48,3 @@ def handle_data(context):
     PlotNumeric("ma2", ma2[-1], 0x00aa00) 
     fit = NetProfit() + FloatProfit() - TradeCost() if his else A_CoverProfit() + A_ProfitLoss() - A_Cost()
     PlotNumeric("fit", fit, 0x0000FF, False)
-

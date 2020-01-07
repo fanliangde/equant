@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+﻿//////////////////////////////////////////////////////////////////////////////
 // 文件名：editor.js
 // 作者：  刘明祥
 // 功能：  实现VScode中的代码编辑器调用, 在网页中嵌入monaco.editor，并在本地进程中嵌入一个浏览器打开该网页
@@ -461,7 +461,7 @@ function add_contextmenu() {
 
     var paste = g_editor.createContextKey('paste', false);
     g_editor.addAction({            
-        id: 'paste_model',  label: '粘贴',  contextMenuGroupId: '9_cutcopypaste',
+        id: 'paste_model',  label: '粘贴　　　　　 　　　Ctrl+V',  contextMenuGroupId: '9_cutcopypaste',
         keybindings: [  ],
         keybindingContext: null,  contextMenuOrder: 8,  precondition: paste.set(true),
         run: function(ed){ do_key_event(); }

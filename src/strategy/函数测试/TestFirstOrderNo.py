@@ -18,3 +18,4 @@ def handle_data(context):
         contNo = A_OrderContractNo(orderNo)
         LogInfo("contNo=", contNo, "orderNo=", orderNo, "orderStatus=", orderStatus)
         orderNo = A_NextOrderNo(orderNo)
+

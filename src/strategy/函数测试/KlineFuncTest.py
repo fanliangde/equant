@@ -44,32 +44,3 @@ def handle_data(context):
     
     LogInfo("context=", context.triggerData)
     
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
