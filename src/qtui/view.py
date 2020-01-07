@@ -14,8 +14,6 @@ from copy import deepcopy
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import Qt, QPoint, QUrl, pyqtSignal, pyqtSlot, QSharedMemory, QTimer, QDir, QSettings
 from PyQt5.QtGui import QTextCursor, QIcon, QKeySequence
-from PyQt5.QtWebChannel import QWebChannel
-from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEngineSettings
 from PyQt5.QtWidgets import *
 
 from engine.strategy_cfg_model_new import StrategyConfig_new
@@ -28,8 +26,11 @@ from qtui.utils import parseStrategtParam, Tree, get_strategy_filters, FileIconP
     EmptyDelegate
 from utils.utils import save
 
+from qtui.quant.code_editor import CodeEditor
+
 from utils.window.framelesswindow import FramelessWindow, CommonHelper
 from utils.window.res.default import *
+from api.base_api import BaseApi
 
 strategy_path = os.path.join(os.getcwd(), 'strategy')
 
@@ -1668,154 +1669,6 @@ class ContractSelect(QWidget):
         self.choice_tree.clear()
 
 
-class WebEngineView(QWebEngineView):
-    contentFromQt = pyqtSignal(str, str)
-    saveSignal = pyqtSignal(str)
-    switchSignal = pyqtSignal(str)
-    setThemeSignal = pyqtSignal(str)
-    fileStatusSignal = pyqtSignal(str, str)
-    exitSignal = pyqtSignal()
-
-    def __init__(self, *args, **kwargs):
-        super(WebEngineView, self).__init__(*args, **kwargs)
-        self.initSettings()
-        self.channel = QWebChannel(self)
-        # 把自身对象传递进去
-        self.channel.registerObject('Bridge', self)
-        # 设置交互接口
-        self.page().setWebChannel(self.channel)
-
-        self.files = []
-
-        # 是否退出标志
-        self.exit_flag = False
-
-        # START #####以下代码可能是在5.6 QWebEngineView刚出来时的bug,必须在每次加载页面的时候手动注入
-        #### 也有可能是跳转页面后就失效了，需要手动注入，有没有修复具体未测试
-
-    #         self.page().loadStarted.connect(self.onLoadStart)
-    #         self._script = open('Data/qwebchannel.js', 'rb').read().decode()
-
-    #     def onLoadStart(self):
-    #         self.page().runJavaScript(self._script)
-
-    # END ###########################
-
-    # 注意pyqtSlot用于把该函数暴露给js可以调用
-    @pyqtSlot(str, str, bool)
-    def contentFromJS(self, file, text, confirm):
-        try:
-            if confirm and file in self.files:
-                reply = QMessageBox.question(self, '提示', '是否保存修改？', QMessageBox.Ok|QMessageBox.Cancel)
-                if reply == QMessageBox.Ok:
-                    with open(file, mode='w', encoding='utf-8') as f:
-                        f.write(text.replace('\r', ''))
-                    self.files.remove(file)
-            else:
-                with open(file, mode='w', encoding='utf-8') as f:
-                    f.write(text.replace('\r', ''))
-                self.files.remove(file)
-                if not self.files and self.exit_flag:
-                    self.exitSignal.emit()
-        except Exception as e:
-            print(e)
-
-    def sendContentToJS(self, file):
-        # 发送自定义信号
-        with open(file, 'r', encoding='utf-8') as f:
-            text = f.read()
-        self.contentFromQt.emit(file, text)
-
-    def sendSaveSignal(self, file):
-        self.saveSignal.emit(file)
-
-    def sendSetThemeSignal(self, theme):
-        self.setThemeSignal.emit(theme)
-
-    @pyqtSlot(str)
-    def switchFile(self, path):
-        """编辑器切换tab时候发信号到app修改策略路径"""
-        self.switchSignal.emit(path)
-
-    @pyqtSlot(str, bool)
-    def receiveFileStatus(self, file, status):
-        """
-        从编辑器接收文件保存状态
-        :param file: 文件路径
-        :param status: 文件状态(True: 已保存, False: 未保存)
-        :return:
-        """
-        if status:
-            if file not in self.files:
-                self.files.append(file)
-        else:
-            if file in self.files:
-                self.files.remove(file)
-
-
-    @pyqtSlot(str)
-    @pyqtSlot(QUrl)
-    def load(self, url):
-        '''
-        eg: load("https://pyqt5.com")
-        :param url: 网址
-        '''
-        return super(WebEngineView, self).load(QUrl(url))
-
-    def initSettings(self):
-        '''
-        eg: 初始化设置
-        '''
-        # 获取浏览器默认设置
-        settings = QWebEngineSettings.globalSettings()
-        # 设置默认编码utf8
-        settings.setDefaultTextEncoding("utf-8")
-        # 自动加载图片,默认开启
-        # settings.setAttribute(QWebEngineSettings.AutoLoadImages,True)
-        # 自动加载图标,默认开启
-        # settings.setAttribute(QWebEngineSettings.AutoLoadIconsForPage,True)
-        # 开启js,默认开启
-        # settings.setAttribute(QWebEngineSettings.JavascriptEnabled,True)
-        # js可以访问剪贴板
-        settings.setAttribute(
-            QWebEngineSettings.JavascriptCanAccessClipboard, True)
-        # js可以打开窗口,默认开启
-        # settings.setAttribute(QWebEngineSettings.JavascriptCanOpenWindows,True)
-        # 链接获取焦点时的状态,默认开启
-        # settings.setAttribute(QWebEngineSettings.LinksIncludedInFocusChain,True)
-        # 本地储存,默认开启
-        # settings.setAttribute(QWebEngineSettings.LocalStorageEnabled,True)
-        # 本地访问远程
-        settings.setAttribute(
-            QWebEngineSettings.LocalContentCanAccessRemoteUrls, True)
-        # 本地加载,默认开启
-        # settings.setAttribute(QWebEngineSettings.LocalContentCanAccessFileUrls,True)
-        # 监控负载要求跨站点脚本,默认关闭
-        # settings.setAttribute(QWebEngineSettings.XSSAuditingEnabled,False)
-        # 空间导航特性,默认关闭
-        # settings.setAttribute(QWebEngineSettings.SpatialNavigationEnabled,False)
-        # 支持平超链接属性,默认关闭
-        # settings.setAttribute(QWebEngineSettings.HyperlinkAuditingEnabled,False)
-        # 使用滚动动画,默认关闭
-        settings.setAttribute(QWebEngineSettings.ScrollAnimatorEnabled, True)
-        # 支持错误页面,默认启用
-        # settings.setAttribute(QWebEngineSettings.ErrorPageEnabled, True)
-        # 支持插件,默认关闭
-        settings.setAttribute(QWebEngineSettings.PluginsEnabled, True)
-        # 支持全屏应用程序,默认关闭
-        settings.setAttribute(
-            QWebEngineSettings.FullScreenSupportEnabled, True)
-        # 支持屏幕截屏,默认关闭
-        settings.setAttribute(QWebEngineSettings.ScreenCaptureEnabled, True)
-        # 支持html5 WebGl,默认开启
-        settings.setAttribute(QWebEngineSettings.WebGLEnabled, True)
-        # 支持2d绘制,默认开启
-        settings.setAttribute(
-            QWebEngineSettings.Accelerated2dCanvasEnabled, True)
-        # 支持图标触摸,默认关闭
-        settings.setAttribute(QWebEngineSettings.TouchIconsEnabled, True)
-
-
 class QuantApplication(QWidget):
 
     exitSignal = pyqtSignal()
@@ -1936,22 +1789,19 @@ class QuantApplication(QWidget):
 
     def save_edit_strategy(self):
         question = QMessageBox(self)
-        if self.contentEdit.files:
-            question.setText('有策略被修改，程序退出前是否要保存这些策略？')
+        if self.contentEdit.modify_count:
+            question.setText('有策略已被修改，退出前是否保存？\t\t')
             question.setStandardButtons(QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel)
         else:
-            question.setText('您确定退出本程序吗？\t\t\t')
+            question.setText('您确定要退出本程序吗？\t\t\t')
             question.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
         question.setIcon(QMessageBox.Question)
         question.setWindowTitle('极星量化')
 
         reply = question.exec_()
         if reply == QMessageBox.Yes:
-            self.contentEdit.exit_flag = True
-            self.contentEdit.exitSignal.connect(self.close_app)
-            if self.contentEdit.files:
-                for file in self.contentEdit.files:
-                    self.contentEdit.saveSignal.emit(file)
+            self.contentEdit.on_saveMdySignal.connect(self.close_app)
+            self.contentEdit.save_mdy()
         elif reply == QMessageBox.No or reply == QMessageBox.Ok:
             self.close_app()
         elif reply == QMessageBox.Cancel:
@@ -2028,7 +1878,7 @@ class QuantApplication(QWidget):
             self.strategy_tree.setCurrentIndex(index)
             self.strategy_path = path
             if not os.path.isdir(item_path):
-                self.contentEdit.sendContentToJS(item_path)
+                self.contentEdit.sendOpenSignal(item_path)
 
     # 策略右键菜单
     def strategy_tree_right_menu(self, point):
@@ -2070,7 +1920,7 @@ class QuantApplication(QWidget):
                             shutil.copy(fname, _path)
                     else:
                         shutil.copy(fname, _path)
-                    self.contentEdit.sendContentToJS(_path)
+                    self.contentEdit.sendOpenSignal(_path)
                     self.strategy_path = _path
         elif action == add_strategy:
             index = self.strategy_tree.currentIndex()
@@ -2323,7 +2173,7 @@ class QuantApplication(QWidget):
         self.save_btn.setMaximumWidth(100)
         self.run_btn.setEnabled(False)
         # self.contentEdit = MainFrmQt("localhost", 8765, "pyeditor", os.path.join(os.getcwd(), 'quant\python_editor\editor.htm'))
-        self.contentEdit = WebEngineView()
+        self.contentEdit = CodeEditor()
         self.contentEdit.setObjectName('contentEdit')
         if self.settings.contains('theme') and self.settings.value('theme') == 'vs-dark':
             self.contentEdit.load(
@@ -2331,7 +2181,7 @@ class QuantApplication(QWidget):
         else:
             self.contentEdit.load(
                 QUrl.fromLocalFile(os.path.abspath(r'qtui/quant/python_editor/editor_vs.htm')))
-        self.contentEdit.switchSignal.connect(self.switch_strategy_path)
+        self.contentEdit.on_switchSignal.connect(self.switch_strategy_path)
         self.statusBar = QLabel()
         self.statusBar.setText("  极星9.5连接失败，请重新打开极星量化！")
         self.statusBar.setStyleSheet('color: #0062A3;')
@@ -2359,8 +2209,7 @@ class QuantApplication(QWidget):
         self.run_btn.setEnabled(status)
 
     def emit_custom_signal(self):
-        if self.strategy_path in self.contentEdit.files:
-            self.contentEdit.sendSaveSignal(self.strategy_path)
+        self.contentEdit.sendSaveSignal(self.strategy_path)
 
     def create_func_tab(self):
         # 函数列表
@@ -2653,7 +2502,7 @@ class QuantApplication(QWidget):
         model = index.model()  # 请注意这里可以获得model的对象
         item_path = model.filePath(index)
         if not os.path.isdir(item_path):
-            self.contentEdit.sendContentToJS(item_path)
+            self.contentEdit.sendOpenSignal(item_path)
             self.strategy_path = item_path
 
     def func_tree_clicked(self):
@@ -2762,12 +2611,6 @@ class QuantApplication(QWidget):
             self.main_strategy_policy_win.setWindowModality(Qt.ApplicationModal)  # 设置阻塞父窗口
             self.main_strategy_policy_win.show()
             self.strategy_policy_win.show()
-        else:
-            MyMessageBox.warning(self, '提示', '请选择策略！！！', QMessageBox.Ok)
-
-    def save_strategy(self):
-        if self.strategy_path:
-            self.contentEdit.on_saveclick(self.strategy_path)
         else:
             MyMessageBox.warning(self, '提示', '请选择策略！！！', QMessageBox.Ok)
 
