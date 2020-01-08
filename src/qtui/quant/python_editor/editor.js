@@ -325,30 +325,34 @@ function add_tab(name, value){
 //////////////////////////////////////////////////////////////////////////////
 ///Qt客户端通道
 //////////////////////////////////////////////////////////////////////////////
-new QWebChannel(qt.webChannelTransport,
-    function (channel) {
-        window.Bridge = channel.objects.Bridge;
+try{
+    new QWebChannel(qt.webChannelTransport,
+        function (channel) {
+            window.Bridge = channel.objects.Bridge;
 
-        // 绑定自定义的信号customSignal
-        Bridge.openSignal.connect(function (file, text) {
-            if (g_ready)
-                add_tab(file, text);
-        });
-        
-        Bridge.saveSignal.connect(function (file){
-            save_file(file, false)
-        });
+            // 绑定自定义的信号customSignal
+            Bridge.openSignal.connect(function (file, text) {
+                if (g_ready)
+                    add_tab(file, text);
+            });
+            
+            Bridge.saveSignal.connect(function (file){
+                save_file(file, false)
+            });
 
-        Bridge.setThemeSignal.connect(function (text) {
-            set_theme(text, '');
-            if (text == 'vs-dark'){
-                document.getElementById('main_link').href = 'editor.css'
-            }else {
-                document.getElementById('main_link').href = 'editor_vs.css'
-            }
-        });
-    }
-);
+            Bridge.setThemeSignal.connect(function (text) {
+                set_theme(text, '');
+                if (text == 'vs-dark'){
+                    document.getElementById('main_link').href = 'editor.css'
+                }else {
+                    document.getElementById('main_link').href = 'editor_vs.css'
+                }
+            });
+        }
+    );
+}catch(e){
+    
+}
 
 
 
