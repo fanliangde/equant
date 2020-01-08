@@ -2015,9 +2015,11 @@ class QuantApplication(QWidget):
                 while True:
                     value, ok = getText(self, '修改', '策略名称', filename)
                     if not value.strip().endswith('.py'):
-                        new_path = os.path.join(file_path, value.strip() + '.py')
+                        # new_path = os.path.join(file_path, value.strip() + '.py')
+                        new_path = file_path + "/" + value.strip() + '.py'
                     else:
-                        new_path = os.path.join(file_path, value.strip())
+                        # new_path = os.path.join(file_path, value.strip())
+                        new_path = file_path + "/" + value.strip()
                     if os.path.exists(new_path) and ok:
                         MyMessageBox.warning(self, '提示', '策略名%s在此分组中已经存在！！！' % value.strip(), QMessageBox.Ok)
                     elif not ok:
