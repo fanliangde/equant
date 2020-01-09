@@ -9,6 +9,8 @@ from PyQt5.QtWebEngineWidgets import *
 class CodeEditor(QWebEngineView):
     openSignal = pyqtSignal(str, str)
     saveSignal = pyqtSignal(str)
+    deleteSignal = pyqtSignal(str)
+    renameSignal = pyqtSignal(str, str)
     setThemeSignal = pyqtSignal(str)
     on_switchSignal = pyqtSignal(str)
     on_saveMdySignal = pyqtSignal()
@@ -40,6 +42,17 @@ class CodeEditor(QWebEngineView):
         if file in self.__mdy_files:
             self.saveSignal.emit(file)
 
+    def sendRenameSignal(self, file, newfile):
+        self.renameSignal.emit(file, newfile)
+        if file in self.__mdy_files:
+            self.__mdy_files.append(newfile)
+            self.__mdy_files.remove(file)
+
+    def sendDeleteSignal(self, file):
+        if file in self.__mdy_files:
+            self.__mdy_files.remove(file)
+        self.deleteSignal.emit(file)
+
     def sendSetThemeSignal(self, theme):
         self.setThemeSignal.emit(theme)
 
@@ -59,7 +72,8 @@ class CodeEditor(QWebEngineView):
             print(e)    
 
         self.__mdy_files.remove(file)  
-        if self.__save_mdy and not self.__mdy_files:
+
+        if self.__save_mdy and not len(self.__mdy_files):
             self.__save_mdy = False
             self.on_saveMdySignal.emit()
 
@@ -98,5 +112,4 @@ class CodeEditor(QWebEngineView):
             self.sendSaveSignal(file)
 
     def modify_count(self):
-        return self.__mdy_files
-
+        return len(self.__mdy_files)

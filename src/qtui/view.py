@@ -1789,7 +1789,7 @@ class QuantApplication(QWidget):
 
     def save_edit_strategy(self):
         question = QMessageBox(self)
-        if self.contentEdit.modify_count:
+        if self.contentEdit.modify_count():
             question.setText('有策略已被修改，退出前是否保存？\t\t')
             question.setStandardButtons(QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel)
         else:
@@ -2015,17 +2015,16 @@ class QuantApplication(QWidget):
                 while True:
                     value, ok = getText(self, '修改', '策略名称', filename)
                     if not value.strip().endswith('.py'):
-                        # new_path = os.path.join(file_path, value.strip() + '.py')
-                        new_path = file_path + "/" + value.strip() + '.py'
+                        new_path = '%s/%s.py' % (file_path, value.strip())
                     else:
-                        # new_path = os.path.join(file_path, value.strip())
-                        new_path = file_path + "/" + value.strip()
+                        new_path = '%s/%s' % (file_path, value.strip())
                     if os.path.exists(new_path) and ok:
                         MyMessageBox.warning(self, '提示', '策略名%s在此分组中已经存在！！！' % value.strip(), QMessageBox.Ok)
                     elif not ok:
                         break
                     else:
                         os.rename(item_path, new_path)
+                        self.contentEdit.sendRenameSignal(item_path, new_path)
                         break
             else:
                 value = ''
@@ -2052,6 +2051,7 @@ class QuantApplication(QWidget):
             elif item_path and not os.path.isdir(item_path):
                 reply = MyMessageBox.question(self, '提示', '确定删除策略%s吗？' % os.path.split(item_path)[1], QMessageBox.Ok | QMessageBox.Cancel)
                 if reply == QMessageBox.Ok:
+                    self.contentEdit.sendDeleteSignal(item_path)
                     os.remove(item_path)
             else:
                 pass

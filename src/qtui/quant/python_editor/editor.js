@@ -57,12 +57,12 @@ function init_editor(layoutid, code_str, theme) {
                 minimap: {enabled: true},       //代码略缩图
                 fontSize: 14,                   //字体大小
                 //wordWrap: "on",               //自动换行，注意大小写
-                //wrappingIndent: "indent",     //自动缩进
+                wrappingIndent: "indent",       //自动缩进
                 //glyphMargin: true,            //字形边缘
                 //useTabStops: false,           //tab键停留
                 //selectOnLineNumbers: true,    //单击行号选中该行
                 //roundedSelection: false,      //
-                //readOnly: false,              // 只读
+                //readOnly: false,              //只读
                 //cursorStyle: 'line',          //光标样式
                 //autoIndent:true,              //自动布局
                 //quickSuggestions: false,
@@ -134,6 +134,18 @@ function load_file(file, txt) {
     g_filename = file;
     g_editor.setValue(txt);
     g_loading = false;
+}
+
+//重命名
+function rename_file(file, newfile) {
+    rename_tab(file, newfile);
+    if (file == g_filename)
+        g_filename = newfile;
+}
+
+//关闭标签
+function close_file(file){
+    close_tab(file)
 }
 
 //保存代码到本地文件, need_confirm为true时需要用户确认是否保存，否则不需要用户确认直接保存
@@ -224,6 +236,39 @@ var org_datas = new Array();
 // 当前标签
 var currtab = "";
 var overtab = "";
+
+function close_tab(id){
+    var tab = $(id.toString())
+    if (!tab)
+        return;
+
+    if (tab.className == 'current')
+    {
+        var _tab = tab.nextElementSibling;
+        if (!_tab)
+            _tab = tab.previousElementSibling;
+        switch_tab(_tab ? _tab.id : '');
+    }
+
+    delete datas[id];
+    delete org_datas[id];
+    tab.remove();
+}
+
+function rename_tab(id, newid){
+    var tab = $(id.toString())
+    if (!tab)
+        return;
+    var btn = tab.children[0];
+    tab.id = newid;
+    tab.innerHTML = newid.substr(newid.lastIndexOf('/')+1);
+    tab.appendChild(btn);
+
+    datas[newid] = datas[id];
+    org_datas[newid] = org_datas[id];
+    delete datas[id];
+    delete org_datas[id];
+}
 
 // 切换标签
 function switch_tab(newtab) {
@@ -323,7 +368,7 @@ function add_tab(name, value){
 
 
 //////////////////////////////////////////////////////////////////////////////
-///Qt客户端通道
+///Qt web客户端通道
 //////////////////////////////////////////////////////////////////////////////
 try{
     new QWebChannel(qt.webChannelTransport,
@@ -338,6 +383,14 @@ try{
             
             Bridge.saveSignal.connect(function (file){
                 save_file(file, false)
+            });
+            
+            Bridge.renameSignal.connect(function (file, newfile){
+                rename_file(file, newfile)
+            });
+            
+            Bridge.deleteSignal.connect(function (file){
+                close_file(file)
             });
 
             Bridge.setThemeSignal.connect(function (text) {
