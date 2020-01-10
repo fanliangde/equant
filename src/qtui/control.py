@@ -50,14 +50,14 @@ class Controller(object):
         self._createReportWin()
         ################################################
 
-        self.app = QuantApplication(self)
+        self.mainWnd = FramelessWindow()
+        self.mainWnd.setWindowTitle('极星量化')
+        self.app = QuantApplication(self, master=self.mainWnd)
         if self.app.settings.contains('theme') and self.app.settings.value('theme') == 'vs-dark':
             theme = THESE_STATE_DARK
         else:
             theme = THESE_STATE_WHITE
 
-        self.mainWnd = FramelessWindow()
-        self.mainWnd.setWindowTitle('极星量化')
         self.mainWnd.setWinThese(theme)
         self.mainWnd.setWindowIcon(QIcon('icon/epolestar ix2.ico'))
         screen = QDesktopWidget().screenGeometry()

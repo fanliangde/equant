@@ -1944,6 +1944,8 @@ class QuantApplication(QWidget):
                                     '\n\n'
                                     'def initialize(context): \n    pass\n\n\n'
                                     'def handle_data(context):\n    pass\n\n\n'
+                                    'def hisover_callback(context):\n    """历史阶段结束策略调用该函数"""\n    pass\n\n\n'
+                                    'def exit_callback(context):\n    """策略停止时调用该函数"""\n    pass\n\n\n'
                                     )
                         self.model.directoryLoaded.connect(lambda: self.focus_tree_item(path))
                         self.strategy_tree.expand(index)
@@ -1965,8 +1967,10 @@ class QuantApplication(QWidget):
                         with open(path, 'w', encoding='utf-8') as w:
                             w.write('import talib\n'
                                     '\n\n'
-                                    'def initialize(context): \n    pass\n\n\n'
+                                    'def initialize(context):\n    pass\n\n\n'
                                     'def handle_data(context):\n    pass\n\n\n'
+                                    'def hisover_callback(context):\n    """历史阶段结束策略调用该函数"""\n    pass\n\n\n'
+                                    'def exit_callback(context):\n    """策略停止时调用该函数"""\n    pass\n\n\n'
                                     )
                         self.model.directoryLoaded.connect(lambda: self.focus_tree_item(path))
                         break
