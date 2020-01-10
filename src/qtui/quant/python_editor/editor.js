@@ -86,8 +86,11 @@ function init_editor(layoutid, code_str, theme) {
         );
 
         g_editor.onDidChangeModelContent(function(v) {
-            if (!g_loading && g_filename)
-                modify_nty(g_filename, org_datas[g_filename] != g_editor.getValue());
+            if (!g_loading && g_filename){
+                var attr = editor_arrts[g_filename];
+                if (attr)
+                    modify_nty(g_filename, attr.origin_txt != g_editor.getValue());
+            }
         });
 
         disable_drag();
@@ -150,20 +153,23 @@ function close_file(file){
 
 //保存代码到本地文件, need_confirm为true时需要用户确认是否保存，否则不需要用户确认直接保存
 function save_file(file, need_confirm) {
+    var attr = editor_arrts[file];
+    if (!attr)
+        return;
+
     if (file == g_filename)
-        datas[file] = g_editor.getValue()
-	
-    org_datas[file] = datas[file];
+        attr.modify_txt = g_editor.getValue();
+    attr.origin_txt = attr.modify_txt;
     on_modify(file, false);
     
     // data = {
     //     'cmd':'savefile_rsp',
     //     'file':file,
-    //     'txt':datas[file]
+    //     'txt':attr.origin_txt
     // };
     // senddata(data);
 
-    Bridge.do_save_file(file, datas[file], need_confirm);
+    Bridge.do_save_file(file, attr.origin_txt, need_confirm);
 }
 //切换文件
 function switch_file(file){
@@ -229,14 +235,52 @@ function $(id){
     return typeof id === 'string' ? document.getElementById(id):id;
 }
  
-//全局字典 file->content
-var datas = new Array();
-var org_datas = new Array();
 
 // 当前标签
 var currtab = "";
 var overtab = "";
+// 全局字典 文件->编辑器属性
+var editor_arrts = new Array();
 
+
+// 保存编辑器属性
+function save_editor_attr(file, text, is_save){
+    var attr = editor_arrts[file];
+    if (!attr)
+    {
+        editor_arrts[file] = {
+            origin_txt  : text,                             //已保存的文件内容
+            modify_txt  : text,                             //修改过的文件内容
+            scroll_hpos : { scrollLeft: 0, scrollTop: 0 },  //滚动条的位置
+            cursor_pos  : { lineNumber: 0, column: 0 },     //光标行索引
+            selections  : []                                //所有选中区域
+        };
+        attr = editor_arrts[file];
+        return;
+    }
+
+    if (is_save)
+        attr.origin_txt = text;
+    attr.modify_txt     = g_editor.getValue();
+    attr.scroll_pos     = { scrollLeft: g_editor.getScrollLeft(), scrollTop: g_editor.getScrollTop() };
+    attr.cursor_pos     = g_editor.getPosition();
+    attr.selections     = g_editor.getSelections();
+}
+
+// 更新编辑器属性
+function update_editor_attr(file){
+    var attr = editor_arrts[file];
+    if (!attr)
+        return;
+
+    g_editor.setValue(attr.modify_txt);
+    g_editor.setPosition(attr.cursor_pos);
+    g_editor.setScrollPosition(attr.scroll_pos);
+    g_editor.SetSelections(attr.selections);    
+    alert(attr)
+}
+
+// 关闭标签
 function close_tab(id){
     var tab = $(id.toString())
     if (!tab)
@@ -250,11 +294,11 @@ function close_tab(id){
         switch_tab(_tab ? _tab.id : '');
     }
 
-    delete datas[id];
-    delete org_datas[id];
+    delete editor_attr[id];
     tab.remove();
 }
 
+// 标签改名
 function rename_tab(id, newid){
     var tab = $(id.toString())
     if (!tab)
@@ -264,10 +308,13 @@ function rename_tab(id, newid){
     tab.innerHTML = newid.substr(newid.lastIndexOf('/')+1);
     tab.appendChild(btn);
 
-    datas[newid] = datas[id];
-    org_datas[newid] = org_datas[id];
-    delete datas[id];
-    delete org_datas[id];
+    editor_arrts[newid] = editor_arrts[id];
+    delete editor_arrts[id];
+
+    if (id == currtab)
+        currtab = newid;
+    else if (id == overtab)
+        overtab = newid;
 }
 
 // 切换标签
@@ -286,7 +333,7 @@ function switch_tab(newtab) {
         if (btn && btn.className != 'modify_btn')
             btn.className = '';
 
-       datas[currtab] = g_editor.getValue();
+        save_editor_attr(currtab, g_editor.getValue(), false);
     }
     
     currtab = newtab;
@@ -296,7 +343,8 @@ function switch_tab(newtab) {
         if (btn && btn.className != 'modify_btn')
             btn.className = 'curr_btn';
     }
-    load_file(currtab, tab_new ? datas[currtab] : '');
+    load_file(currtab, tab_new ? editor_arrts[currtab].modify_txt : '');
+    update_editor_attr(currtab);    
     switch_file(currtab);
 }
 
@@ -304,7 +352,7 @@ function switch_tab(newtab) {
 function add_tab(name, value){
     if (name == "")
         return;
-    if (datas.hasOwnProperty(name)){
+    if (editor_arrts.hasOwnProperty(name)){
         switch_tab(name);
         return;
     }
@@ -326,6 +374,7 @@ function add_tab(name, value){
 
     //设置标签和按钮的单击事件
     tab.onclick = function(){
+        g_editor.focus();
         switch_tab(this.id);
     }
     btn.onclick = function(){
@@ -337,11 +386,10 @@ function add_tab(name, value){
                 _tab = tab.previousElementSibling;
             switch_tab(_tab ? _tab.id : '');
         }
-        if (org_datas[tab.id] != datas[tab.id])
+        if (editor_arrts[tab.id].origin_txt != editor_arrts[tab.id].modify_txt)
             save_file(tab.id, true);
 
-        delete datas[tab.id];
-        delete org_datas[tab.id];
+        delete editor_arrts[tab.id];
         tab.remove();
     }
     tab.onmouseover = function(){
@@ -359,8 +407,7 @@ function add_tab(name, value){
 
 
     //添加标签关联的数据
-    datas[name] = value;
-    org_datas[name] = value;
+    save_editor_attr(name, value, true);
     //切换到新标签
     switch_tab(name);
 }
@@ -569,7 +616,7 @@ function add_completions() {
     g_editor.addCommand(monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.Space, function(){
         g_editor.trigger('', 'editor.action.triggerSuggest');
         //g_editor.getContribution('editor.contrib.suggestController').triggerSuggest();
-        //g_editor.trigger('', 'editor.action.showHover', {});
+        //g_editor.trigger('', 'editor.action.showHover');
     });
 }
 
