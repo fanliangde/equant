@@ -22,8 +22,8 @@ from report.fieldConfigure import RunMode, StrategyStatus
 from api.base_api import BaseApi
 from api.api_func import _all_func_
 from capi.com_types import *
-from qtui.utils import parseStrategtParam, Tree, get_strategy_filters, FileIconProvider, MyMessageBox, getText, \
-    EmptyDelegate
+from qtui.utils import parseStrategtParam, Tree, FileIconProvider, MyMessageBox, getText, \
+    EmptyDelegate, MySortFilterProxyModel
 from utils.utils import save
 
 from qtui.quant.code_editor import CodeEditor
@@ -1715,9 +1715,6 @@ class QuantApplication(QWidget):
         self.left_top_splitter.setChildrenCollapsible(False)
         self.left_top_splitter.setContentsMargins(0, 0, 0, 0)
 
-        # 获取所有策略可用过滤规则及目录
-        self.strategy_filter = get_strategy_filters(strategy_path)
-
         self.create_content_vbox()
         self.create_stragety_vbox()
         self.create_func_tab()
@@ -1833,22 +1830,25 @@ class QuantApplication(QWidget):
         self.strategy_layout.setContentsMargins(0, 0, 0, 0)
         self.strategy_layout.setSpacing(0)
         self.model = QFileSystemModel()
-        self.strategy_tree = Tree(self.model, self.strategy_filter, self)
+        self.strategy_tree = Tree(self.model, self)
         self.strategy_tree.setObjectName("StrategyTree")
         # self.strategy_tree = Tree(strategy_path)
         self.model.setRootPath(QtCore.QDir.rootPath())
+        self.model.setNameFilterDisables(False)
+        self.proxyModel = MySortFilterProxyModel()
+        self.proxyModel.setSourceModel(self.model)
         self.strategy_tree.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.strategy_tree.setModel(self.model)
+        self.strategy_tree.setModel(self.proxyModel)
+        self.strategy_tree.setRootIndex(self.proxyModel.mapFromSource(self.model.index(strategy_path)))
+        # self.strategy_tree.setModel(self.model)
         # TODO: 拖动！！
         # self.strategy_tree.setDragDropMode(QAbstractItemView.InternalMove)
         self.strategy_tree.setRootIndex(self.model.index(strategy_path))
         # self.strategy_tree.setColumnCount(1)
         self.model.setReadOnly(False)
-        self.model.setNameFilters(self.strategy_filter)
         self.model.setNameFilterDisables(False)
-        self.model.setFilter(QDir.Dirs | QDir.Files)
+        self.model.setFilter(QDir.Dirs | QDir.Files | QDir.NoDotAndDotDot)
         self.model.setIconProvider(FileIconProvider())
-        # self.strategy_tree.setHeaderLabels(['策略'])
         self.strategy_tree.setHeaderHidden(True)
         self.strategy_tree.hideColumn(1)
         self.strategy_tree.hideColumn(2)
@@ -1857,7 +1857,6 @@ class QuantApplication(QWidget):
         self.strategy_tree.setContextMenuPolicy(Qt.CustomContextMenu)
         self.strategy_tree.customContextMenuRequested[QPoint].connect(self.strategy_tree_right_menu)
 
-        self.strategy_tree.doubleClicked.connect(self.strategy_tree_clicked)
         self.strategy_layout.addWidget(label)
         self.strategy_layout.addWidget(self.strategy_tree)
         self.strategy_vbox.setLayout(self.strategy_layout)
@@ -1906,7 +1905,8 @@ class QuantApplication(QWidget):
         if action == import_file:
             index = self.strategy_tree.currentIndex()
             model = index.model()  # 请注意这里可以获得model的对象
-            item_path = model.filePath(index)
+            index = model.mapToSource(index)  # 将index转化为过滤器的模型的index
+            item_path = self.model.filePath(index)
             if item_path:
                 if not os.path.isdir(item_path):
                     item_path = os.path.split(item_path)[0]
@@ -1925,7 +1925,9 @@ class QuantApplication(QWidget):
         elif action == add_strategy:
             index = self.strategy_tree.currentIndex()
             model = index.model()  # 请注意这里可以获得model的对象
-            item_path = model.filePath(index)
+            index = model.mapToSource(index)  # 将index转化为过滤器的模型的index
+            item_path = self.model.filePath(index)
+            # item_path = model.filePath(index)
             if item_path and os.path.isdir(item_path):
                 value = ''
                 while True:
@@ -1986,7 +1988,9 @@ class QuantApplication(QWidget):
                 else:
                     index = self.strategy_tree.currentIndex()
                     model = index.model()  # 请注意这里可以获得model的对象
-                    item_path = model.filePath(index)
+                    index = model.mapToSource(index)  # 将index转化为过滤器的模型的index
+                    item_path = self.model.filePath(index)
+                    # item_path = model.filePath(index)
                 value, ok = getText(self, '新建', '分组名称：')
                 if os.path.isdir(item_path):
                     path = os.path.join(item_path, value)
@@ -1998,21 +2002,23 @@ class QuantApplication(QWidget):
                     break
                 else:
                     os.mkdir(path)
-                    self.strategy_filter.append(os.path.split(path)[1])
-                    self.model.setNameFilters(self.strategy_filter)
                     self.model.directoryLoaded.connect(lambda: self.focus_tree_item(path))
                     break
 
         elif action == start_file:
             index = self.strategy_tree.currentIndex()
             model = index.model()  # 请注意这里可以获得model的对象
-            item_path = model.filePath(index)
+            index = model.mapToSource(index)  # 将index转化为过滤器的模型的index
+            item_path = self.model.filePath(index)
+            # item_path = model.filePath(index)
             dir_name = os.path.dirname(item_path)
             os.startfile(dir_name)
         elif action == rename:
             index = self.strategy_tree.currentIndex()
             model = index.model()  # 请注意这里可以获得model的对象
-            item_path = model.filePath(index)
+            index = model.mapToSource(index)  # 将index转化为过滤器的模型的index
+            item_path = self.model.filePath(index)
+            # item_path = model.filePath(index)
             if not os.path.isdir(item_path):  # 修改策略名
                 value = ''
                 (file_path, filename) = os.path.split(item_path)
@@ -2046,12 +2052,14 @@ class QuantApplication(QWidget):
         elif action == delete:
             index = self.strategy_tree.currentIndex()
             model = index.model()  # 请注意这里可以获得model的对象
-            item_path = model.filePath(index)
+            index = model.mapToSource(index)  # 将index转化为过滤器的模型的index
+            item_path = self.model.filePath(index)
+            # item_path = model.filePath(index)
             if item_path and os.path.isdir(item_path):
                 reply = MyMessageBox.question(self, '提示', '确定删除分组及目录下的所有文件吗？', QMessageBox.Ok | QMessageBox.Cancel)
                 if reply == QMessageBox.Ok:
                     shutil.rmtree(item_path)
-                    self.strategy_filter.remove(os.path.split(item_path)[1])
+
             elif item_path and not os.path.isdir(item_path):
                 reply = MyMessageBox.question(self, '提示', '确定删除策略%s吗？' % os.path.split(item_path)[1], QMessageBox.Ok | QMessageBox.Cancel)
                 if reply == QMessageBox.Ok:
@@ -2501,15 +2509,6 @@ class QuantApplication(QWidget):
         self.func_doc_layout.addWidget(self.func_content)
         self.func_doc.setLayout(self.func_doc_layout)
         self.func_doc.setContentsMargins(0, 0, 0, 0)
-
-    def strategy_tree_clicked(self):
-        # 策略双击槽函数
-        index = self.strategy_tree.currentIndex()
-        model = index.model()  # 请注意这里可以获得model的对象
-        item_path = model.filePath(index)
-        if not os.path.isdir(item_path):
-            self.contentEdit.sendOpenSignal(item_path)
-            self.strategy_path = item_path
 
     def func_tree_clicked(self):
         item = self.func_tree.currentItem()

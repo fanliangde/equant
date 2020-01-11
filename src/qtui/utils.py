@@ -11,14 +11,13 @@ from PyQt5.QtGui import QFont, QEnterEvent, QPainter, QColor, QPen, QIcon
 
 
 class Tree(QTreeView):
-    def __init__(self, model, strategy_filters, quantWin):
+    def __init__(self, model, quantWin):
         QTreeView.__init__(self)
         self._win = quantWin
         # model.setReadOnly(False)
 
         # self.setSelectionMode(self.SingleSelection)
         self._model = model
-        self.strategy_filters = strategy_filters
         self.setDragDropMode(QAbstractItemView.InternalMove)
         self.setDragEnabled(True)
         self.setAcceptDrops(True)
@@ -88,13 +87,34 @@ class Tree(QTreeView):
                     event.acceptProposedAction()
 
 
-def get_strategy_filters(root_path):
-    """获取策略根目录下所有可用的文件夹"""
-    strategy_filters = ['*.py', '*.pyc']
-    for current_path, dirs, files in os.walk(root_path):
-        if '__pycache__' not in dirs:
-            strategy_filters.extend(dirs)
-    return strategy_filters
+class MySortFilterProxyModel(QSortFilterProxyModel):
+    """策略列表文件过滤"""
+    def __init__(self):
+        super(MySortFilterProxyModel, self).__init__()
+
+    def filterAcceptsRow(self, rowProc, parentProc):
+        sourceModel = self.sourceModel()
+        if not sourceModel:
+            return
+        index = sourceModel.index(rowProc, 0, parentProc)
+        name = sourceModel.fileName(index)
+        if sourceModel.isDir(index):
+            if name == "__pycache__":
+                return False
+            return True
+        else:
+            if name.endswith(".py") or name.endswith(".pyc"):
+                return True
+        return False
+
+
+# def get_strategy_filters(root_path):
+#     """获取策略根目录下所有可用的文件夹"""
+#     strategy_filters = ['*.py', '*.pyc']
+#     for current_path, dirs, files in os.walk(root_path):
+#         if '__pycache__' not in dirs:
+#             strategy_filters.extend(dirs)
+#     return strategy_filters
 
 
 def parseStrategtParam(strategyPath):

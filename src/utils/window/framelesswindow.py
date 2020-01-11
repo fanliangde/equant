@@ -54,7 +54,6 @@ class FramelessWindow(QWidget):
             size = self.size()
             xPos = cenPosX - size.width() / 2
             yPos = cenPosY - size.height() / 2
-            print("333: ", xPos, yPos, size)
             self.move(xPos, yPos)
         else:
             qr = self.frameGeometry()
