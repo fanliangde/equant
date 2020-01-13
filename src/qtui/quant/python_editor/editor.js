@@ -251,9 +251,9 @@ function save_editor_attr(file, text, is_save){
         editor_arrts[file] = {
             origin_txt  : text,                             //已保存的文件内容
             modify_txt  : text,                             //修改过的文件内容
-            scroll_hpos : { scrollLeft: 0, scrollTop: 0 },  //滚动条的位置
-            cursor_pos  : { lineNumber: 0, column: 0 },     //光标行索引
-            selections  : []                                //所有选中区域
+            scroll_hpos : null, //{ scrollLeft: 0, scrollTop: 0 },  //滚动条的位置
+            cursor_pos  : null, //{ lineNumber: 0, column: 0 },     //光标行索引
+            selections  : null                                //所有选中区域
         };
         attr = editor_arrts[file];
         return;
@@ -276,8 +276,7 @@ function update_editor_attr(file){
     g_editor.setValue(attr.modify_txt);
     g_editor.setPosition(attr.cursor_pos);
     g_editor.setScrollPosition(attr.scroll_pos);
-    g_editor.SetSelections(attr.selections);    
-    alert(attr)
+    //g_editor.SetSelection(attr.selections);
 }
 
 // 关闭标签
@@ -344,7 +343,7 @@ function switch_tab(newtab) {
             btn.className = 'curr_btn';
     }
     load_file(currtab, tab_new ? editor_arrts[currtab].modify_txt : '');
-    update_editor_attr(currtab);    
+    update_editor_attr(currtab);
     switch_file(currtab);
 }
 
