@@ -313,7 +313,8 @@ def main(versionNo=None):
                 return
         if chkEpoRlt:
             directory = os.path.abspath(os.path.join(dirPath, "..\\epolestar"))
-            dest = os.path.join(workDir, time_now)
+            #dest = os.path.join(workDir, time_now)
+            dest = os.path.abspath(os.path.join(workDir, "..\\epolestarbackup"+time_now))
             epobacRlt = backup(directory, dest)
             if epobacRlt == 0:  # 路径不存在
                 print("equant备份数据过程出错！")
