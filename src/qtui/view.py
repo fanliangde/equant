@@ -1857,6 +1857,7 @@ class QuantApplication(QWidget):
         self.strategy_tree.setContextMenuPolicy(Qt.CustomContextMenu)
         self.strategy_tree.customContextMenuRequested[QPoint].connect(self.strategy_tree_right_menu)
 
+        self.strategy_tree.doubleClicked.connect(self.strategy_tree_clicked)
         self.strategy_layout.addWidget(label)
         self.strategy_layout.addWidget(self.strategy_tree)
         self.strategy_vbox.setLayout(self.strategy_layout)
@@ -2509,6 +2510,15 @@ class QuantApplication(QWidget):
         self.func_doc_layout.addWidget(self.func_content)
         self.func_doc.setLayout(self.func_doc_layout)
         self.func_doc.setContentsMargins(0, 0, 0, 0)
+
+    def strategy_tree_clicked(self):
+        index = self.strategy_tree.currentIndex()
+        model = index.model()
+        index = model.mapToSource(index)  # 将index转化为过滤器的模型的index
+        item_path = self.model.filePath(index)
+        if not os.path.isdir(item_path):
+            self.contentEdit.sendOpenSignal(item_path)
+            self.strategy_path = item_path
 
     def func_tree_clicked(self):
         item = self.func_tree.currentItem()
