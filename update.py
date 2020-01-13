@@ -34,9 +34,9 @@ dirPath = os.getcwd()
 
 # 工作路径(appdata所在路径)
 # appPath = os.getenv("APPDATA")
-if not os.path.exists(os.path.abspath(os.path.join(dirPath, "..\\equant_backups"))):
-    os.makedirs(os.path.join(dirPath, "..\\equant_backups"))
-os.chdir(os.path.abspath(os.path.join(dirPath, "..\\equant_backups")))
+if not os.path.exists(os.path.abspath(os.path.join(dirPath, "..\\equantbackup"))):
+    os.makedirs(os.path.join(dirPath, "..\\equantbackup"))
+os.chdir(os.path.abspath(os.path.join(dirPath, "..\\equantbackup")))
 
 workDir = os.getcwd()
 
@@ -304,16 +304,16 @@ def main(versionNo=None):
         time.sleep(2)
 
         # ===========================备份文件==========================================
-        time_now = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        time_now = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
         if chkEquRlt:  # 备份equant
-            directory, dest = dirPath, os.path.join(workDir, "equant_back_"+time_now)
+            directory, dest = dirPath, os.path.join(workDir, time_now)
             equbacRlt = backup(directory, dest)
             if equbacRlt == 0:  # 路径不存在
                 print("equant备份数据过程出错！")
                 return
         if chkEpoRlt:
             directory = os.path.abspath(os.path.join(dirPath, "..\\epolestar"))
-            dest = os.path.join(workDir, "epolestar_back_"+time_now)
+            dest = os.path.join(workDir, time_now)
             epobacRlt = backup(directory, dest)
             if epobacRlt == 0:  # 路径不存在
                 print("equant备份数据过程出错！")
