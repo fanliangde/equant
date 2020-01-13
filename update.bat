@@ -1,13 +1,11 @@
 @echo off
 
-set curdir=%~dp0
-set pypath=%~dp0..\Miniconda\
+set updatepath="%~dp0update.py"
 
-
+set pypath="%~dp0..\miniconda\python.exe"
 if not exist %pypath% (
-	set pypath=
+	set pypath="python.exe"
 )
 
-cmd /k %pypath%python.exe %curdir%update.py
-pause
-                
+%pypath% %updatepath%
+TIMEOUT /T 10
