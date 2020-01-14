@@ -111,28 +111,32 @@ class StageTab(QWidget):
         mvbox = VLayout()
         wvbox = VLayout()
         dvbox = VLayout()
-        headers = ["年份", "权益", "净利润", "盈利率", "胜率", "平均盈利/亏损", "净利润增长速度"]
-        self.ytable = BaseTable(headers)
+        yheaders = ["年份", "权益", "净利润", "盈利率", "胜率", "平均盈利/亏损", "净利润增长速度"]
+        self.ytable = BaseTable(yheaders)
         ylabel = Label("年度分析", self.ytable, self)
         yvbox.addWidget(ylabel)
         yvbox.addWidget(self.ytable)
 
-        self.qtable = BaseTable(headers)
+        qheaders = ["季度", "权益", "净利润", "盈利率", "胜率", "平均盈利/亏损", "净利润增长速度"]
+        self.qtable = BaseTable(qheaders)
         qlabel = Label("季度分析", self.qtable, self)
         qvbox.addWidget(qlabel)
         qvbox.addWidget(self.qtable)
 
-        self.mtable = BaseTable(headers)
+        mheaders = ["月份", "权益", "净利润", "盈利率", "胜率", "平均盈利/亏损", "净利润增长速度"]
+        self.mtable = BaseTable(mheaders)
         mlabel = Label("月度分析", self.mtable, self)
         mvbox.addWidget(mlabel)
         mvbox.addWidget(self.mtable)
 
-        self.wtable = BaseTable(headers)
+        wheaders = ["星期", "权益", "净利润", "盈利率", "胜率", "平均盈利/亏损", "净利润增长速度"]
+        self.wtable = BaseTable(wheaders)
         wlabel = Label("周分析", self.wtable, self)
         wvbox.addWidget(wlabel)
         wvbox.addWidget(self.wtable)
 
-        self.dtable = BaseTable(headers)
+        dheaders = ["日期", "权益", "净利润", "盈利率", "胜率", "平均盈利/亏损", "净利润增长速度"]
+        self.dtable = BaseTable(dheaders)
         dlabel = Label("日分析", self.dtable, self)
         dvbox.addWidget(dlabel)
         dvbox.addWidget(self.dtable)
@@ -151,7 +155,12 @@ class StageTab(QWidget):
                   "日分析": self.dtable}
         for key in tables:
             data = datas[key]
+            # print("key: ", data)
             table = tables[key]
+            # 清空table的数据
+            # for i in range(table.rowCount()):
+            #     table.removeRow(i)
+
             table.setRowCount(len(data))
             row = 0
 
@@ -161,7 +170,7 @@ class StageTab(QWidget):
                     time = str(ret.year) + '年'
                 elif key == "季度分析":
                     time = str(ret.year) + '年第' + str((ret.month - 1) // 3 + 1) + "季度"
-                elif key == "月季度分析":
+                elif key == "月度分析":
                     time = str(ret.year) + '年' + str(ret.month) + '月'
                 elif key == "周分析":
                     time = str(ret.year) + '年第' + str(ret.isocalendar()[1]) + "周"

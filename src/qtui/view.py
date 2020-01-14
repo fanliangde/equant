@@ -2933,7 +2933,10 @@ class QuantApplication(QWidget):
         reportPath = save(data, runMode, stName)
         #
         _pGeometry = self._master.frameGeometry()
-        self.reportWnd.center(_pGeometry)
+        # 只在报告窗口关闭后才重新设置位置
+        if not self.reportWnd.isVisible():
+            self.reportWnd.center(_pGeometry)
+        # self.reportWnd.center(_pGeometry)
 
         self.reportView.reportShowSig.emit([data, reportPath])
         # TODO: 在这里展示报告会导致程序不响应，放到接收信号处展示

@@ -58,7 +58,6 @@ class ReportView(QWidget):
 
         self.parent.show()
         self.parent.raise_()
-        # self.show()
 
     def selectReportItem(self, path):
         """定位报告位置"""
