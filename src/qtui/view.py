@@ -668,7 +668,7 @@ class StrategyPolicy(QWidget):
         # self.main_contractSelectWin.setFixedSize(750, 550)
         # 设置窗口的大小和位置
         _pGeometry = self.main_contractWin.frameGeometry()
-        self.main_contractSelectWin.resize(_pGeometry.width() * 2, _pGeometry.height() * 2)
+        self.main_contractSelectWin.resize(_pGeometry.width() * 1.5, _pGeometry.height() * 1.5)
         self.main_contractSelectWin.center(_pGeometry)
         self.main_contractSelectWin.titleBar.theseSelect.hide()
         self.main_contractSelectWin.titleBar.iconLabel.hide()
