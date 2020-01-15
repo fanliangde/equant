@@ -5719,9 +5719,9 @@ class BaseApi(object):
               返回整型，0成功，-1失败
 
         【示例】
-              SetTradeFee('O', 2， 5) 设置基础合约的开仓手续费为5元/手
-              SetTradeFee('O', 1， 0.02) 设置基础合约的开仓手续费为每笔2%
-              SetTradeFee('T', 2， 5, "ZCE|F|SR|906") 设置合约ZCE|F|SR|906的平今手续费为5元/手
+              SetTradeFee('O', 2, 5) 设置基础合约的开仓手续费为5元/手
+              SetTradeFee('O', 1, 0.02) 设置基础合约的开仓手续费为每笔2%
+              SetTradeFee('T', 2, 5, "ZCE|F|SR|906") 设置合约ZCE|F|SR|906的平今手续费为5元/手
         '''
         return self._dataModel.setTradeFee(type, feeType, feeValue, contractNo)
 

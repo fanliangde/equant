@@ -155,11 +155,10 @@ class StageTab(QWidget):
                   "日分析": self.dtable}
         for key in tables:
             data = datas[key]
-            # print("key: ", data)
             table = tables[key]
             # 清空table的数据
-            # for i in range(table.rowCount()):
-            #     table.removeRow(i)
+            for i in range(0, table.rowCount())[::-1]:
+                table.removeRow(i)
 
             table.setRowCount(len(data))
             row = 0

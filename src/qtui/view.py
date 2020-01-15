@@ -1767,6 +1767,8 @@ class QuantApplication(QWidget):
 
         # 策略信息
         self.strategy_path = None
+        # 策略打开记录
+        self.strategy_open_record = set()
 
         # with open(r'ui/qdark.qss', encoding='utf-8') as f:
         #     self.setStyleSheet(f.read())
@@ -2036,6 +2038,12 @@ class QuantApplication(QWidget):
                         break
                     else:
                         os.rename(item_path, new_path)
+                        if item_path == self.strategy_path:
+                            self.strategy_path = new_path
+                        # 更新策略打开记录
+                        if item_path in self.strategy_open_record:
+                            self.strategy_open_record.remove(item_path)
+                            self.strategy_open_record.add(new_path)
                         self.contentEdit.sendRenameSignal(item_path, new_path)
                         break
             else:
@@ -2043,13 +2051,36 @@ class QuantApplication(QWidget):
                 (dir_path, dir_name) = os.path.split(item_path)
                 while True:
                     value, ok = getText(self, '修改', '分组名称', dir_name)
-                    new_path = os.path.join(dir_path, value)
+                    new_path = '%s/%s' % (dir_path, value.strip())
                     if os.path.exists(new_path) and ok:
                         MyMessageBox.warning(self, '提示', '分组%s已经存在！！！' % value, QMessageBox.Ok)
                     elif not ok:
                         break
                     else:
+                        # def allFilePath(rootDir, newDir):
+                        #     """
+                        #     :param rootDir: 原根目录
+                        #     :param newPath: 修改后的根目录
+                        #     :return:
+                        #     """
+                        #     for root, dirs, files in os.walk(rootDir):
+                        #         for file in files:
+                        #             print("dddd: ", file)
+                        #             filePath = os.path.join(root, file)
+                        #             if filePath in self.strategy_open_record:
+                        #                 newFilePath = os.path.join(newDir, filePath)
+                        #                 self.strategy_open_record.remove(filePath)
+                        #                 self.strategy_open_record.add(os.path.join(newDir, filePath))
+                        #                 self.contentEdit.sendRenameSignal(filePath, newFilePath)
+                        #         for dir in dirs:
+                        #             dirPath = os.path.join(root, dir)
+                        #             newDirPath = os.path.join(newDir, dir)
+                        #             allFilePath(dirPath, newDirPath)
+
                         os.rename(item_path, new_path)
+                        if item_path == self.strategy_path:
+                            self.strategy_path = new_path
+                        # allFilePath(item_path, new_path)
                         break
         elif action == delete:
             index = self.strategy_tree.currentIndex()
@@ -2519,6 +2550,7 @@ class QuantApplication(QWidget):
         item_path = self.model.filePath(index)
         if not os.path.isdir(item_path):
             self.contentEdit.sendOpenSignal(item_path)
+            self.strategy_open_record.add(item_path)
             self.strategy_path = item_path
 
     def func_tree_clicked(self):

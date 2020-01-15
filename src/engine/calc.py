@@ -83,7 +83,6 @@ class CalcCenter(object):
         self._strategy = args
         self._setProfitInitialFundInfo(int(self._strategy["InitialFunds"]) - self._runSet["StartFund"])
         self._setExpertSetting()
-        self._curTradeDate = self._strategy["StartTime"]
         self._limit = self._strategy["Limit"]
 
         self._initOrderCtl()
@@ -98,12 +97,10 @@ class CalcCenter(object):
         """更新当前交易日信息"""
         if self._curTradeDate is None:
             return
-        if self._curTradeDate == Time:
-            return
+
+        # 计算阶段总结和交易信息
         self._curTradeDate = Time
-        # TODO: 计算阶段总结和交易信息
-        self._calcTradeInfo()
-        self._stageStatistics()
+        # self._stageStatistics()
 
     def _setExpertSetting(self):
         """
@@ -443,7 +440,8 @@ class CalcCenter(object):
         if not self._beginDate:
             self._beginDate = order["TradeDate"]
         self._endDate = order["TradeDate"]
-        self._updateTradeDate(order["TradeDate"])
+        if self._curTradeDate is None:
+            self._curTradeDate = order["TradeDate"]
 
         # TODO:限制信息写在这里
         # TODO: 应该先判断下面的限制再判断needCover 和 coverJudge
@@ -520,7 +518,10 @@ class CalcCenter(object):
         self._updateOtherProfit(order["DateTimeStamp"])
 
         # self._calcTradeInfo()
-        self._updateFundRecord(order["DateTimeStamp"], eo["Profit"], eo["Cost"])
+        self._updateFundRecord(order["DateTimeStamp"], eo["Profit"], eo["Cost"], order["TradeDate"])
+        self._stageStatistics()  # 计算阶段总结
+        self._calcTradeInfo()    # 计算交易信息
+        self._updateTradeDate(order["TradeDate"])
         # print("end:", datetime.now().strftime('%H:%M:%S.%f'))
 
         return 1  # 订单发送成功
@@ -1296,6 +1297,8 @@ class CalcCenter(object):
         self._endDate = barInfo[benchmarkNo]["TradeDate"]
         t = barInfo[benchmarkNo]["TradeDate"]
         timeStamp = barInfo[benchmarkNo]["DateTimeStamp"]
+        if self._curTradeDate is None:
+            self._curTradeDate = t
 
         for contract in contractList:
 
@@ -1311,7 +1314,6 @@ class CalcCenter(object):
             if not contPrice["Price"] == 0:
                 self._prices[contract] = contPrice
 
-        self._updateTradeDate(t)
         self._updatePosition(contPrices)
         self._updateOtherProfit(timeStamp)
 
@@ -1320,7 +1322,10 @@ class CalcCenter(object):
             self._updateBuyOpenOrderPrice(barInfo[c]["HighPrice"], barInfo[c]["LowPrice"], c)
             self._updateSellOpenOrderPrice(barInfo[c]["HighPrice"], barInfo[c]["LowPrice"], c)
 
-        self._updateFundRecord(timeStamp, 0, 0)
+        self._updateFundRecord(timeStamp, 0, 0, t)
+        self._stageStatistics()  # 计算阶段总结
+        self._calcTradeInfo()    # 计算交易信息
+        self._updateTradeDate(t)
         # ----------1ms或小于1ms-----------------------
         return
 
@@ -1363,7 +1368,7 @@ class CalcCenter(object):
 
                     self._positions[user][contract] = pInfo
 
-    def _updateFundRecord(self, time, profit, cost):
+    def _updateFundRecord(self, time, profit, cost, tradeDate):
         """
         更新资金记录数据
         :param time:
@@ -1395,7 +1400,7 @@ class CalcCenter(object):
         else:
             fundRecord["id"] = len(self._fundRecords)
             fundRecord["Time"] = time
-            fundRecord["TradeDate"] = self._curTradeDate  # 交易日
+            fundRecord["TradeDate"] = tradeDate  # 交易日
             fundRecord["TradeCost"] = cost  # 当前bar进行的交易产生的手续费
 
         fundRecord.update({
@@ -1554,16 +1559,14 @@ class CalcCenter(object):
             else:
                 self._runSet["EndTime"] = lastTime
 
-        # 将最后一个阶段的数据计算出来
-        # self.calcLastStaticInfo()
-
     def calcLastStaticInfo(self):
         # 计算最后一个阶段总结数据
-        self._calcStageStaticInfo(self._dailyStatis)
-        self._calcStageStaticInfo(self._weekStatis)
-        self._calcStageStaticInfo(self._monthStatis)
-        self._calcStageStaticInfo(self._quarterStatis)
-        self._calcStageStaticInfo(self._yearStatis)
+        pass
+        # self._calcStageStaticInfo(self._dailyStatis)
+        # self._calcStageStaticInfo(self._weekStatis)
+        # self._calcStageStaticInfo(self._monthStatis)
+        # self._calcStageStaticInfo(self._quarterStatis)
+        # self._calcStageStaticInfo(self._yearStatis)
 
     def getFundRecord(self):
         """
@@ -1925,14 +1928,14 @@ class CalcCenter(object):
     def _stageStatistics(self):
         """
         阶段统计计算
-        :return:
+        :param uflag: 更新最后一条记录标志位 True: 增加记录， False: 更新记录
         """
         if self._runSet["StartFund"] == 0:
             return
         if not self._fundRecords:
             return
 
-        day = str(self._curTradeDate)
+        day = str(self._fundRecords[-1]["TradeDate"])
         week = parse(day).isocalendar()[1]
         month = parse(day).month
         quarter = int(month / 3 if month % 3 == 0 else month / 3 + 1)
@@ -1941,33 +1944,31 @@ class CalcCenter(object):
         end = "".join(self._runSet["EndTime"].split("-"))
         # self._runSet["EndTime"][0:4] + self._runSet[5:7] + self._runSet[8:]
 
-        # 还不能遍历self._fundRecords
-        # day_statis["Time"]应该取TradeTime，不应该是时间戳
         # 交易次数记下来了，但是会不会存在总盈利和交易次数不匹配的情况呢：比如记录day_statis，
         # 在天的某一时刻有交易次数记录了，此时的总盈利和总亏损为某一值
         # 但是接下来仍然存在交易，但是接下来的交易只是没有满足一次交易的条件(意思是没有全平完)，
         # 但是总盈利和总亏损却变化了，这样会不会对计算有很大影响
         # 判断是否满一天或回测时间结束
-        if day != str(self._fundRecords[-1]["TradeDate"]):
-            self._calcStageStaticInfo(self._dailyStatis)
+        uflag = True if day != str(self._curTradeDate) else False
+        self._calcStageStaticInfo(self._dailyStatis, uflag)
 
         # 判断是否满一星期了或回测时间结束
         # theDay = parse(str(self._fundRecords[-1]["TradeDate"]))
-        if parse(str(self._fundRecords[-1]["TradeDate"])).isocalendar()[1] != week:
-            self._calcStageStaticInfo(self._weekStatis)
+        uflag = True if parse(str(self._curTradeDate)).isocalendar()[1] != week else False
+        self._calcStageStaticInfo(self._weekStatis, uflag)
 
         # 判读是否满一个月了或回测时间结束
-        if parse(str(self._fundRecords[-1]["TradeDate"])).month != month:
-            self._calcStageStaticInfo(self._monthStatis)
+        uflag = True if parse(str(self._curTradeDate)).month != month else False
+        self._calcStageStaticInfo(self._monthStatis, uflag)
 
         # 判断是否满一季度了或回测时间结束
-        theMonth = parse(str(self._fundRecords[-1]["TradeDate"])).month
-        if int(theMonth / 3 if theMonth % 3 == 0 else theMonth / 3 + 1) != quarter:
-            self._calcStageStaticInfo(self._quarterStatis)
+        theMonth = parse(str(self._curTradeDate)).month
+        uflag = True if int(theMonth / 3 if theMonth % 3 == 0 else theMonth / 3 + 1) != quarter else False
+        self._calcStageStaticInfo(self._quarterStatis, uflag)
 
         # 判断是否满一年了或回测时间结束
-        if parse(str(self._fundRecords[-1]["TradeDate"])).year != year:
-            self._calcStageStaticInfo(self._yearStatis)
+        uflag = True if parse(str(self._curTradeDate)).year != year else False
+        self._calcStageStaticInfo(self._yearStatis, uflag)
 
     def getLastStaticData(self, periodStatis):
         if periodStatis:  # 是否为空
@@ -1977,7 +1978,7 @@ class CalcCenter(object):
             lastData["Equity"] = self._runSet["StartFund"]
         return lastData
 
-    def _calcStageStaticInfo(self, periodStatis):
+    def _calcStageStaticInfo(self, periodStatis, uflag):
         if not self._fundRecords:
             return
 
@@ -2026,7 +2027,14 @@ class CalcCenter(object):
         # 净利润增长速度：本次的盈利率 - 上次的盈利率
         # statis["IncSpeed"] = (statis["NetProfit"] - lastPeriodData["NetProfit"]) / self._runSet["StartFund"]
         statis["IncSpeed"] = statis["Returns"] - lastPeriodData["Returns"]
-        periodStatis.append(statis)
+        if uflag:
+            periodStatis.append(statis)
+
+        else:
+            if len(periodStatis) == 0:
+                periodStatis.append(statis)
+                return
+            periodStatis[-1] = statis
 
     # 这个函数是不是需要整理一下呢？？？
     def _calcSingleReturns(self, extendOrder):
@@ -2149,7 +2157,6 @@ class CalcCenter(object):
         return self._reportDetails
 
     def _calcTradeInfo(self):
-        # 这个函数应该放在updateFundRecord函数之前进行调用。。。
         # 如果数据不满一天的话怎么办呢？？？（从开始有数据时就使天数加一）
         # 在计算最大、最小这类数据的时候建立了这么多类的私有变量，
         # 是不是可以用局部变量表示呢？
@@ -2171,9 +2178,9 @@ class CalcCenter(object):
         if self._curTradeDate != self._fundRecords[-1]["TradeDate"]:
             if self._profit["LastAssets"] > self._runSet["StartFund"]:  # 盈利
                 if self._continueWinDays == 0:
-                    self._continueWinDaysStartTime = self._curTradeDate
+                    self._continueWinDaysStartTime = self._fundRecords[-1]["TradeDate"]
                 self._continueWinDays += 1
-                self._continueWinDaysEndTime = self._curTradeDate
+                self._continueWinDaysEndTime = self._fundRecords[-1]["TradeDate"]
                 self._continueLoseDays = 0
                 if self._continueWinDays > self._tradeInfo["MaxWinContinueDays"]:
                     self._tradeInfo["MaxWinContinueDays"] = self._continueWinDays
@@ -2182,9 +2189,9 @@ class CalcCenter(object):
 
             elif self._profit["LastAssets"] < self._runSet["StartFund"]:  # 亏损
                 if self._continueLoseDays == 0:
-                    self._continueLoseDaysStartTime = self._curTradeDate
+                    self._continueLoseDaysStartTime = self._fundRecords[-1]["TradeDate"]
                 self._continueLoseDays += 1
-                self._continueLoseDaysEndTime = self._curTradeDate
+                self._continueLoseDaysEndTime = self._fundRecords[-1]["TradeDate"]
                 self._continueWinDays = 0
                 if self._continueLoseDays > self._tradeInfo["MaxLoseContinueDays"]:
                     self._tradeInfo["MaxLoseContinueDays"] = self._continueLoseDays
@@ -2195,14 +2202,13 @@ class CalcCenter(object):
                 self._continueWinDays = 0
                 self._continueLoseDays = 0
 
-        # --------------------------------------------2.11新增------------------------------------------------------
         if self._curTradeDate != self._fundRecords[-1]["TradeDate"]:
             self._tradeInfo["CurrentDayEquity"] = self._fundRecords[-1]["DynamicEquity"]
             if self._tradeInfo["PreviousDayEquity"]:
                 if self._tradeInfo["CurrentDayEquity"] > self._tradeInfo["PreviousDayEquity"]:
                     if self._winComparedIncreaseContinueDays == 0:
-                        self._winComparedIncreaseContinueDaysStartTime = self._curTradeDate
-                    self._winComparedIncreaseContinueDaysEndTime = self._curTradeDate
+                        self._winComparedIncreaseContinueDaysStartTime = self._fundRecords[-1]["TradeDate"]
+                    self._winComparedIncreaseContinueDaysEndTime = self._fundRecords[-1]["TradeDate"]
                     self._winComparedIncreaseContinueDays += 1
                     self._loseComparedIncreaseContinueDays = 0
                     if self._winComparedIncreaseContinueDays > self._tradeInfo["MaxWinComparedIncreaseContinueDays"]:
@@ -2213,8 +2219,8 @@ class CalcCenter(object):
                             self._winComparedIncreaseContinueDaysEndTime)
                 elif self._tradeInfo["CurrentDayEquity"] < self._tradeInfo["PreviousDayEquity"]:
                     if self._loseComparedIncreaseContinueDays == 0:
-                        self._loseComparedIncreaseContinueDaysStartTime = self._curTradeDate
-                    self._loseComparedIncreaseContinueDaysEndTime = self._curTradeDate
+                        self._loseComparedIncreaseContinueDaysStartTime = self._fundRecords[-1]["TradeDate"]
+                    self._loseComparedIncreaseContinueDaysEndTime = self._fundRecords[-1]["TradeDate"]
                     self._loseComparedIncreaseContinueDays += 1
                     self._winComparedIncreaseContinueDays = 0
                     if self._loseComparedIncreaseContinueDays > self._tradeInfo["MaxLoseComparedIncreaseContinueDays"]:
@@ -2278,7 +2284,7 @@ class CalcCenter(object):
         :return:
         """
         # 先计算出最后一个阶段的统计数据
-        self.calcLastStaticInfo()
+        # self.calcLastStaticInfo()
         result = {}
 
         result["Fund"] = self.getFundRecord()
