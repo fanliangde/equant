@@ -2,7 +2,7 @@
 import talib as ta
 import numpy as np
 
-ContractId = 'SHFE|F|CU|1909'
+ContractId = 'SHFE|F|CU|MAIN'
 arr1 = np.array([])
 arr2 = np.array([])
 

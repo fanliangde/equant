@@ -16,10 +16,8 @@ EnterOrderId = -1
 ExitOrderId = -1
 retEnter = -1
 retExit = -1
-#ContractId = "SHFE|F|CU|1907"
-ContractId = "NYMEX|F|CL|1907"
-#UserId = "ET001"
-UserId = "Q912526205"
+ContractId = "SHFE|F|CU|MAIN"
+UserId = "ET001"
 
 
 # 初始化函数

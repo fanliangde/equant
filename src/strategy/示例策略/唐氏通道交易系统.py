@@ -13,7 +13,7 @@ FloatStopPoint = 20  # 浮动止损点
 HHV = np.array([])
 LLV = np.array([])
 
-ContractId = 'SHFE|F|CU|1908'
+ContractId = 'SHFE|F|CU|MAIN'
 
 def initialize(context): 
     global ContractId
@@ -56,6 +56,3 @@ def handle_data(context):
     SetWinPoint(WinPoint)
     # 浮动止损, 暂不支持
     #SetFloatStopPoint(FloatStopStart, FloatStopPoint)
-
-
-

@@ -24,7 +24,7 @@ fsDonchianLo = 0
 ExitHighestPrice = 0
 ExitLowestPrice = 0
 
-ContractId = 'SHFE|F|CU|1909'
+ContractId = 'SHFE|F|CU|MAIN'
 
 # 求真实最高价，真实最低价，真实范围序列值
 def TrueRange(barsinfo:list):

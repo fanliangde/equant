@@ -2,8 +2,8 @@
 import talib
 import numpy as np
 
-code1="ZCE|F|TA|001"
-code2="ZCE|F|TA|005"
+code1="ZCE|F|TA|005"
+code2="ZCE|F|TA|009"
 
 p1=5
 p2=20
