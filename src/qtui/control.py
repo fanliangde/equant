@@ -271,27 +271,6 @@ class Controller(object):
                 return
             self._request.reportRequest(id)
 
-    def newStrategy(self, path):
-        """右键新建策略"""
-        if not os.path.exists(path):
-            f = open(path, "w")
-            f.write('import talib\n'
-                    '\n\n'
-                    'def initialize(context): \n    pass\n\n\n'
-                    'def handle_data(context):\n    pass\n\n\n'
-                    'def exit_callback(context):\n    pass')
-            f.close()
-
-        self.app.updateEditorModifyTime(os.path.getmtime(path))
-
-        # 更新策略路径
-        self.setEditorTextCode(path)
-
-        self.app.updateStrategyTree(path)
-
-        # 更新策略编辑界面内容
-        self.updateEditor(path)
-
     def newDir(self, path):
         """策略目录右键新建文件夹"""
         if not os.path.exists(path):

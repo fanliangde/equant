@@ -1931,55 +1931,46 @@ class QuantApplication(QWidget):
             model = index.model()  # 请注意这里可以获得model的对象
             index = model.mapToSource(index)  # 将index转化为过滤器的模型的index
             item_path = self.model.filePath(index)
-            # item_path = model.filePath(index)
-            if item_path and os.path.isdir(item_path):
-                value = ''
-                while True:
-                    value, ok = getText(self, '新增', '策略名称：')
-                    if not value.strip().endswith('.py'):
-                        path = os.path.join(item_path, value.strip() + '.py')
-                    else:
-                        path = os.path.join(item_path, value.strip())
-                    if os.path.exists(path) and ok:
-                        MyMessageBox.warning(self, '提示', '策略名%s在选择的分组已经存在！！！' % value.strip(), QMessageBox.Ok)
-                    elif not ok:
-                        break
-                    else:
-                        with open(path, 'w', encoding='utf-8') as w:
-                            w.write('import talib\n'
-                                    '\n\n'
-                                    'def initialize(context): \n    pass\n\n\n'
-                                    'def handle_data(context):\n    pass\n\n\n'
-                                    'def hisover_callback(context):\n    """历史阶段结束策略调用该函数"""\n    pass\n\n\n'
-                                    'def exit_callback(context):\n    """策略停止时调用该函数"""\n    pass\n\n\n'
-                                    )
-                        self.model.directoryLoaded.connect(lambda: self.focus_tree_item(path))
-                        self.strategy_tree.expand(index)
-                        break
-            elif not os.path.isdir(item_path):
-                value = ''
-                while True:
-                    value, ok = getText(self, '新建', '策略名称：')
-                    if not value.strip().endswith('.py'):
-                        path = os.path.join(os.path.split(item_path)[0], value.strip() + '.py')
-                    else:
-                        path = os.path.join(os.path.split(item_path)[0], value.strip())
-
-                    if os.path.exists(path) and ok:
-                        MyMessageBox.warning(self, '提示', '策略名在选择的分组%s已经存在！！！' % value, QMessageBox.Ok)
-                    elif not ok:
-                        break
-                    else:
-                        with open(path, 'w', encoding='utf-8') as w:
-                            w.write('import talib\n'
-                                    '\n\n'
-                                    'def initialize(context):\n    pass\n\n\n'
-                                    'def handle_data(context):\n    pass\n\n\n'
-                                    'def hisover_callback(context):\n    """历史阶段结束策略调用该函数"""\n    pass\n\n\n'
-                                    'def exit_callback(context):\n    """策略停止时调用该函数"""\n    pass\n\n\n'
-                                    )
-                        self.model.directoryLoaded.connect(lambda: self.focus_tree_item(path))
-                        break
+            if not os.path.isdir(item_path):
+                item_path = os.path.split(item_path)[0]
+            value = ''
+            while True:
+                value, ok = getText(self, '新增', '策略名称：')
+                if not value.strip().endswith('.py'):
+                    path = '%s/%s.py' % (item_path, value.strip())
+                else:
+                    path = '%s/%s' % (item_path, value.strip())
+                if os.path.exists(path) and ok:
+                    MyMessageBox.warning(self, '提示', '策略名%s在选择的分组已经存在！！！' % value.strip(), QMessageBox.Ok)
+                elif not ok:
+                    break
+                else:
+                    with open(path, 'w', encoding='utf-8') as w:
+                        w.write('import talib\n'
+                            '\n\n'
+                            '# 策略参数字典\n'
+                            'g_params[\'p1\'] = 20    # 参数示例\n'
+                            '\n\n'
+                            '# 策略开始运行时执行该函数一次\n'
+                            'def initialize(context): \n'
+                            '    pass\n'
+                            '\n\n'
+                            '# 策略触发事件每次触发时都会执行该函数\n'
+                            'def handle_data(context):\n'
+                            '    pass\n'
+                            '\n\n'
+                            '# 历史回测阶段结束时执行该函数一次\n'
+                            'def hisover_callback(context):\n'
+                            '    pass\n'
+                            '\n\n'
+                            '# 策略退出前执行该函数一次\n'
+                            'def exit_callback(context):\n'
+                            '    pass\n'
+                            '\n\n'
+                            )
+                    self.model.directoryLoaded.connect(lambda: self.focus_tree_item(path))
+                    self.strategy_tree.expand(index)
+                    break
             else:
                 MyMessageBox.warning(self, '提示', '请选择分组！！！', QMessageBox.Ok)
 
@@ -1997,9 +1988,9 @@ class QuantApplication(QWidget):
                     # item_path = model.filePath(index)
                 value, ok = getText(self, '新建', '分组名称：')
                 if os.path.isdir(item_path):
-                    path = os.path.join(item_path, value)
+                    path = '%s/%s' % (item_path, value.strip())
                 else:
-                    path = os.path.join(os.path.split(item_path)[0], value)
+                    path = '%s/%s' % (os.path.split(item_path)[0], value.strip())
                 if os.path.exists(path) and ok:
                     MyMessageBox.warning(self, '提示', '分组%s已经存在！！！' % value, QMessageBox.Ok)
                 elif not ok:

@@ -148,7 +148,7 @@ function rename_file(file, newfile) {
 
 //关闭标签
 function close_file(file){
-    close_tab(file)
+    close_tab(file);
 }
 
 //保存代码到本地文件, need_confirm为true时需要用户确认是否保存，否则不需要用户确认直接保存
@@ -293,8 +293,8 @@ function close_tab(id){
         switch_tab(_tab ? _tab.id : '');
     }
 
-    delete editor_attr[id];
     tab.remove();
+    delete editor_attr[id];
 }
 
 // 标签改名
