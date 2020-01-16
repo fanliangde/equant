@@ -49,9 +49,18 @@ class Controller(object):
         ################创建回测报告####################
         self._createReportWin()
         ################################################
+        
+        version = ''
+        if os.path.exists('../Version.txt'):
+            with open('../Version.txt', 'r', encoding='utf-8-sig') as f:
+                version = f.readline()
+        if ' ' in version:
+            version = version.split(' ')[1]
+        if len(version) > 0:
+            version = ' - ' + version
 
         self.mainWnd = FramelessWindow()
-        self.mainWnd.setWindowTitle('极星量化')
+        self.mainWnd.setWindowTitle('极星量化' + version)
         self.app = QuantApplication(self, master=self.mainWnd)
         if self.app.settings.contains('theme') and self.app.settings.value('theme') == 'vs-dark':
             theme = THESE_STATE_DARK
