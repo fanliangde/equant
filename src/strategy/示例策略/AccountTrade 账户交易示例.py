@@ -54,13 +54,13 @@ def handle_data(context):
     #撤消未成交开仓单
     if retEnter == 0 and A_OrderStatus(EnterOrderId) != 6:
         #A_DeleteOrder(EnterOrderId)
-        LogInfo("撤销未成交的开仓单：%s, 订单状态值：%d, 可用资金：%f\n" %(EnterOrderId, A_DeleteOrder(EnterOrderId), A_FreeMargin()))
+        LogInfo("撤销未成交的开仓单：%s, 订单状态值：%d, 可用资金：%f\n" %(EnterOrderId, A_DeleteOrder(EnterOrderId), A_Available()))
         retEnter = -1
 
     #撤消未成交平仓单
     if retExit == 0 and A_OrderStatus(ExitOrderId) != 6:
         #A_DeleteOrder(ExitOrderId)
-        LogInfo("撤销未成交的平仓单：%s, 订单状态值：%d, 可用资金：%f\n" %(ExitOrderId, A_DeleteOrder(ExitOrderId), A_FreeMargin()))
+        LogInfo("撤销未成交的平仓单：%s, 订单状态值：%d, 可用资金：%f\n" %(ExitOrderId, A_DeleteOrder(ExitOrderId), A_Available()))
         retExit = -1
         
         
