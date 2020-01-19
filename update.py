@@ -296,10 +296,11 @@ def main(versionNo=None):
 
         # ==========================关进程============================================
         killEpProcess()
-        with open("..\\equant\\src\\log\\mainpid.log", "r") as f:
-            pid = f.readline()
-            if pid:
-                killProcesses(int(pid))
+        if os.path.exists("..\\equant\\src\\log\\mainpid.log"):
+            with open("..\\equant\\src\\log\\mainpid.log", "r") as f:
+                pid = f.readline()
+                if pid:
+                    killProcesses(int(pid))
         
         time.sleep(2)
 
