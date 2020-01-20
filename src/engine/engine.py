@@ -257,10 +257,15 @@ class StrategyEngine(object):
     def run(self):
         # 在当前进程中初始化
         self._initialize()
-        
         while True:
             try:
                 self._handleUIData()
+
+                ppid = os.getppid()
+                if ppid == 1 or ppid not in psutil.pids():
+                    self.saveStrategyContext2File()
+                    os._exit(0)
+
             except Exception as e:
                 errorText = traceback.format_exc()
                 self.sendErrorMsg(-1, errorText)
@@ -306,7 +311,11 @@ class StrategyEngine(object):
             
     # //////////////////////UI事件处理函数/////////////////////
     def _handleUIData(self):
-        event = self._ui2egQueue.get()
+        try:
+            event = self._ui2egQueue.get(timeout=0.5)
+        except:
+            return
+
         code = event.getEventCode()
 
         if code == EV_UI2EG_LOADSTRATEGY:
@@ -450,7 +459,6 @@ class StrategyEngine(object):
         self._apiThreadH.start()
         
     def _1SecondsThreadFunc(self):
-        '''1秒定时器'''
         while True:
             #60秒查一次资金
             self._queryMoney()

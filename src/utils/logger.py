@@ -3,6 +3,7 @@ import sys,os
 from multiprocessing import Queue, Process
 import queue
 import time
+import psutil
 import datetime
 from copy import deepcopy
 
@@ -149,7 +150,13 @@ class Logger(object):
         self._initialize()
         '''从log_queue中获取日志，刷新到文件和控件上'''
         while True:
-            data_list = self.log_queue.get()
+            try:
+                data_list = self.log_queue.get(timeout=0.5)
+            except:
+                ppid = os.getppid()
+                if ppid == 1 or ppid not in psutil.pids():
+                    os._exit(0)
+
             if data_list is None: break
             #数据格式不对
             self.level_func[data_list[0]](data_list[1:])
