@@ -154,8 +154,10 @@ class Logger(object):
                 data_list = self.log_queue.get(timeout=0.5)
             except:
                 ppid = os.getppid()
-                if ppid == 1 or ppid not in psutil.pids():
+                if ppid == 1 or not psutil.pid_exists(ppid):
                     os._exit(0)
+                else:
+                    continue
 
             if data_list is None: break
             #数据格式不对

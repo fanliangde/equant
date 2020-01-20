@@ -262,7 +262,7 @@ class StrategyEngine(object):
                 self._handleUIData()
 
                 ppid = os.getppid()
-                if ppid == 1 or ppid not in psutil.pids():
+                if ppid == 1 or not psutil.pid_exists(ppid):
                     self.saveStrategyContext2File()
                     os._exit(0)
 
