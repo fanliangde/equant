@@ -257,6 +257,7 @@ class StrategyEngine(object):
     def run(self):
         # 在当前进程中初始化
         self._initialize()
+
         while True:
             try:
                 self._handleUIData()
