@@ -13,7 +13,7 @@ from copy import deepcopy
 
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import Qt, QPoint, QUrl, pyqtSignal, pyqtSlot, QSharedMemory, QTimer, QDir, QSettings
-from PyQt5.QtGui import QTextCursor, QIcon, QKeySequence
+from PyQt5.QtGui import QTextCursor, QFont, QIcon, QKeySequence
 from PyQt5.QtWidgets import *
 
 from engine.strategy_cfg_model_new import StrategyConfig_new
@@ -2356,12 +2356,16 @@ class QuantApplication(QWidget):
         self.log_widget = QTabWidget()
         self.log_widget.setTabPosition(QTabWidget.South)
         self.user_log_widget = QTextBrowser()
+        font = QFont("Courier New", 11)
+        self.user_log_widget.setFont(font)
         self.user_log_widget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.user_log_widget.customContextMenuRequested[QPoint].connect(self.user_log_right_menu)
         self.signal_log_widget = QTextBrowser()
+        self.signal_log_widget.setFont(font)
         self.signal_log_widget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.signal_log_widget.customContextMenuRequested[QPoint].connect(self.signal_log_right_menu)
         self.sys_log_widget = QTextBrowser()
+        self.sys_log_widget.setFont(font)
         self.sys_log_widget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.sys_log_widget.customContextMenuRequested[QPoint].connect(self.sys_log_right_menu)
         self.log_widget.addTab(self.user_log_widget, '用户日志')
