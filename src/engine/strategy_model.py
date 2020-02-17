@@ -307,7 +307,7 @@ class StrategyModel(object):
                 break
         if not key:
             raise Exception(
-                "在使用Q_LastTime方法时，请确保已经在设置界面或者在策略代码中添加了SetBarInterval('%s', 'T', 1)为合约%s订阅了Tick行情！" % (symbol, symbol))
+                "在使用Q_LastDate方法时，请确保已经在设置界面或者在策略代码中添加了SetBarInterval('%s', 'T', 1)为合约%s订阅了Tick行情！" % (symbol, symbol))
         tickInfo = self._hisModel.getLastStoredKLine(key)[0]
         dateTimeStamp = tickInfo['DateTimeStamp']
         return int(dateTimeStamp) // 1000000000
