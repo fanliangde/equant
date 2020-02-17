@@ -558,18 +558,16 @@ class Strategy:
 
             while not self._isExit():
                 try:
-                    event = self._triggerQueue.get_nowait()
+                    event = self._triggerQueue.get(timeout=0.1)
                     # 发单方式，实时发单、k线稳定后发单。
                     self._dataModel.runRealTime(self._context, self._userModule.handle_data, event)
-                except queue.Empty as e:
+                except queue.Empty:
                     if self._firstTriggerQueueEmpty:
                         self._clearHisPos()
                         self._atHisOver()
                         self._runStatus = ST_STATUS_CONTINUES
                         self._send2UiEgStatus(self._runStatus)
                         self._firstTriggerQueueEmpty = False
-                    else:
-                        time.sleep(0.1)
         except Exception as e:
                 self._strategyState = StrategyStatusExit
                 self._isSt2EgQueueEffective = False

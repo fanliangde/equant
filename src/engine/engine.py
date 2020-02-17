@@ -45,7 +45,7 @@ class StrategyEngine(object):
         self._regMainWorkFunc()
         
         # Api->Engine, 品种、行情、K线、交易等
-        self._api2egQueue = queue.Queue()
+        self._api2egQueue = Queue()
         # Strategy->Engine, 初始化、行情、K线、交易等
         self._st2egQueue = Queue()
 
@@ -314,31 +314,30 @@ class StrategyEngine(object):
     def _handleUIData(self):
         try:
             event = self._ui2egQueue.get(timeout=0.5)
-        except:
+            code = event.getEventCode()
+
+            if code == EV_UI2EG_LOADSTRATEGY:
+                # 加载策略事件
+                self._loadStrategy(event)
+            elif code == EV_UI2EG_REPORT:
+                self._noticeStrategyReport(event)
+            elif code == EV_UI2EG_STRATEGY_QUIT:
+                self._onStrategyQuit(event)
+            elif code == EV_UI2EG_STRATEGY_RESUME:
+                self._onStrategyResume(event)
+            elif code == EV_UI2EG_EQUANT_EXIT:
+                self._onEquantExit(event)
+            elif code == EV_UI2EG_STRATEGY_REMOVE:
+                self.logger.info(f"收到策略删除信号，策略id:{event.getStrategyId()}")
+                self._onStrategyRemove(event)
+            elif code == EV_UI2EG_STRATEGY_FIGURE:
+                self._switchStrategy(event)
+            elif code == EV_UI2EG_STRATEGY_RESTART:
+                self._restartStrategyWhenParamsChanged(event)
+            elif code == EV_UI2EG_SYNCPOS_CONF:
+                self._onSyncPosConf(event)
+        except queue.Empty:
             return
-
-        code = event.getEventCode()
-
-        if code == EV_UI2EG_LOADSTRATEGY:
-            # 加载策略事件
-            self._loadStrategy(event)
-        elif code == EV_UI2EG_REPORT:
-            self._noticeStrategyReport(event)
-        elif code == EV_UI2EG_STRATEGY_QUIT:
-            self._onStrategyQuit(event)
-        elif code == EV_UI2EG_STRATEGY_RESUME:
-            self._onStrategyResume(event)
-        elif code == EV_UI2EG_EQUANT_EXIT:
-            self._onEquantExit(event)
-        elif code == EV_UI2EG_STRATEGY_REMOVE:
-            self.logger.info(f"收到策略删除信号，策略id:{event.getStrategyId()}")
-            self._onStrategyRemove(event)
-        elif code == EV_UI2EG_STRATEGY_FIGURE:
-            self._switchStrategy(event)
-        elif code == EV_UI2EG_STRATEGY_RESTART:
-            self._restartStrategyWhenParamsChanged(event)
-        elif code == EV_UI2EG_SYNCPOS_CONF:
-            self._onSyncPosConf(event)
 
     #
     def _noticeStrategyReport(self, event):
@@ -397,76 +396,62 @@ class StrategyEngine(object):
             self._sendEvent2Strategy(id, event)
 
     # ////////////////api回调及策略请求事件处理//////////////////
-    def _handleApiData(self):
-        try:
-            apiEvent = self._api2egQueue.get_nowait()
-            code = apiEvent.getEventCode()
-            # print("c api code =", code)
-            if code not in self._apiCallbackDict:
-                return
-
-            # 处理api event及异常
-            try:
-                self._apiCallbackDict[code](apiEvent)
-            except Exception as e:
-                traceback.print_exc()
-                self.logger.error("处理 c api 发来的数据出现错误, event code = {}".format(code))
-                errorText = traceback.format_exc()
-                errorText = errorText + "When handle C API in engine, EventCode: {}".format(code)
-                self.sendErrorMsg(-1, errorText)
-
-            self.maxContinuousIdleTimes = 0
-        except queue.Empty as e:
-            self.maxContinuousIdleTimes += 1
-            pass
-
-    def _handleStData(self):
-        try:
-            event = self._st2egQueue.get_nowait()
-            code = event.getEventCode()
-            strategyId = event.getStrategyId()
-            if code not in self._mainWorkFuncDict:
-                self.logger.debug('Event %d not register in _mainWorkFuncDict'%code)
-                # print("未处理的event code =",code)
-                return
-            try:
-                if strategyId in self._isSt2EngineDataEffective and not self._isSt2EngineDataEffective[strategyId]:
-                    return
-                self._mainWorkFuncDict[code](event)
-            except Exception as e:
-                # traceback.print_exc()
-                errorText = traceback.format_exc()
-                errorText = errorText + f"When handle strategy:{strategyId} in engine, EventCode: {code}. stop stratey {strategyId}!"
-                self._handleEngineExceptionCausedByStrategy(strategyId)
-                self.sendErrorMsg(-1, errorText)
-
-            self.maxContinuousIdleTimes = 0
-        except queue.Empty as e:
-            self.maxContinuousIdleTimes += 1
-            pass
-
-    maxContinuousIdleTimes = 0
-    def _mainThreadFunc(self):
+    def _apiThreadFunc(self):
         while True:
-            self._handleApiData()
-            self._handleStData()
-            if self.maxContinuousIdleTimes >= 1000:
-                time.sleep(0.1)
-            self.maxContinuousIdleTimes %= 1000
+            try:
+                apiEvent = self._api2egQueue.get(timeout=0.1)
+                code = apiEvent.getEventCode()
+                if code not in self._apiCallbackDict:
+                    return
+
+                # 处理api event及异常
+                try:
+                    self._apiCallbackDict[code](apiEvent)
+                except Exception as e:
+                    traceback.print_exc()
+                    self.logger.error("处理 c api 发来的数据出现错误, event code = {}".format(code))
+                    errorText = traceback.format_exc()
+                    errorText = errorText + "When handle C API in engine, EventCode: {}".format(code)
+                    self.sendErrorMsg(-1, errorText)
+            except queue.Empty:
+                pass
+
+    def _stThreadFunc(self):
+        while True:
+            try:
+                event = self._st2egQueue.get(timeout=0.1)
+                code = event.getEventCode()
+                if code not in self._mainWorkFuncDict:
+                    self.logger.debug('Event %d not register in _mainWorkFuncDict'%code)
+                    return
+
+                # 处理策略 event及异常
+                try:
+                    strategyId = event.getStrategyId()
+                    if strategyId in self._isSt2EngineDataEffective and not self._isSt2EngineDataEffective[strategyId]:
+                        return
+                    self._mainWorkFuncDict[code](event)
+                except Exception as e:
+                    # traceback.print_exc()
+                    errorText = traceback.format_exc()
+                    errorText = errorText + f"When handle strategy:{strategyId} in engine, EventCode: {code}. stop stratey {strategyId}!"
+                    self._handleEngineExceptionCausedByStrategy(strategyId)
+                    self.sendErrorMsg(-1, errorText)
+            except queue.Empty:
+                pass
             
     def _startMainThread(self):
         '''从api队列及策略队列中接收数据'''
-        self._apiThreadH = Thread(target=self._mainThreadFunc)
+        self._apiThreadH = Thread(target=self._apiThreadFunc)
         self._apiThreadH.start()
+
+        self._stThreadH = Thread(target=self._stThreadFunc)
+        self._stThreadH.start()
         
     def _1SecondsThreadFunc(self):
         while True:
-            #60秒查一次资金
             self._queryMoney()
-            
-            #10秒同步一次持仓
-            self._syncPosition()
-                
+            self._syncPosition()                
             time.sleep(0.1)
                 
     def _start1secondsTimer(self):
@@ -475,15 +460,13 @@ class StrategyEngine(object):
         self._1SecondsThreadH.start()
         
     def _queryMoney(self):
-        nowTime = datetime.now()
-        
         userDict = self._trdModel.getUserInfo()
         if len(userDict) <= 0:
-            self._lastMoneyTime = nowTime
             return
-            
+
+        # 查询所有账户下的资金, 30秒一次
+        nowTime = datetime.now()
         if self._lastMoneyTime == 0 or (nowTime - self._lastMoneyTime).total_seconds() >= 30:
-            # 查询所有账户下的资金
             self._reqUserMoney()
             self._lastMoneyTime = nowTime
         
@@ -584,14 +567,12 @@ class StrategyEngine(object):
         return ret/1000
         
     def _syncPosition(self):
-        nowTime = datetime.now()
         # 未登录，不同步持仓
         userDict = self._trdModel.getUserInfo()
         if len(userDict) <= 0:
-            self._lastPosTime = nowTime
-            time.sleep(1)
             return
-            
+
+        nowTime = datetime.now()            
         if self._isOneKeySyncPos or self._timeDiffMs(self._lastPosTime, nowTime) >= 400:
             self._lastPosTime = nowTime
             
