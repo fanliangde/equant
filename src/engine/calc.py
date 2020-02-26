@@ -11,8 +11,9 @@ from engine.orderctl import LimitCtl, DirectionCtl
 
 
 class CalcCenter(object):
-    def __init__(self, logger):
+    def __init__(self, logger, strategyModel):
         self._logger = logger
+        self._stModel = strategyModel
 
         self._orderId = 0
         # self._curTradeDate = self._strategy["StartTime"]  # 当前交易日
@@ -137,8 +138,10 @@ class CalcCenter(object):
         else:
             self._costs[contract] = {}
             # TODO:费率直接在这里写默认值还是传进来
-            self._costs[contract]["TradeDot"] = self._strategy["TradeDot"]
-            self._costs[contract]["PriceTick"] = self._strategy["PriceTick"]
+            # self._costs[contract]["TradeDot"] = self._strategy["TradeDot"]
+            # self._costs[contract]["PriceTick"] = self._strategy["PriceTick"]
+            self._costs[contract]["TradeDot"] = self._stModel.getContractUnit(contract)
+            self._costs[contract]["PriceTick"] = self._stModel.getPriceScale(contract)
             self._costs[contract]["Margin"] = self._strategy["Margin"]
             self._costs[contract]["OpenRatio"] = self._strategy["OpenRatio"]
             self._costs[contract]["CloseRatio"] = self._strategy["CloseRatio"]

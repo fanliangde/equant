@@ -304,7 +304,7 @@ class BaseApi(object):
               返回格式为YYYYMMDD的整数
 
         【示例】
-              当前Bar对用的日期为2019-03-25，则TradeDate返回值为20190325
+              当前Bar对用的交易日为2019-03-25，则TradeDate返回值为20190325
         '''
         return self._dataModel.getBarTradeDate(contractNo, kLineType, kLineValue)
 

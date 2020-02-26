@@ -33,7 +33,7 @@ class StrategyModel(object):
         self._cfgModel = StrategyConfig_new(self._argsDict)
         self._config = self._cfgModel
         # 回测计算
-        self._calcCenter = CalcCenter(self.logger)
+        self._calcCenter = CalcCenter(self.logger, self)
 
         self._qteModel = StrategyQuote(strategy, self._cfgModel)
         self._hisModel = StrategyHisQuote(strategy, self._cfgModel, self._calcCenter, self)
