@@ -2,7 +2,7 @@
 # 阶段突破策略:
 #   记录早上split_tim时间点前的高低点
 #   split_tim时间点之后突破就开仓，止损stop_dot点
-#   当日市闭前cover_min分钟开始清仓，实盘清仓会自动追价，每秒一次，先撤后平
+#   当日闭市前cover_min分钟开始清仓，实盘清仓会自动追价，每秒一次，先撤后平
 ######################################################################
 import math
 
@@ -65,7 +65,7 @@ def handle_data(context):
             DeleteAllOrders()
             b_qty = A_BuyPosition()
             s_qty = A_SellPosition()
-          if b_qty > 0:
+            if b_qty > 0:
                 A_SendOrder(Enum_Sell(), Enum_ExitToday(), b_qty, Q_BidPrice())
             if s_qty > 0:
                 A_SendOrder(Enum_Buy(), Enum_ExitToday(), s_qty, Q_AskPrice())

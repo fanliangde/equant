@@ -95,8 +95,7 @@ class StrategyTrade(TradeModel):
         tMoneyModel = None
         if 'Base' in tUserInfoModel._money:
             tMoneyModel = tUserInfoModel._money['Base']
-
-        if len(tUserInfoModel._money) > 0:
+        elif len(tUserInfoModel._money) > 0:
             tMoneyModelList = list(tUserInfoModel._money.values())
             tMoneyModel = tMoneyModelList[0]
 

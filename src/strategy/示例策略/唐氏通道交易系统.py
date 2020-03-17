@@ -5,15 +5,15 @@ import numpy as np
 M = 5
 N = 5
 MaxPositionNum = 3   # 最大开仓数
-StopPoint = 30       # 止损点
-WinPoint = 100       # 止赢点
+StopPoint = 5        # 止损点
+WinPoint = 10        # 止赢点
 FloatStopStart = 50  # 浮动止损开始点
 FloatStopPoint = 20  # 浮动止损点
 
 HHV = np.array([])
 LLV = np.array([])
 
-ContractId = 'SHFE|F|CU|MAIN'
+ContractId = 'ZCE|Z|TA|MAIN'#'ZCE|F|TA|005'#
 
 def initialize(context): 
     global ContractId

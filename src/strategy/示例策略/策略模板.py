@@ -74,8 +74,10 @@ def handle_data(context):
     PlotNumeric('ma2', ma2, 0x0000ff)
 
 # 历史回测阶段结束时执行该函数一次
-def hisover_callback(context):
-    pass
+def hisover_callback(context):    
+    # 清空所有历史持仓
+    Sell(BuyPosition(), Close()[-1])
+    BuyToCover(SellPosition(), Close()[-1])
 
 # 策略退出前执行该函数一次
 def exit_callback(context):

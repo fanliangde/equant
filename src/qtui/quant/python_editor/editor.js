@@ -2336,10 +2336,10 @@ function init_function_info() {
                                   '\n' +
                                   '示例：\n' +
                                   '    在当前没有持仓或者持有多头仓位的情况下：\n' +
-                                  '    Buy(50,10.2) 表示用10.2的价格买入50张合约。\n' +
-                                  '    Buy(10,Close) 表示用当前Bar收盘价买入10张合约，马上发送委托。\n' +
-                                  '    Buy(5,0) 表示用现价买入5张合约，马上发送委托。\n' +
-                                  '    Buy(0,0) 表示用现价按交易设置中设置的手数,马上发送委托。\n' +
+                                  '    Buy(50,10.2) 表示平掉所有空仓，并用10.2的价格买入50张合约。\n' +
+                                  '    Buy(10,Close) 表示平掉所有空仓，并用当前Bar收盘价买入10张合约，马上发送委托。\n' +
+                                  '    Buy(5,0) 表示平掉所有空仓，并用现价买入5张合约，马上发送委托。\n' +
+                                  '    Buy(0,0) 表示平掉所有空仓，并用现价按交易设置中设置的手数,马上发送委托。\n' +
                                   '    \n' +
                                   '    在当前持有空头仓位的情况下：\n' +
                                   '    Buy(10,Close) 表示平掉所有空仓，并用当前Bar收盘价买入10张合约，马上发送委托。',
@@ -2435,22 +2435,22 @@ function init_function_info() {
                                   '\n' +
                                   '示例：\n' +
                                   '    在没有持仓或者持有空头持仓的情况下：\n' +
-                                  '    SellShort(50,10.2) 表示用10.2的价格空头卖出50张合约。\n' +
-                                  '    SellShort(10,Close) 表示用当前Bar收盘价空头卖出10张合约，马上发送委托。\n' +
-                                  '    SellShort(5,0) 表示用现价空头卖出5张合约，马上发送委托。\n' +
-                                  '    SellShort(0,0) 表示用现价按交易设置中设置的手数,马上发送委托。\n' +
+                                  '    SellShort(50,10.2) 表示平掉所有多仓，并用10.2的价格空头卖出50张合约。\n' +
+                                  '    SellShort(10,Close) 表示平掉所有多仓，并用当前Bar收盘价空头卖出10张合约，马上发送委托。\n' +
+                                  '    SellShort(5,0) 表示平掉所有多仓，并用现价空头卖出5张合约，马上发送委托。\n' +
+                                  '    SellShort(0,0) 表示平掉所有多仓，并用现价按交易设置中设置的手数,马上发送委托。\n' +
                                   '    在MarketPosition=1的情况下：（当前持有多头持仓）\n' +
-                                  '    SellShort(10,Close) 表示平掉所有多头仓位，并用当前Bar收盘价空头卖出10张合约，马上发送委托。',
+                                  '    SellShort(10,Close) 表示平掉所有多仓，并用当前Bar收盘价空头卖出10张合约，马上发送委托。',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
                 label           : 'StartTrade()',
                 insertText      : 'StartTrade()',
-                detail          : '# 开启实盘交易。\n' +
+                detail          : '# 恢复实盘交易。\n' +
                                   '    StartTrade()\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    在策略运行时，使用StopTrade可以暂时停止策略向实盘发单，通过该方法可以开启策略向实盘发单的功能。',
+                                  '    在策略运行时，使用StopTrade函数暂停策略向实盘发单后， 可以通过StartTrade函数恢复策略向实盘发单的功能。',
                 kind            : monaco.languages.CompletionItemKind.Function
             },{
                 label           : 'StopTrade()',
@@ -2483,7 +2483,7 @@ function init_function_info() {
                                   '    当前数据周期为1日线，BarInterval等于1；\n' +
                                   '    当前数据周期为22日线，BarInterval等于22；\n' +
                                   '    当前数据周期为60分钟线，BarInterval等于60；\n' +
-                                  '    当前数据周期为1TICK线，BarInterval等于1；br>当前数据周期为5000量线，BarInterval等于5000。',
+                                  '    当前数据周期为1TICK线，BarInterval等于1。',
                 kind            : monaco.languages.CompletionItemKind.Function
             },{
                 label           : 'BarType()',
@@ -2507,7 +2507,7 @@ function init_function_info() {
             },{
                 label           : 'BidAskSize(contractNo=\'\')',
                 insertText      : 'BidAskSize(${1})',
-                detail          : '# 买卖盘个数\n' +
+                detail          : '# 买卖盘个数，即行情深度\n' +
                                   '    int BidAskSize(string contractNo=\'\')\n' +
                                   '\n' +
                                   '参数：\n' +
@@ -5042,8 +5042,9 @@ function init_function_info() {
                                   '\n' +
                                   '参数：\n' +
                                   '    contractNo 合约编号\n' +
-                                  '    barType K线类型 T分笔，M分钟，D日线\n' +
+                                  '    barType K线类型 T分笔或秒线，M分钟，D日线\n' +
                                   '    barInterval K线周期\n' +
+                                  '        当barType为T，barInterval等于0时订阅的为Tick数据，barInterval大于0时订阅的为秒线数据，\n' +
                                   '    sampleConfig 策略历史回测的起始点信息，可选的值为：\n' +
                                   '    字符A : 使用所有K线\n' +
                                   '    字符N : 不执行历史K线\n' +
@@ -5271,21 +5272,27 @@ function init_function_info() {
                                   '    nAddTick 超价点数 仅当nPrice为0，1，2时有效，默认为0；\n' +
                                   '    contractNo 合约代码，默认为基准合约。\n' +
                                   '\n' +
+                                  '备注：\n' +
+                                  '    该函数仅对虚拟持仓有效，即对历史阶段的持仓和实时阶段Buy、SellShort生成的持仓有效。\n' +
+                                  '\n' +
                                   '示例：\n' +
                                   '    SetWinPoint(10) # 当价格相对于最近一次开仓价格超过10个点，进行止盈平仓。如郑棉合约多头：开仓价格为15000，当前价格大于或等于5*10=50时，即达到15050，则进行平仓。',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
-                label           : 'SetWinPoint(stopPoint, nPriceType=0, nAddTick=0, contractNo=\"\")',
+                label           : 'SetStopPoint(stopPoint, nPriceType=0, nAddTick=0, contractNo=\"\")',
                 insertText      : 'SetStopPoint(${1})',
                 detail          : '# 设置触发方式\n' +
-                                  '    SetWinPoint(int stopPoint, int nPriceType = 0, int nAddTick = 0, string contractNo = \"\")\n' +
+                                  '    SetStopPoint(int stopPoint, int nPriceType = 0, int nAddTick = 0, string contractNo = \"\")\n' +
                                   '\n' +
                                   '参数：\n' +
                                   '    stopPoint 止损点数，若当前价格相对于最近一次开仓价格亏损点数达到或跌破该值，就进行止损；\n' +
                                   '    nPriceType 平仓下单价格类型 0:最新价 1：对盘价 2：挂单价 3：市价 4：停板价，默认值为0；\n' +
                                   '    nAddTick 超价点数 仅当nPrice为0，1，2时有效，默认为0；\n' +
                                   '    contractNo 合约代码，默认为基准合约。\n' +
+                                  '\n' +
+                                  '备注：\n' +
+                                  '    该函数仅对虚拟持仓有效，即对历史阶段的持仓和实时阶段Buy、SellShort生成的持仓有效。\n' +
                                   '\n' +
                                   '示例：\n' +
                                   '    SetStopPoint(10) # 当价格跌破10个点，进行止损平仓。 如：如郑棉合约多头：开仓价格为15000，当前价格小于或等于5*10=50时，即达到14950，则进行平仓。',
@@ -5303,6 +5310,9 @@ function init_function_info() {
                                   '    nPriceType 平仓下单价格类型 0:最新价 1：对盘价 2：挂单价 3：市价 4：停板价，默认为0；\n' +
                                   '    nAddTick 超价点数 仅当nPrice为0，1，2时有效，默认为0；\n' +
                                   '    contractNo 合约代码，默认为基准合约。\n' +
+                                  '\n' +
+                                  '备注：\n' +
+                                  '    该函数仅对虚拟持仓有效，即对历史阶段的持仓和实时阶段Buy、SellShort生成的持仓有效。\n' +
                                   '\n' +
                                   '示例：\n' +
                                   '    SetFloatStopPoint(20,10)\n' +
@@ -5457,7 +5467,7 @@ function init_function_info() {
                 label           : 'PlotText(value, text, color, main, barsback=0)',
                 insertText      : 'PlotText(${1})',
                 detail          : '# 在当前Bar输出字符串\n' +
-                                  '    PlotText(stirng value, string text, int color, bool main, int barsback=0)\n' +
+                                  '    PlotText(float value, string text, int color, bool main, int barsback=0)\n' +
                                   '\n' +
                                   '参数：\n' +
                                   '    value 输出的价格\n' +
@@ -5470,7 +5480,7 @@ function init_function_info() {
                                   '    在当前Bar输出字符串，输出的值用于在上层调用模块显示。返回数值型，即输入的Number。\n' +
                                   '\n' +
                                   '示例：\n' +
-                                  '    例1：PlotText(\"ORDER\");',
+                                  '    例1：PlotText(2603, \"ORDER\");',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -5974,7 +5984,7 @@ function init_function_info() {
                                   '    triggerType()\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    返回字符, \'T\' 定时触发; \'C\' 周期性触发; \'K\' 实时阶段K线触发; \'H\' 回测阶段K线触发; \'S\' 即时行情触发; \'O\' 委托状态变化触发 ; \'M\' 成交回报触发',
+                                  '    返回字符, \'T\' 定时触发; \'C\' 周期性触发; \'K\' 实时阶段K线触发; \'H\' 回测阶段K线触发; \'S\' 即时行情触发; \'O\' 委托状态变化触发',
                 kind            : monaco.languages.CompletionItemKind.Function
             },{
                 label           : 'contractNo()',

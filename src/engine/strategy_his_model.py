@@ -1017,7 +1017,7 @@ class StrategyHisQuote(object):
                 context.setCurTriggerSourceInfo(args)
                 handle_data(context)
 
-            # 处理历史回测阶段止损止盈
+            # 处理历史回测阶段止损止盈            
             if key[1] not in self._config.getStopWinKtBlack():
                 self._stopWinOrLose(key[0], True, row)
                 self._stopFloatWinLose(key[0], True, row)
