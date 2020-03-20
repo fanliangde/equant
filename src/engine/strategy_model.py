@@ -1025,7 +1025,7 @@ class StrategyModel(object):
             "UserNo": userNo,  # 账户编号
             "OrderType": orderType,  # 定单类型
             "ValidType": validType,  # 有效类型
-            "ValidTime": '0',  # 有效日期时间(GTD情况下使用)
+            "ValidTime": '',  # 有效日期时间(GTD情况下使用)
             "Cont": contNo,  # 合约
             "Direct": orderDirct,  # 买卖方向：买、卖
             "Offset": entryOrExit,  # 开仓、平仓、平今
@@ -1179,7 +1179,7 @@ class StrategyModel(object):
             'Cont': contNo,
             'OrderType': orderType,
             'ValidType': validType,
-            'ValidTime': '0',
+            'ValidTime': '',
             'Direct': orderDirct,
             'Offset': entryOrExit,
             'Hedge': hedge,
