@@ -304,7 +304,7 @@ class BaseApi(object):
               返回格式为YYYYMMDD的整数
 
         【示例】
-              当前Bar对用的交易日为2019-03-25，则TradeDate返回值为20190325
+              当前Bar对应的交易日为2019-03-25，则TradeDate返回值为20190325
         '''
         return self._dataModel.getBarTradeDate(contractNo, kLineType, kLineValue)
 
@@ -463,7 +463,7 @@ class BaseApi(object):
                 KLineQty K线成交量，如18
                 TotalQty 总成交量，如41401
                 KLineSlice K线周期， 如1
-                KLineType K线周期，如'M'
+                KLineType K线类型，如'M'
                 OpeningPrice 开盘价， 如63.5
                 LastPrice 收盘价，如63.49
                 SettlePrice 结算价，如63.21
@@ -1646,6 +1646,8 @@ class BaseApi(object):
               '8'   交易未连
               '9'   闭市处理
 
+              该方法仅适用于内盘交易所，对外盘交易所返回值为空字符串。
+
         【示例】
               ExchangeStatus('ZCE')
         '''
@@ -1678,6 +1680,8 @@ class BaseApi(object):
               '7'   报盘未连
               '8'   交易未连
               '9'   闭市处理
+
+              该方法仅适用于内盘品种，对外盘品种返回值为空字符串。
 
         【示例】
               CommodityStatus('ZCE|F|SR')
@@ -1904,6 +1908,7 @@ class BaseApi(object):
 
         【备注】
               该函数只计算两个时间之间的差值，不考虑两个参数的日期
+              若输入参数不为float类型，则函数返回值为0
 
         【示例】
               TimeDiff(20190404.104110,20110404.104120);返回两时间相差10秒；
@@ -6605,7 +6610,7 @@ class BaseApi(object):
             获取最近N周期条件满足的计数
 
         【语法】
-            int CountIf(condition, period)
+            int CountIf(bool condition, int period)
 
         【参数】
             condition 传入的条件表达式；

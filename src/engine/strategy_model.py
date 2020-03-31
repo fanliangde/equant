@@ -1906,7 +1906,7 @@ class StrategyModel(object):
         return float(currentTime)
         
     def _gethms(self, time):
-        itime = int((time + 1e-9) * 1000000)
+        itime = round((time + 1e-9) * 1000000)
         hh,mm,ss = 0, 0, 0
         if itime > 0:
             hh = int(itime / 10000)
