@@ -124,7 +124,12 @@ class StrategyEngine(object):
         if not os.path.exists('config/StrategyContext.json'):
             return
         with open("config/StrategyContext.json", 'r', encoding="utf-8") as resumeFile:
-            strategyContext = json.load(resumeFile)
+            try:
+                strategyContext = json.load(resumeFile)
+            except:
+                self.logger.warn("Resume strategy failed!!!")
+                return
+
             for k,v in strategyContext.items():
                 if k == "MaxStrategyId":
                     self._maxStrategyId = int(v)

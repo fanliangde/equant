@@ -50,7 +50,7 @@ class StrategyQuote(QuoteModel):
         strategyId = event.getStrategyId()
         #self.logger.debug("QteModelOnExchange:%s" %dataDict)
         for k, v in dataDict.items():
-            self._exchangeData[k] = ExchangeModel(self.logger, v) 
+            self._exchangeData[k] = ExchangeModel(self.logger, v)
             self._exchangeData[k].updateStatus(strategyId, v)
        
     def onExchangeStatus(self, event):

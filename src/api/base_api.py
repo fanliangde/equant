@@ -1773,13 +1773,13 @@ class BaseApi(object):
         '''
         return self._dataModel.getGetSessionStartTime(contractNo, index)
 
-    def GetNextTimeInfo(self, contractNo, timeStamp):
+    def GetNextTimeInfo(self, contractNo, timeStr):
         '''
         【说明】
               获取指定合约指定时间点的下一个时间点及交易状态。
 
         【语法】
-              dict GetNextTimeInfo(string contractNo, float timeStamp)
+              dict GetNextTimeInfo(string contractNo, float timeStr)
 
         【参数】
               contractNo 合约编号。
@@ -1791,7 +1791,7 @@ class BaseApi(object):
                 'Time' : 0.21,
                 'TradeState' : 3
               }
-              其中Time对应的值表示指定时间timeStamp的下一个时间点，返回指定合约的交易时间段开始时间，格式为0.HHMMSS的浮点数。
+              其中Time对应的值表示指定时间timeStr的下一个时间点，返回指定合约的交易时间段开始时间，格式为0.HHMMSS的浮点数。
               TradeState表示对应时间点的交易状态，数据类型为字符，可能出现的值及相应的状态含义如下：
                 1 : 集合竞价
                 2 : 集合竞价撮合
@@ -1812,7 +1812,7 @@ class BaseApi(object):
               curTime = time.strftime('0.%H%M%S',time.localtime(time.time()))
               timeInfoDict = GetNextTimeInfo("SHFE|F|CU|1907", curTime)
         '''
-        return self._dataModel.getNextTimeInfo(contractNo, timeStamp)
+        return self._dataModel.getNextTimeInfo(contractNo, timeStr)
 
     def TradeSessionBeginTime(self, contractNo, tradeDate, index):
         '''
@@ -2192,7 +2192,7 @@ class BaseApi(object):
               contractNo 取商品主连/近月编号，为空时，取基准合约。
 
         【备注】
-              返回字符串
+              返回字符串，若contractNo为具体的合约，则返回contractNo
 
         【示例】
               GetTrendContract('DCE|Z|I|MAIN') 的返回为"DCE|F|I|1909"
@@ -6147,10 +6147,10 @@ class BaseApi(object):
             在当前Bar输出字符串
 
         【语法】
-            void PlotText(stirng value, string text, int color, bool main, int barsback=0)
+            void PlotText(float coord, string text, int color, bool main, int barsback=0)
 
         【参数】
-            value 输出的价格
+            coord 输出的价格
             text 输出的字符串，最多支持19个英文字符
             color 输出值的显示颜色，默认表示使用属性设置框中的颜色；
             main  指标是否加载到主图，True-主图，False-幅图，默认主图
@@ -6160,7 +6160,7 @@ class BaseApi(object):
             在当前Bar输出字符串，输出的值用于在上层调用模块显示。
 
         【示例】
-            例1：PlotText("ORDER")
+            例1：PlotText(Close()[-1], "ORDER", main=True)
         '''
         return self._dataModel.setPlotText(value, text, color, main, barsback)
 
