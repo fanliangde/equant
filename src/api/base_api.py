@@ -1741,6 +1741,7 @@ class BaseApi(object):
 
         【备注】
               返回指定合约的交易时间段结束时间，格式为0.HHMMSS的浮点数。
+              若index索引超出交易时段大小，则返回0.0
 
         【示例】
               contractNo = "ZCE|F|SR|905"
@@ -1767,6 +1768,7 @@ class BaseApi(object):
 
         【备注】
               返回指定合约的交易时间段开始时间，格式为0.HHMMSS的浮点数。
+              若index索引超出交易时段大小，则返回0.0
 
         【示例】
               无

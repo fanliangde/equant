@@ -1857,7 +1857,12 @@ class StrategyModel(object):
             return 0
 
         timeBucket = self._qteModel._commodityData[commodity]._metaData['TimeBucket']
-        endTime = timeBucket[2 * index + 1]["BeginTime"] if 2 * index + 1 < len(timeBucket) else 0
+        if not isinstance(index, int):
+            raise IndexError("交易时段索引应为整数")
+        if 2 * index + 1 >= len(timeBucket) or 2 * index + 1 < -len(timeBucket):
+            self.logger.warn("GetSessionEndTime()函数交易时段索引超限")
+            return 0.0
+        endTime = timeBucket[2 * index + 1]["BeginTime"]
         return float(endTime) / 1000000000
 
     def getGetSessionStartTime(self, contNo, index):
@@ -1866,7 +1871,12 @@ class StrategyModel(object):
             return 0
 
         timeBucket = self._qteModel._commodityData[commodity]._metaData['TimeBucket']
-        beginTime = timeBucket[2 * index]["BeginTime"] if 2 * index < len(timeBucket) else 0
+        if not isinstance(index, int):
+            raise IndexError("交易时段索引应为整数")
+        if 2 * index >= len(timeBucket) or 2 * index < -len(timeBucket):
+            self.logger.warn("GetSessionStartTime()函数交易时段索引超限")
+            return 0.0
+        beginTime = timeBucket[2 * index]["BeginTime"]
         return float(beginTime) / 1000000000
 
     def getNextTimeInfo(self, contNo, timeStr):
@@ -2652,14 +2662,14 @@ class StrategyModel(object):
         
     def getCrossOver(self, price1, price2):
         '''price1是否上穿price2,前一个在下，当前跟在上'''
-        if price1[-1]  <= price2[-1]:
+        if price1[-1] <= price2[-1]:
             return False
         #只有一根线，不做比较
         if len(price1) <= 1:
             return False
             
         #如果前一根相等，则继续往前找上一根
-        pos = -2;
+        pos = -2
         while price1[pos] == price2[pos]:
             pos = pos -1
             if pos <= -len(price1):
