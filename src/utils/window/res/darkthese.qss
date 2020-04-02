@@ -146,9 +146,11 @@ QLabel {
 /**********滚动条-水平**********/
 QScrollBar:horizontal {
     height: 7px;
+    min-height:7px;
     background: transparent;
     margin-bottom: 0px;
 }
+/**********滑动块设置**********/
 QScrollBar::handle:horizontal {
     background: #424242;
     border:2px solid transparent;
@@ -157,14 +159,16 @@ QScrollBar::handle:horizontal {
 QScrollBar::handle:horizontal:hover {
     background: #4E4E4E;
 }
+/*******左侧控制块**********/
 QScrollBar::sub-line:horizontal {
     background: transparent;
-    width: 7px;
+    width: 0px;
     subcontrol-position: left;
 }
+/*******右侧控制块**********/
 QScrollBar::add-line:horizontal {
     background: transparent;
-    width: 7px;
+    width: 0px;
     subcontrol-position: right;
 }
 QScrollBar::sub-line:horizontal:hover {
@@ -173,6 +177,7 @@ QScrollBar::sub-line:horizontal:hover {
 QScrollBar::add-line:horizontal:hover {
     background: rgb(68, 69, 73);
 }
+/************滑块右边，滑块左边********/
 QScrollBar::add-page:horizontal,QScrollBar::sub-page:horizontal {
     background: transparent;
 }
@@ -180,6 +185,7 @@ QScrollBar::add-page:horizontal,QScrollBar::sub-page:horizontal {
 /**********滚动条-垂直**********/
 QScrollBar:vertical {
     width: 7px;
+    min-width:7px;
     background: transparent;
     margin-right: 0px;
 }
@@ -193,12 +199,12 @@ QScrollBar::handle:vertical:hover {
 }
 QScrollBar::sub-line:vertical {
     background: transparent;
-    height: 7px;
+    height: 0px;
     subcontrol-position: top;
 }
 QScrollBar::add-line:vertical {
     background: transparent;
-    height: 7px;
+    height: 0px;
     subcontrol-position: bottom;
 }
 QScrollBar::sub-line:vertical:hover {
@@ -207,6 +213,7 @@ QScrollBar::sub-line:vertical:hover {
 QScrollBar::add-line:vertical:hover {
     background: rgb(68, 69, 73);
 }
+/**********滑块右边，滑块左边**************/
 QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
     background: transparent;
 }

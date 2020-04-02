@@ -22,7 +22,7 @@ g_params['见顶根数'] = 9
 g_params['日内平仓'] = False
 
 def initialize(context):
-    SetBarInterval("DCE|F|I|1909", 'M', 1, 1)
+    SetBarInterval("DCE|Z|I|MAIN", 'M', 1, 1)
 
 
 def handle_data(context):

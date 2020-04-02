@@ -12,7 +12,7 @@ def getAvg(high, low):
     return avg
 
 def initialize(context): 
-    SetBarInterval("DCE|F|I|1909", 'M', 1, 100)
+    SetBarInterval("DCE|Z|I|MAIN", 'M', 1, 100)
 
 
 def handle_data(context):

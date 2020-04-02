@@ -24,7 +24,7 @@ fsDonchianLo = 0
 ExitHighestPrice = 0
 ExitLowestPrice = 0
 
-ContractId = 'SHFE|F|CU|MAIN'
+ContractId = 'SHFE|Z|CU|MAIN'
 
 # 求真实最高价，真实最低价，真实范围序列值
 def TrueRange(barsinfo:list):
@@ -75,7 +75,6 @@ def XAverage(prices:np.array, length):
     return xa
 
 def initialize(context):
-    global ContractId
     SetBarInterval(ContractId, 'M', 1, 2000)
     SetActual()
 

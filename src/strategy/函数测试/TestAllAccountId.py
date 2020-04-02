@@ -6,9 +6,14 @@ import talib
 #3. 退出登录，清理掉登出的账号
 
 def initialize(context): 
-    SetBarInterval('NYMEX|F|CL|1909', 'M', 1, 1)
+    SetBarInterval('NYMEX|Z|CL|MAIN', 'M', 1, 1)
 
 
 def handle_data(context):
-    accList = A_AllAccountID()
-    LogInfo(accList)
+    # accList = A_AllAccountID()
+    # LogInfo(accList)
+    test()
+
+
+def test():
+    LogInfo("1111: ", A_AllAccountID())

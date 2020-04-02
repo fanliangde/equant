@@ -2,7 +2,7 @@ import talib
 
 cur_times = 0
 order_times = 1
-ContractId = "NYMEX|F|CL|1909"
+ContractId = "NYMEX|Z|CL|MAIN"
 
 def initialize(context): 
     SetBarInterval(ContractId, 'M', 1, 100)

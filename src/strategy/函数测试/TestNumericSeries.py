@@ -1,12 +1,12 @@
 import talib
-from NumericSeries import NumericSeries
+from EsSeries import NumericSeries
 
 aa = NumericSeries()
 bb = NumericSeries()
 cc = NumericSeries()
 
 def initialize(context): 
-    SetBarInterval("NYMEX|F|CL|1908", 'M', 1, 2000)
+    SetBarInterval("NYMEX|Z|CL|MAIN", 'M', 1, 2000)
 
 
 def handle_data(context):

@@ -114,6 +114,7 @@ QLabel {
 /**********滚动条-水平**********/
 QScrollBar:horizontal {
     height: 7px;
+    min-height: 7px;
     background: transparent;
     margin-bottom: 0px;
 }
@@ -127,12 +128,12 @@ QScrollBar::handle:horizontal:hover {
 }
 QScrollBar::sub-line:horizontal {
     background: transparent;
-    width: 7px;
+    width: 0px;
     subcontrol-position: left;
 }
 QScrollBar::add-line:horizontal {
     background: transparent;
-    width: 7px;
+    width: 0px;
     subcontrol-position: right;
 }
 QScrollBar::sub-line:horizontal:hover {
@@ -148,6 +149,7 @@ QScrollBar::add-page:horizontal,QScrollBar::sub-page:horizontal {
 /**********滚动条-垂直**********/
 QScrollBar:vertical {
     width: 7px;
+    min-width:7px;
     background: transparent;
     margin-right: 0px;
 }
@@ -161,12 +163,12 @@ QScrollBar::handle:vertical:hover {
 }
 QScrollBar::sub-line:vertical {
     background: transparent;
-    height: 7px;
+    height: 0px;
     subcontrol-position: top;
 }
 QScrollBar::add-line:vertical {
     background: transparent;
-    height: 7px;
+    height: 0px;
     subcontrol-position: bottom;
 }
 QScrollBar::sub-line:vertical:hover {
