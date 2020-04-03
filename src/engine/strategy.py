@@ -411,13 +411,17 @@ class Strategy:
         # 2. 创建策略上下文
         self._context = StrategyContext()
 
+        self._cfgModel.setParams(self._argsDict["Params"])
+
+        builtins.g_params = {k:v[0] for k,v in self._argsDict["Params"].items()}
+
         # 5. 初始化用户策略参数
         if not self._noInitialize:
             userModule.initialize(self._context)
 
-        self._cfgModel.setParams(self._argsDict["Params"])
-
-        builtins.g_params = {k:v[0] for k,v in self._argsDict["Params"].items()}
+        # self._cfgModel.setParams(self._argsDict["Params"])
+        #
+        # builtins.g_params = {k:v[0] for k,v in self._argsDict["Params"].items()}
         #     self._argsDict["Params"] = self._context.params
         #     self._dataModel.getConfigModel().setParams(self._context.params)
         # else:
