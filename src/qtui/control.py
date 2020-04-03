@@ -69,9 +69,9 @@ class Controller(object):
 
         self.mainWnd.setWinThese(theme)
         self.mainWnd.setWindowIcon(QIcon('icon/epolestar ix2.ico'))
-        screen = QDesktopWidget().screenGeometry()
-        self.mainWnd.setGeometry(screen.width() * 0.1, screen.height() * 0.1, screen.width() * 0.8,
-                                 screen.height() * 0.8)
+        # screen = QDesktopWidget().screenGeometry()
+        # self.mainWnd.setGeometry(screen.width() * 0.1, screen.height() * 0.1, screen.width() * 0.8,
+        #                          screen.height() * 0.8)
         # self.mainWnd.titleBar.buttonClose.clicked.connect(self.quitThread)
         self.mainWnd.titleBar.buttonClose.clicked.disconnect(self.mainWnd.titleBar.closeWindow)
         self.mainWnd.titleBar.buttonClose.clicked.connect(self.app.save_edit_strategy)
@@ -97,9 +97,9 @@ class Controller(object):
         self.reportWnd.setObjectName("ReportWnd")
         self.reportWnd.resize(1000, 600)
         self.reportWnd.setMinimumSize(600, 600)
-        self.reportWnd.setMaximumSize(1000, 600)
+        # self.reportWnd.setMaximumSize(1000, 600)
         self.reportWnd.hideTheseBtn()
-        self.reportWnd.disabledMaximumBtn()
+        # self.reportWnd.disabledMaximumBtn()
         self.reportWnd.setWindowTitle("回测报告")
         self.reportWnd.setWindowIcon(QIcon('icon/epolestar ix2.ico'))
         self.reportView = ReportView(self.reportWnd)

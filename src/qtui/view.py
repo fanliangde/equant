@@ -1755,6 +1755,13 @@ class QuantApplication(QWidget):
             self.main_splitter.restoreState(self.settings.value('main_splitter'))
         else:
             self.main_splitter.setSizes([self.width * 0.4, self.width * 0.1])
+        # 设置主窗口位置
+        if self.settings.contains('geometry'):
+            self._master.setGeometry(self.settings.value('geometry'))
+        else:
+            screen = QDesktopWidget().screenGeometry()
+            self._master.setGeometry(screen.width() * 0.1, screen.height() * 0.1, screen.width() * 0.8,
+                                     screen.height() * 0.8)
 
         self.hbox.addWidget(self.main_splitter)
         self.setLayout(self.hbox)
@@ -1783,6 +1790,8 @@ class QuantApplication(QWidget):
 
     def close_app(self):
         self.save_settings()
+
+        self.reportView.saveSettings()
         self._controller.quitThread()
         self._controller.mainWnd.titleBar.closeWindow()
 
@@ -1815,6 +1824,8 @@ class QuantApplication(QWidget):
         self.settings.setValue('main_splitter', self.main_splitter.saveState())
         self.settings.setValue(
             'theme', 'vs' if self._controller.mainWnd.getWinThese() == '浅色' else 'vs-dark')
+        # 保存主窗口位置和大小
+        self.settings.setValue('geometry', self._master.frameGeometry())
 
     def init_control(self):
         self._exchange = self._controller.model.getExchange()

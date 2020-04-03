@@ -25,6 +25,7 @@ class ReportView(QWidget):
         self.setWindowTitle(self._windowTitle)
         self.setWindowIcon(QIcon(self._iconPath))
 
+        self.initSettings()
         # 初始化界面
         self._initUI()
         # 接收报告显示信号
@@ -64,4 +65,19 @@ class ReportView(QWidget):
         index = self.dir.model.index(path)
         self.dir.expand(index.parent())
         self.dir.setCurrentIndex(index)
+
+    def initSettings(self):
+        self._settings = QSettings('config/settings.ini', QSettings.IniFormat)
+
+    def saveSettings(self):
+        """保存投资报告界面布局"""
+        self._settings.setValue("report_win_geometry", self.parent.frameGeometry())
+
+    def loadSettings(self):
+        """设置保存的界面布局"""
+        if self._settings.contains("report_win_geometry"):
+            self.parent.setGeometry(self._settings.value("report_win_geometry"))
+        else:
+            pass
+
 
