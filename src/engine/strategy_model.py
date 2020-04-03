@@ -841,7 +841,10 @@ class StrategyModel(object):
 
     def getBuyProfitLoss(self, userNo, contNo):
         contNo = self.getIndexMap(contNo)
-        return self._trdModel.getBuyProfitLoss(userNo, contNo)
+        # 获取每手乘数、最新价用于计算浮动盈亏
+        contUnit = self.getContractUnit(contNo)
+        lastPrice = self.getQLast(contNo)
+        return self._trdModel.getBuyProfitLoss(userNo, contNo, lastPrice, contUnit)
 
     def getSellAvgPrice(self, userNo, contNo):
         contNo = self.getIndexMap(contNo)
@@ -853,11 +856,15 @@ class StrategyModel(object):
 
     def getSellPositionCanCover(self, userNo, contNo):
         contNo = self.getIndexMap(contNo)
+
         return self._trdModel.getSellPositionCanCover(userNo, contNo)
 
     def getSellProfitLoss(self, userNo, contNo):
         contNo = self.getIndexMap(contNo)
-        return self._trdModel.getSellProfitLoss(userNo, contNo)
+        # 获取每手乘数、最新价用于计算浮动盈亏
+        contUnit = self.getContractUnit(contNo)
+        lastPrice = self.getQLast(contNo)
+        return self._trdModel.getSellProfitLoss(userNo, contNo, lastPrice, contUnit)
 
     def getTotalAvgPrice(self, userNo, contNo):
         contNo = self.getIndexMap(contNo)
@@ -869,7 +876,10 @@ class StrategyModel(object):
 
     def getTotalProfitLoss(self, userNo, contNo):
         contNo = self.getIndexMap(contNo)
-        return self._trdModel.getTotalProfitLoss(userNo, contNo)
+        # 获取每手乘数、最新价用于计算浮动盈亏
+        contUnit = self.getContractUnit(contNo)
+        lastPrice = self.getQLast(contNo)
+        return self._trdModel.getTotalProfitLoss(userNo, contNo, lastPrice, contUnit)
 
     def getTodayBuyPosition(self, userNo, contNo):
         contNo = self.getIndexMap(contNo)
