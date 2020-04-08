@@ -28,6 +28,10 @@ _all_func_ = {
                 
     '即时行情': [
                     ['Q_UpdateTime'        , '即时行情更新时间'],
+                    ['Q_PreClose'          , '昨收盘价'],
+                    ['Q_SettlePrice'       , '结算价'],
+                    ['Q_BuyTotalVol'       , '委买总量'],
+                    ['Q_SellTotalVol'      , '委卖总量'],
                     ['Q_AskPrice'          , '最新卖价'],
                     # ['Q_AskPriceFlag'      , '卖价变化标志'],
                     ['Q_AskVol'            , '最新卖量'],
@@ -43,7 +47,7 @@ _all_func_ = {
                     ['Q_Last'              , '最新价'],
                     ['Q_LastDate'          , '最新成交日期'],
                     ['Q_LastTime'          , '最新成交时间'],
-                    # ['Q_LastVol'           , '现手'],
+                    ['Q_LastVol'           , '现手'],
                     ['Q_Low'               , '当日最低价'],
                     ['Q_LowLimit'          , '当日跌停价'],
                     ['Q_Open'              , '当日开盘价'],

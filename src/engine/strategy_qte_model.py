@@ -198,6 +198,30 @@ class StrategyQuote(QuoteModel):
         quoteDataModel = self._contractData[contNo]
         return str(quoteDataModel._metaData['UpdateTime'])
 
+    # 昨收盘价
+    @paramValidatorFactory(0)
+    def getQPreClose(self, contNo):
+        quoteDataModel = self._contractData[contNo]
+        return quoteDataModel.getLv1Data(0, 0.0)
+
+    # 结算价
+    @paramValidatorFactory(0)
+    def getQSettlePrice(self, contNo):
+        quoteDataModel = self._contractData[contNo]
+        return quoteDataModel.getLv1Data(15, 0.0)
+
+    # 委买总量
+    @paramValidatorFactory(0)
+    def getQBuyTotalVol(self, contNo):
+        quoteDataModel = self._contractData[contNo]
+        return quoteDataModel.getLv1Data(25, 0)
+
+    # 委卖总量
+    @paramValidatorFactory(0)
+    def getQSellTotalVol(self, contNo):
+        quoteDataModel = self._contractData[contNo]
+        return quoteDataModel.getLv1Data(26, 0)
+
     # 合约最新卖价
     @paramValidatorFactory(0)
     def getQAskPrice(self, contNo, level=1):
@@ -308,11 +332,13 @@ class StrategyQuote(QuoteModel):
         quoteDataModel = self._contractData[contNo]
         return quoteDataModel.getLv1Data(4, 0.0)
 
-    # 现手
+    # 现手(最新成交量)
     @paramValidatorFactory(0)
     def getQLastVol(self, contNo):
-        # TODO: 增加现手计算逻辑
-        return 0
+        # # TODO: 增加现手计算逻辑
+        # return 0
+        quoteDataModel = self._contractData[contNo]
+        return quoteDataModel.getLv1Data(16, 0)
 
     # 当日最低价
     @paramValidatorFactory(0)
@@ -451,3 +477,5 @@ class StrategyQuote(QuoteModel):
     def getQuoteDataExist(self, contNo):
         quoteDataModel = self._contractData[contNo]
         return True if len(quoteDataModel._metaData["Lv1Data"]) > 0 else False
+
+

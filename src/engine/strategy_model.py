@@ -262,6 +262,19 @@ class StrategyModel(object):
     def getQAskPrice(self, symbol, level):
         return self._qteModel.getQAskPrice(symbol, level)
 
+    # 新增
+    def getQPreClose(self, symbol):
+        return self._qteModel.getQPreClose(symbol)
+
+    def getQSettlePrice(self, symbol):
+        return self._qteModel.getQSettlePrice(symbol)
+
+    def getQBuyTotalVol(self, symbol):
+        return self._qteModel.getQBuyTotalVol(symbol)
+
+    def getQSellTotalVol(self, symbol):
+        return self._qteModel.getQSellTotalVol(symbol)
+
     def getQAskPriceFlag(self, symbol):
         return self._qteModel.getQAskPriceFlag(symbol)
 

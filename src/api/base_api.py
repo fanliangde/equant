@@ -499,6 +499,82 @@ class BaseApi(object):
         '''
         return self._dataModel.getQUpdateTime(contractNo)
 
+    def Q_PreClose(self, contractNo=''):
+        '''
+        【说明】
+              合约昨收盘价
+
+        【语法】
+              float Q_PreClose(string contractNo='')
+
+        【参数】
+              contractNo 合约编号, 默认当前合约
+
+        【备注】
+              返回浮点数
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getQPreClose(contractNo)
+
+    def Q_SettlePrice(self, contractNo=''):
+        '''
+        【说明】
+              合约收盘价
+
+        【语法】
+              float Q_SettlePrice(string contractNo='')
+
+        【参数】
+              contractNo 合约编号, 默认当前合约
+
+        【备注】
+              返回浮点数
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getQSettlePrice(contractNo)
+
+    def Q_BuyTotalVol(self, contractNo=''):
+        '''
+        【说明】
+              合约委买总量
+
+        【语法】
+              int Q_BuyTotalPrice(string contractNo='')
+
+        【参数】
+              contractNo 合约编号, 默认当前合约
+
+        【备注】
+              返回整数
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getQBuyTotalVol(contractNo)
+
+    def Q_SellTotalVol(self, contractNo=''):
+        '''
+        【说明】
+              合约委卖总量
+
+        【语法】
+              int Q_SellTotalPrice(string contractNo='')
+
+        【参数】
+              contractNo 合约编号, 默认当前合约
+
+        【备注】
+              返回整数
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getQSellTotalVol(contractNo)
+
     def Q_AskPrice(self, contractNo='', level=1):
         '''
         【说明】
@@ -7003,6 +7079,18 @@ def HisBarsInfo(contractNo='', kLineType='', kLineValue=0, maxLength=None):
 #即时行情
 def Q_UpdateTime(contractNo=''):
     return baseApi.Q_UpdateTime(contractNo)
+
+def Q_PreClose(contractNo=''):
+    return baseApi.Q_PreClose(contractNo)
+
+def Q_SettlePrice(contractNo=''):
+    return baseApi.Q_SettlePrice(contractNo)
+
+def Q_BuyTotalVol(contractNo=''):
+    return baseApi.Q_BuyTotalVol(contractNo)
+
+def Q_SellTotalVol(contractNo=''):
+    return baseApi.Q_SellTotalVol(contractNo)
 
 def Q_AskPrice(contractNo='', level=1):
     return baseApi.Q_AskPrice(contractNo, level)
