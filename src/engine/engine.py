@@ -455,7 +455,8 @@ class StrategyEngine(object):
         
     def _1SecondsThreadFunc(self):
         while True:
-            self._queryMoney()
+            # TODO: 去掉主动去查资金方式，改为由9.5推送资金信息
+            # self._queryMoney()
             self._syncPosition()                
             time.sleep(0.1)
                 
@@ -471,7 +472,7 @@ class StrategyEngine(object):
 
         # 查询所有账户下的资金, 30秒一次
         nowTime = datetime.now()
-        if self._lastMoneyTime == 0 or (nowTime - self._lastMoneyTime).total_seconds() >= 30:
+        if self._lastMoneyTime == 0 or (nowTime - self._lastMoneyTime).total_seconds() >= 1:
             self._reqUserMoney()
             self._lastMoneyTime = nowTime
         
@@ -1557,7 +1558,7 @@ class StrategyEngine(object):
     def _reqPosition(self, event):
         #self.logger.info("request position")
         return self._pyApi.reqQryPosition(event)
-        
+
     def _reqUserMoney(self):
         userDict = self._trdModel.getUserInfo()
         for v in userDict.values():

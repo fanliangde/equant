@@ -673,6 +673,7 @@ class StrategyHisQuote(object):
             rfdataList[i]['KLineIndex'] = i+1
 
     def _handleKLineNoticeData(self, localDataList, event):
+        # print("1111111111: ", localDataList)
         key = (event.getContractNo(), event.getKLineType(), event.getKLineSlice())
 
         # notice数据，直接加到队尾
@@ -724,6 +725,7 @@ class StrategyHisQuote(object):
                 if orderWay == SendOrderRealTime:
                     self._sendRealTimeKLineTriggerEvent(key, localDataList[-1])
                 elif orderWay == SendOrderStable and len(localDataList) >= 2 and localDataList[-2]["IsKLineStable"] and isNewKLine:
+                    #print("+++++++++++++")
                     self._sendRealTimeKLineTriggerEvent(key, localDataList[-2])
             else:
                 pass

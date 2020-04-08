@@ -1124,8 +1124,8 @@ class PyAPI(object):
             }
             dataList.append(idict)
             self._exchangeCount += 1
-        
-        #发送到引擎  
+
+        #发送到引擎
         apiEvent.setData(dataList)
         sid = apiEvent.getSessionId()
         apiEvent.setStrategyId(self._getStrategyId(sid))
@@ -1383,7 +1383,7 @@ class PyAPI(object):
                 idict['SettlePrice']  = data.KLineData.KLineData0.SettlePrice
 
             dataList.append(idict)
-        
+
         # 发送到引擎
         # print("[in py2c] ", len(dataList), apiEvent.getContractNo(), apiEvent.getKLineType(), apiEvent.getKLineSlice(), apiEvent.isChainEnd())
         apiEvent.setData(dataList)
@@ -1649,7 +1649,7 @@ class PyAPI(object):
                 'UpdateTime'    : data.UpdateTime,
             }
             dataList.append(idict)
-        
+
         # print(dataList)
         # 发送到引擎
         apiEvent.setData(dataList)
@@ -1739,9 +1739,13 @@ class PyAPI(object):
                 'CommodityNo'       : data.CommodityNo.decode('utf-8'),
             }
             dataList.append(idict)
-        
+            # if idict["ExchangeNo"] == "ZCE":
+            #     print("交易所状态应答时间: ", datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3])
+            #     print("郑商所交易状态: ", idict['TradeState'])
+            #     print("-------------------------------------------------------------------")
+
         #self.logger.debug("AAAAA:%s"%dataList)
-        
+
         #发送到引擎  
         apiEvent.setData(dataList)
         sid = apiEvent.getSessionId()
