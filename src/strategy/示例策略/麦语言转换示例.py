@@ -35,12 +35,11 @@ g_params['ATRLENGTH'] = 3
 AVGS = []
 TRUERANGE1 = []
 
-class lst():
-    def update_lst(self, lst, val):
-        if len(Close()) > len(lst):
-            lst.append(val)
-        else:
-            lst[-1] = val
+def update_lst(lst, val):
+    if len(Close()) > len(lst):
+        lst.append(val)
+    else:
+        lst[-1] = val
 
 def initialize(context):
     SetOrderWay(2)
@@ -52,12 +51,11 @@ def handle_data(context):
     AVGLENGTH = g_params['AVGLENGTH']
     ATRLENGTH = g_params['ATRLENGTH']
 
-    ls = lst()
     global AVGS, TRUERANGE1
-    ls.update_lst(AVGS, (High()[-1] + Low()[-1] + Close()[-1]) / 3)
+    update_lst(AVGS, (High()[-1] + Low()[-1] + Close()[-1]) / 3)
     TRUEHIGH1    = High()[-1] if High()[-1] > Close()[-2] else Close()[-2]
     TRUELOW1     = Low()[-1] if Low()[-1] <= Close()[-2] else Close()[-2]
-    ls.update_lst(TRUERANGE1, High()[-1] - Low()[-1] if BarStatus() == 2 else TRUEHIGH1 - TRUELOW1)
+    update_lst(TRUERANGE1, High()[-1] - Low()[-1] if BarStatus() == 2 else TRUEHIGH1 - TRUELOW1)
     if len(AVGS) < AVGLENGTH + 1:
         return
 

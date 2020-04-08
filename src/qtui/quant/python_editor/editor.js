@@ -1633,7 +1633,7 @@ function init_function_info() {
                                   '    返回格式为YYYYMMDD的整数\n' +
                                   '\n' +
                                   '示例：\n' +
-                                  '    当前Bar对用的日期为2019-03-25，则Date返回值为20190325',
+                                  '    当前Bar对用的日期为2019-03-25，则TradeDate返回值为20190325',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -1745,7 +1745,7 @@ function init_function_info() {
                                   '    contractNo 合约编号, 为空时取当前合约\n' +
                                   '    kLineType K线类型，可选值请参阅周期类型枚举函数\n' +
                                   '    kLineValue K线周期\n' +
-                                  '    maxLength 定返回历史数据数组的最大长度，默认值为所有K线数据\n' +
+                                  '    maxLength 返回历史数据数组的最大长度，默认值为所有K线数据\n' +
                                   '    若contractNo, kLineType, kLineValue同时不填，则取用于展示的合约及相应的K线类型和周期\n' +
                                   '\n' +
                                   '备注：\n' +
@@ -1757,14 +1757,14 @@ function init_function_info() {
                                   '    KLineQty K线成交量，如18\n' +
                                   '    TotalQty 总成交量，如41401\n' +
                                   '    KLineSlice K线周期， 如1\n' +
-                                  '    KLineType K线周期，如\'M\'\n' +
+                                  '    KLineType K线类型，如\'M\'\n' +
                                   '    OpeningPrice 开盘价， 如63.5\n' +
                                   '    LastPrice 收盘价，如63.49\n' +
                                   '    SettlePrice 结算价，如63.21\n' +
                                   '    HighPrice 最高价，如63.5\n' +
                                   '    LowPrice 最低价， 如63.49\n' +
                                   '    PositionQty 总持仓，如460816\n' +
-                                  '    TradeDate\' 交易日期，如20190521\n' +
+                                  '    TradeDate 交易日期，如20190521\n' +
                                   '\n' +
                                   '示例：\n' +
                                   '    barList = HisBarsInfo(\"ZCE|F|SR|906\", Enum_Period_Min(), 5, 1000) # 获取合约ZCE|F|SR|906包含当前Bar在内的之前1000个历史5分钟K线的数据\n' +
@@ -1964,7 +1964,7 @@ function init_function_info() {
                                   '    contractNo 合约编号\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    返回当前公式应用商品的最新成交日期，格式为YYYYMMDD整数表示的日期。',
+                                  '    返回当前公式应用商品的最新成交日期，格式为YYYYMMDD整数表示的日期',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -1977,7 +1977,7 @@ function init_function_info() {
                                   '    contractNo 合约编号\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    返回当前公式应用商品的最新成交时间，以格式为0.HHMMSSmmm浮点数表示的时间。',
+                                  '    返回当前公式应用商品的最新成交时间，以格式为0.HHMMSSmmm浮点数表示的时间',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -2280,6 +2280,71 @@ function init_function_info() {
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
+                label           : 'Q_PreClose(contractNo=\'\')',
+                insertText      : 'Q_PreClose(${1})',
+                detail          : '# 前收盘价\n' +
+                                  '    float Q_PreClose(string contractNo=\'\')\n' +
+                                  '\n' +
+                                  '参数：\n' +
+                                  '    contractNo 合约编号\n' +
+                                  '\n' +
+                                  '备注：\n' +
+                                  '    返回浮点数, 不存在时返回0',
+                kind            : monaco.languages.CompletionItemKind.Function,
+                insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            },{
+                label           : 'Q_SettlePrice(contractNo=\'\')',
+                insertText      : 'Q_SettlePrice(${1})',
+                detail          : '# 结算价\n' +
+                                  '    float Q_SettlePrice(string contractNo=\'\')\n' +
+                                  '\n' +
+                                  '参数：\n' +
+                                  '    contractNo 合约编号\n' +
+                                  '\n' +
+                                  '备注：\n' +
+                                  '    返回浮点数, 不存在时返回0',
+                kind            : monaco.languages.CompletionItemKind.Function,
+                insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            },{
+                label           : 'Q_LastVol(contractNo=\'\')',
+                insertText      : 'Q_LastVol(${1})',
+                detail          : '# 最新成交量(现手)\n' +
+                                  '    int Q_LastVol(string contractNo=\'\')\n' +
+                                  '\n' +
+                                  '参数：\n' +
+                                  '    contractNo 合约编号\n' +
+                                  '\n' +
+                                  '备注：\n' +
+                                  '    返回整数',
+                kind            : monaco.languages.CompletionItemKind.Function,
+                insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            },{
+                label           : 'Q_BuyTotalVol(contractNo=\'\')',
+                insertText      : 'Q_BuyTotalVol(${1})',
+                detail          : '# 委买总量\n' +
+                                  '    int Q_BuyTotalVol(string contractNo=\'\')\n' +
+                                  '\n' +
+                                  '参数：\n' +
+                                  '    contractNo 合约编号\n' +
+                                  '\n' +
+                                  '备注：\n' +
+                                  '    返回整数',
+                kind            : monaco.languages.CompletionItemKind.Function,
+                insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            },{
+                label           : 'Q_SellTotalVol(contractNo=\'\')',
+                insertText      : 'Q_SellTotalVol(${1})',
+                detail          : '# 委卖总量\n' +
+                                  '    int Q_SellTotalVol(string contractNo=\'\')\n' +
+                                  '\n' +
+                                  '参数：\n' +
+                                  '    contractNo 合约编号\n' +
+                                  '\n' +
+                                  '备注：\n' +
+                                  '    返回整数',
+                kind            : monaco.languages.CompletionItemKind.Function,
+                insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            },{
                 label           : 'QuoteDataExist(contractNo=\'\')',
                 insertText      : 'QuoteDataExist(${1})',
                 detail          : '# 行情数据是否有效\n' +
@@ -2313,13 +2378,13 @@ function init_function_info() {
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
-                label           : 'Buy(share=0, price=0, contractNo=None, needCover=True, userNo=\'\')',
+                label           : 'Buy(orderQty=0, orderPrice=0, contractNo=None, needCover=True, userNo=\'\')',
                 insertText      : 'Buy(${1})',
                 detail          : '# 产生一个多头建仓操作\n' +
-                                  '    Buy(int share=0, float price=0, string contractNo=None, bool needCover = True, string userNo=\'\')\n' +
+                                  '    Buy(int orderQty=0, float orderPrice=0, string contractNo=None, bool needCover = True, string userNo=\'\')\n' +
                                   '\n' +
                                   '参数：\n' +
-                                  '    share 买入数量，为整型值，默认为0；\n' +
+                                  '    orderQty 买入数量，为整型值，默认为0；\n' +
                                   '    price 买入价格，为浮点数，默认为0；\n' +
                                   '    contract 合约代码，为字符串，默认使用基准合约；\n' +
                                   '    needCover 是否先清掉方向持仓，默认为True；\n' +
@@ -2342,21 +2407,21 @@ function init_function_info() {
                                   '    Buy(0,0) 表示平掉所有空仓，并用现价按交易设置中设置的手数,马上发送委托。\n' +
                                   '    \n' +
                                   '    在当前持有空头仓位的情况下：\n' +
-                                  '    Buy(10,Close) 表示平掉所有空仓，并用当前Bar收盘价买入10张合约，马上发送委托。',
+                                  '    Buy(10,Close) 表示平掉所有空仓，并用当前Bar收盘价买入10张合约，马上发送委托',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
-                label           : 'BuyToCover(share=0, price=0, contractNo=None, userNo=\'\', coverFlag=\'A\')',
+                label           : 'BuyToCover(orderQty=0, orderPrice=0, contractNo=None, userNo=\'\', coverFlag=\'A\')',
                 insertText      : 'BuyToCover(${1})',
                 detail          : '# 产生一个空头平仓操作\n' +
-                                  '    BuyToCover(int share=0, float price=0, string contractNo=None, string userNo=\'\', char coverFlag = \'A\')\n' +
+                                  '    BuyToCover(int orderQty=0, float orderPrice=0, string contractNo=None, string userNo=\'\', char coverFlag = \'A\')\n' +
                                   '\n' +
                                   '参数：\n' +
-                                  '    share 买入数量，为整型值，默认为0；\n' +
+                                  '    orderQty 买入数量，为整型值，默认为0；\n' +
                                   '    price 买入价格，为浮点数，默认为0；\n' +
                                   '    contract 合约代码，为字符串，默认使用基准合约；\n' +
                                   '    userNo 用户编号，为字符串，默认使用界面选定用户编号。\n' +
-                                  '    coverFlag 平今平昨标志（此参数仅对SHFE和INE有效）\n' +
+                                  '    coverFlag 平今平昨标志(此参数仅对SHFE和INE有效)\n' +
                                   '    默认设置为\'A\'自适应(先平昨再平今)\n' +
                                   '    若平昨，则需设置为\'C\'\n' +
                                   '    若平今，则需设置为\'T\'\n' +
@@ -2366,7 +2431,7 @@ function init_function_info() {
                                   '    该函数仅用于空头平仓，其处理规则如下：\n' +
                                   '    如果当前持仓状态为持平，该函数不执行任何操作。\n' +
                                   '    如果当前持仓状态为多仓，该函数不执行任何操作。\n' +
-                                  '    如果当前持仓状态为空仓，如果此时Share使用默认值，该函数将平掉所有空仓，达到持平的状态，否则只平掉参数Share的空仓。\n' +
+                                  '    如果当前持仓状态为空仓，如果此时orderQty使用默认值，该函数将平掉所有空仓，达到持平的状态，否则只平掉参数orderQty的空仓。\n' +
                                   '    当委托价格超出k线的有效范围，在历史数据上，将会取最接近的有效价格发单；在实盘中，将会按照实际委托价格发单。\n' +
                                   '    例如：当前k线有效价格为50-100，用BuyToCover(1,10)发单，委托价将以50发单。\n' +
                                   '\n' +
@@ -2375,21 +2440,21 @@ function init_function_info() {
                                   '    BuyToCover(50,10.2) 表示用10.2的价格空头买入50张合约。\n' +
                                   '    BuyToCover(10,Close) 表示用当前Bar收盘价空头买入10张合约，马上发送委托。\n' +
                                   '    BuyToCover(5,0) 表示用现价空头买入5张合约)，马上发送委托。\n' +
-                                  '    BuyToCover(0,0) 表示用现价按交易设置中的设置,马上发送委托。',
+                                  '    BuyToCover(0,0) 表示用现价按交易设置中的设置,马上发送委托',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
-                label           : 'Sell(share=0, price=0, contractNo=None, userNo=\'\', coverFlag=\'A\')',
+                label           : 'Sell(orderQty=0, orderPrice=0, contractNo=None, userNo=\'\', coverFlag=\'A\')',
                 insertText      : 'Sell(${1})',
                 detail          : '# 产生一个多头平仓操作\n' +
-                                  '    Sell(int share=0, float price=0, string contractNo=None, string userNo=\'\', char coverFlag = \'A\')\n' +
+                                  '    Sell(int orderQty=0, float orderPrice=0, string contractNo=None, string userNo=\'\', char coverFlag = \'A\')\n' +
                                   '\n' +
                                   '参数：\n' +
-                                  '    share 买入数量，为整型值，默认为0；\n' +
+                                  '    orderQty 买入数量，为整型值，默认为0；\n' +
                                   '    price 买入价格，为浮点数，默认为0；\n' +
                                   '    contract 合约代码，为字符串，默认使用基准合约；\n' +
                                   '    userNo 用户编号，为字符串，默认使用界面选定用户编号。\n' +
-                                  '    coverFlag 平今平昨标志（此参数仅对SHFE和INE有效）\n' +
+                                  '    coverFlag 平今平昨标志(此参数仅对SHFE和INE有效)\n' +
                                   '    默认设置为\'A\'自适应(先平昨再平今)\n' +
                                   '    若平昨，则需设置为\'C\'\n' +
                                   '    若平今，则需设置为\'T\'\n' +
@@ -2399,7 +2464,7 @@ function init_function_info() {
                                   '    该函数仅用于多头平仓，其处理规则如下：\n' +
                                   '    如果当前持仓状态为持平，该函数不执行任何操作。\n' +
                                   '    如果当前持仓状态为空仓，该函数不执行任何操作。\n' +
-                                  '    如果当前持仓状态为多仓，如果此时Share使用默认值，该函数将平掉所有多仓，达到持平的状态，否则只平掉参数Share的多仓。\n' +
+                                  '    如果当前持仓状态为多仓，如果此时orderQty使用默认值，该函数将平掉所有多仓，达到持平的状态，否则只平掉参数orderQty的多仓。\n' +
                                   '    当委托价格超出k线的有效范围，在历史数据上，将会取最接近的有效价格发单；在实盘中，将会按照实际委托价格发单。\n' +
                                   '    例如：当前k线有效价格为50-100，用sell(1,10)发单，委托价将以50发单。\n' +
                                   '\n' +
@@ -2408,17 +2473,17 @@ function init_function_info() {
                                   '    Sell(50,10.2) 表示用10.2的价格卖出50张合约。\n' +
                                   '    Sell(10,Close) 表示用当前Bar收盘价卖出10张合约，马上发送委托。\n' +
                                   '    Sell(5,0) 表示用现价卖出5张合约，马上发送委托。\n' +
-                                  '    Sell(0,0) 表示用现价按交易设置中的设置,马上发送委托。',
+                                  '    Sell(0,0) 表示用现价按交易设置中的设置,马上发送委托',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
-                label           : 'SellShort(share=0, price=0, contractNo=None, needCover=True, userNo=\'\')',
+                label           : 'SellShort(orderQty=0, orderPrice=0, contractNo=None, needCover=True, userNo=\'\')',
                 insertText      : 'SellShort(${1})',
                 detail          : '# 产生一个空头建仓操作\n' +
-                                  '    SellShort(int share=0, float price=0, string contractNo=None, bool needCover = True, string userNo=\'\')\n' +
+                                  '    SellShort(int orderQty=0, float orderPrice=0, string contractNo=None, bool needCover = True, string userNo=\'\')\n' +
                                   '\n' +
                                   '参数：\n' +
-                                  '    share 买入数量，为整型值，默认为0；\n' +
+                                  '    orderQty 买入数量，为整型值，默认为0；\n' +
                                   '    price 买入价格，为浮点数，默认为0；\n' +
                                   '    contract 合约代码，为字符串，默认使用基准合约；\n' +
                                   '    needCover 是否先清掉方向持仓，默认为True；\n' +
@@ -2439,8 +2504,8 @@ function init_function_info() {
                                   '    SellShort(10,Close) 表示平掉所有多仓，并用当前Bar收盘价空头卖出10张合约，马上发送委托。\n' +
                                   '    SellShort(5,0) 表示平掉所有多仓，并用现价空头卖出5张合约，马上发送委托。\n' +
                                   '    SellShort(0,0) 表示平掉所有多仓，并用现价按交易设置中设置的手数,马上发送委托。\n' +
-                                  '    在MarketPosition=1的情况下：（当前持有多头持仓）\n' +
-                                  '    SellShort(10,Close) 表示平掉所有多仓，并用当前Bar收盘价空头卖出10张合约，马上发送委托。',
+                                  '    在MarketPosition=1的情况下：(当前持有多头持仓)\n' +
+                                  '    SellShort(10,Close) 表示平掉所有多仓，并用当前Bar收盘价空头卖出10张合约，马上发送委托',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -2450,7 +2515,7 @@ function init_function_info() {
                                   '    StartTrade()\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    在策略运行时，使用StopTrade函数暂停策略向实盘发单后， 可以通过StartTrade函数恢复策略向实盘发单的功能。',
+                                  '    在策略运行时，使用StopTrade函数暂停策略向实盘发单后， 可以通过StartTrade函数恢复策略向实盘发单的功能',
                 kind            : monaco.languages.CompletionItemKind.Function
             },{
                 label           : 'StopTrade()',
@@ -2459,7 +2524,7 @@ function init_function_info() {
                                   '    StopTrade()\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    在策略运行时，使用StopTrade可以暂时停止策略向实盘发单。',
+                                  '    在策略运行时，使用StopTrade可以暂时停止策略向实盘发单',
                 kind            : monaco.languages.CompletionItemKind.Function
             },{
                 label           : 'IsTradeAllowed()',
@@ -2468,7 +2533,7 @@ function init_function_info() {
                                   '    bool IsTradeAllowed()\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    获取策略是否可以向实盘发单的布尔值，策略实盘运行时并且允许向实盘发单返回True，否则返回False。',
+                                  '    获取策略是否可以向实盘发单的布尔值，策略实盘运行时并且允许向实盘发单返回True，否则返回False',
                 kind            : monaco.languages.CompletionItemKind.Function
             },{
                 label           : 'BarInterval()',
@@ -2483,7 +2548,7 @@ function init_function_info() {
                                   '    当前数据周期为1日线，BarInterval等于1；\n' +
                                   '    当前数据周期为22日线，BarInterval等于22；\n' +
                                   '    当前数据周期为60分钟线，BarInterval等于60；\n' +
-                                  '    当前数据周期为1TICK线，BarInterval等于1。',
+                                  '    当前数据周期为1TICK线，BarInterval等于1',
                 kind            : monaco.languages.CompletionItemKind.Function
             },{
                 label           : 'BarType()',
@@ -2502,7 +2567,7 @@ function init_function_info() {
                                   '示例：\n' +
                                   '    当前数据周期为22日线，BarType等于D；\n' +
                                   '    当前数据周期为60分钟线，BarType等于M；\n' +
-                                  '    当前数据周期为1TICK线，BarType等于T。',
+                                  '    当前数据周期为1TICK线，BarType等于T',
                 kind            : monaco.languages.CompletionItemKind.Function
             },{
                 label           : 'BidAskSize(contractNo=\'\')',
@@ -2518,7 +2583,7 @@ function init_function_info() {
                                   '\n' +
                                   '示例：\n' +
                                   '    郑商所白糖的买卖盘个数为5个，因此其BidAskSize等于5；\n' +
-                                  '    郑商所棉花的买卖盘个数为1个，因此其BidAskSize等于1。',
+                                  '    郑商所棉花的买卖盘个数为1个，因此其BidAskSize等于1',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -2544,13 +2609,13 @@ function init_function_info() {
                                   '    contractNo: 合约编号，为空时，取基准合约。\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    返回整型，1张合约包含多少标底物。',
+                                  '    返回整型，1张合约包含多少标的物',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
                 label           : 'ExchangeName(contractNo=\'\')',
                 insertText      : 'ExchangeName(${1})',
-                detail          : '# 合约对应交易所名称\n' +
+                detail          : '# 合约对应交易所编码\n' +
                                   '    string ExchangeName(string contractNo=\'\')\n' +
                                   '\n' +
                                   '参数：\n' +
@@ -2560,20 +2625,22 @@ function init_function_info() {
                                   '    返回字符串\n' +
                                   '\n' +
                                   '示例：\n' +
-                                  '    郑商所下各合约的交易所名称为：\"郑州商品交易所\"',
+                                  '    郑商所下各合约的交易所名称为：\"ZCE\"',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
-                label           : 'ExchangeTime(contractNo)',
+                label           : 'ExchangeTime(exchangeNo)',
                 insertText      : 'ExchangeTime(${1})',
                 detail          : '# 交易所时间\n' +
-                                  '    string ExchangeTime(string contractNo)\n' +
+                                  '    string ExchangeTime(string exchangeNo)\n' +
                                   '\n' +
                                   '参数：\n' +
                                   '    exchangeNo: 交易所编号，例如\"ZCE\",\"DCE\",\"SHFE\",\"CFFEX\",\"INE\"\n' +
                                   '\n' +
                                   '备注：\n' +
                                   '    返回字符串 \"2019-07-05 22:11:00\"\n' +
+                                  '    当交易所编号为无效编号时，返回空字符串\n' +
+                                  '    该函数返回的时间是系统时间\n' +
                                   '\n' +
                                   '示例：\n' +
                                   '    ExchangeTime(\'ZCE\')',
@@ -2603,6 +2670,7 @@ function init_function_info() {
                                   '    \'7\'   报盘未连\n' +
                                   '    \'8\'   交易未连\n' +
                                   '    \'9\'   闭市处理\n' +
+                                  '    该方法仅适用于内盘交易所，对外盘交易所返回值为空字符串。\n' +
                                   '\n' +
                                   '示例：\n' +
                                   '    ExchangeStatus(\'ZCE\')',
@@ -2634,6 +2702,7 @@ function init_function_info() {
                                   '    \'7\'   报盘未连\n' +
                                   '    \'8\'   交易未连\n' +
                                   '    \'9\'   闭市处理\n' +
+                                  '    该方法仅适用于内盘交易所，对外盘交易所返回值为空字符串。\n' +
                                   '\n' +
                                   '示例：\n' +
                                   '    CommodityStatus(\'ZCE|F|SR\')',
@@ -2668,7 +2737,7 @@ function init_function_info() {
             },{
                 label           : 'GetSessionEndTime(contractNo=\'\', index=0)',
                 insertText      : 'GetSessionEndTime(${1})',
-                detail          : '# 获取指定交易时间段的结束时间。\n' +
+                detail          : '# 获取指定合约指定交易时间段的结束时间。\n' +
                                   '    float GetSessionEndTime(string contractNo=\'\', int index=0)\n' +
                                   '\n' +
                                   '参数：\n' +
@@ -2676,7 +2745,7 @@ function init_function_info() {
                                   '    index 交易时间段的索引值, 从0开始。\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    返回指定合约的交易时间段结束时间，格式为0.HHMMSS的浮点数。\n' +
+                                  '    返回指定合约指定交易时间段的结束时间，格式为0.HHMMSS的浮点数。\n' +
                                   '\n' +
                                   '示例：\n' +
                                   '    contractNo = \"ZCE|F|SR|905\"\n' +
@@ -2691,7 +2760,7 @@ function init_function_info() {
             },{
                 label           : 'GetSessionStartTime(contractNo=\'\', index=0)',
                 insertText      : 'GetSessionStartTime(${1})',
-                detail          : '# 获取指定交易时间段的开始时间。\n' +
+                detail          : '# 获取指定合约指定交易时间段的开始时间。\n' +
                                   '    float GetSessionStartTime(string contractNo=\'\', int index=0)\n' +
                                   '\n' +
                                   '参数：\n' +
@@ -2699,14 +2768,14 @@ function init_function_info() {
                                   '    index 交易时间段的索引值, 从0开始。\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    返回指定合约的交易时间段开始时间，格式为0.HHMMSS的浮点数。',
+                                  '    返回指定合约指定交易时间段的开始时间，格式为0.HHMMSS的浮点数',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
-                label           : 'GetNextTimeInfo(contractNo, timeStamp)',
+                label           : 'GetNextTimeInfo(contractNo, timeStr)',
                 insertText      : 'GetNextTimeInfo(${1})',
                 detail          : '# 获取指定合约指定时间点的下一个时间点及交易状态。\n' +
-                                  '    dict GetNextTimeInfo(string contractNo, float timeStamp)\n' +
+                                  '    dict GetNextTimeInfo(string contractNo, float timeStr)\n' +
                                   '\n' +
                                   '参数：\n' +
                                   '    contractNo 合约编号。\n' +
@@ -2718,7 +2787,7 @@ function init_function_info() {
                                   '    \'Time\' : 0.21,\n' +
                                   '    \'TradeState\' : 3\n' +
                                   '    }\n' +
-                                  '    其中Time对应的值表示指定时间timeStamp的下一个时间点，返回指定合约的交易时间段开始时间，格式为0.HHMMSS的浮点数。\n' +
+                                  '    其中Time对应的值表示指定时间timeStr的下一个时间点，返回指定合约的交易时间段开始时间，格式为0.HHMMSS的浮点数。\n' +
                                   '    TradeState表示对应时间点的交易状态，数据类型为字符，可能出现的值及相应的状态含义如下：\n' +
                                   '    1 : 集合竞价\n' +
                                   '    2 : 集合竞价撮合\n' +
@@ -2792,7 +2861,7 @@ function init_function_info() {
                                   '    格式为0.HHMMSS的浮点数。\n' +
                                   '\n' +
                                   '示例：\n' +
-                                  '    如果当前时间为11:34:21，CurrentTime返回值为0.113421。',
+                                  '    如果当前时间为11:34:21，CurrentTime返回值为0.113421',
                 kind            : monaco.languages.CompletionItemKind.Function
             },{
                 label           : 'TimeDiff(self, datetime1, datetime2)',
@@ -2806,10 +2875,11 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    该函数只计算两个时间之间的差值，不考虑两个参数的日期\n' +
+                                  '    若输入参数不为float类型，则函数返回值为0\n' +
                                   '\n' +
                                   '示例：\n' +
-                                  '    TimeDiff(20190404.104110,20110404.104120);返回两时间相差10秒；\n' +
-                                  '    TimeDiff(20190404.1041,20110404.1043);返回两时间相差2分钟，即120秒',
+                                  '    TimeDiff(20190404.104110,20110404.104120) 返回两时间相差10秒；\n' +
+                                  '    TimeDiff(20190404.1041,20110404.1043) 返回两时间相差2分钟，即120秒',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -2825,7 +2895,7 @@ function init_function_info() {
                                   '    获取操作系统的当前时间，是否为指定合约的交易时间。\n' +
                                   '\n' +
                                   '示例：\n' +
-                                  '    如果当前时间为11:34:21，IsInSession(\"ZCE|F|TA|909\")返回值为False。',
+                                  '    如果当前时间为11:34:21，IsInSession(\"ZCE|F|TA|909\")返回值为False',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -2895,7 +2965,7 @@ function init_function_info() {
                                   '    contractNo 合约编号，为空时，取基准合约。\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    返回整型，0为看涨，1为看跌， -1为异常。',
+                                  '    返回整型，0为看涨，1为看跌， -1为异常',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3006,7 +3076,7 @@ function init_function_info() {
                                   '    contractNo 取商品主连/近月编号，为空时，取基准合约。\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    返回字符串\n' +
+                                  '    返回字符串，若contractNo为具体的合约，则返回contractNo\n' +
                                   '\n' +
                                   '示例：\n' +
                                   '    GetTrendContract(\'DCE|Z|I|MAIN\') 的返回为\"DCE|F|I|1909\"\n' +
@@ -3020,7 +3090,7 @@ function init_function_info() {
                                   '    float AvgEntryPrice(string contractNo=\'\')\n' +
                                   '\n' +
                                   '参数：\n' +
-                                  '    contractNo 合约编号，默认为基准合约。',
+                                  '    contractNo 合约编号，默认为基准合约',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3035,7 +3105,7 @@ function init_function_info() {
                                   '备注：\n' +
                                   '    获得当前持仓指定合约的第一个建仓位置到当前位置的Bar计数，返回值为整型。\n' +
                                   '    只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。\n' +
-                                  '    注意：在开仓Bar上为0。',
+                                  '    注意：在开仓Bar上为0',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3050,7 +3120,7 @@ function init_function_info() {
                                   '备注：\n' +
                                   '    获得当前持仓指定合约的最近平仓位置到当前位置的Bar计数，返回值为整型。\n' +
                                   '    若从未平过仓，则返回-1。\n' +
-                                  '    注意：在平仓Bar上为0。',
+                                  '    注意：在平仓Bar上为0',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3065,7 +3135,7 @@ function init_function_info() {
                                   '备注：\n' +
                                   '    获得当前持仓指定合约的最后一个建仓位置到当前位置的Bar计数，返回值为整型。\n' +
                                   '    若当前策略持仓为0，则返回-1。\n' +
-                                  '    注意：在建仓Bar上为0。',
+                                  '    注意：在建仓Bar上为0',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3080,7 +3150,7 @@ function init_function_info() {
                                   '备注：\n' +
                                   '    获得当前持仓指定合约的最后一个Buy建仓位置到当前位置的Bar计数，返回值为整型。\n' +
                                   '    若当前策略持仓为0，则返回-1。\n' +
-                                  '    注意：在建仓Bar上为0。',
+                                  '    注意：在建仓Bar上为0',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3095,7 +3165,7 @@ function init_function_info() {
                                   '备注：\n' +
                                   '    获得当前持仓指定合约的最后一个Sell建仓位置到当前位置的Bar计数，返回值为整型。\n' +
                                   '    若当前策略持仓为0，则返回-1。\n' +
-                                  '    注意：在建仓Bar上为0。',
+                                  '    注意：在建仓Bar上为0',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3110,7 +3180,7 @@ function init_function_info() {
                                   '    kLineValue K线周期\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    无。',
+                                  '    无',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3123,7 +3193,7 @@ function init_function_info() {
                                   '    contractNo 合约编号，默认为基准合约。\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    获得当前持仓位置的每手浮动盈亏，返回值为浮点数。',
+                                  '    获得当前持仓位置的每手浮动盈亏，返回值为浮点数',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3137,7 +3207,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    获得策略当前的持仓合约数，返回值为整数。\n' +
-                                  '    该函数返回策略当前的净持仓数量，多仓为正值，空仓为负值，持平返回0。',
+                                  '    该函数返回策略当前的净持仓数量，多仓为正值，空仓为负值，持平返回0',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3150,7 +3220,7 @@ function init_function_info() {
                                   '    contractNo 合约编号，默认为基准合约。\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    获得策略当前持仓的买入方向的持仓量，返回值为整数。',
+                                  '    获得策略当前持仓的买入方向的持仓量，返回值为整数',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3163,7 +3233,7 @@ function init_function_info() {
                                   '    contractNo 合约编号，默认为基准合约。\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    获得策略当前持仓的卖出持仓量，返回值为整数。',
+                                  '    获得策略当前持仓的卖出持仓量，返回值为整数',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3176,7 +3246,7 @@ function init_function_info() {
                                   '    contractNo 合约编号，默认为基准合约。\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    若策略当前持仓为0，则返回无效日期:19700101，否则返回YYYYMMDD格式的日期。',
+                                  '    若策略当前持仓为0，则返回无效日期:19700101，否则返回YYYYMMDD格式的日期',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3190,7 +3260,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    获得当前持仓的第一个建仓价格，返回值为浮点数。\n' +
-                                  '    若策略当前持仓为0，则返回0。',
+                                  '    若策略当前持仓为0，则返回0',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3204,7 +3274,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    获得当前持仓的第一个建仓时间，返回值为0.HHMMSSmmm格式的时间。\n' +
-                                  '    若策略当前持仓为0，则返回0。',
+                                  '    若策略当前持仓为0，则返回0',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3218,7 +3288,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    获得当前持仓的最近平仓时间，返回值为YYYYMMDD格式的日期。\n' +
-                                  '    若从未平过仓，则返回无效日期:19700101。',
+                                  '    若从未平过仓，则返回无效日期:19700101',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3232,7 +3302,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    获得最近平仓位置的平仓价格，返回值为浮点数。\n' +
-                                  '    若合约从未被平仓,则返回0，否则返回合约最近一次平仓时的委托价格。',
+                                  '    若合约从未被平仓,则返回0，否则返回合约最近一次平仓时的委托价格',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3246,7 +3316,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    获得最近平仓位置Bar时间，返回值为0.HHMMSSmmm格式的时间。\n' +
-                                  '    若合约从未平过仓，则返回0。',
+                                  '    若合约从未平过仓，则返回0',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3260,7 +3330,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    获得当前持仓的最后一个建仓位置的日期，返回值为YYYYMMDD格式的日期。\n' +
-                                  '    若策略当前持仓为0，则返回无效日期:19700101。',
+                                  '    若策略当前持仓为0，则返回无效日期:19700101',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3274,7 +3344,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    获得当前持仓的最后一个建仓价格，返回值为浮点数。\n' +
-                                  '    若策略当前持仓为0，则返回0。',
+                                  '    若策略当前持仓为0，则返回0',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3288,7 +3358,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    获得当前Buy持仓的最后一个建仓价格，返回值为浮点数。\n' +
-                                  '    若策略当前Buy持仓为0，则返回0。',
+                                  '    若策略当前Buy持仓为0，则返回0',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3302,7 +3372,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    获得当前Sell持仓的最后一个建仓价格，返回值为浮点数。\n' +
-                                  '    若策略当前Sell持仓为0，则返回0。',
+                                  '    若策略当前Sell持仓为0，则返回0',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3316,7 +3386,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    获得当前Buy持仓的最后一个建仓以来的最高价，返回值为浮点数。\n' +
-                                  '    若策略当前Buy持仓为0，则返回0。',
+                                  '    若策略当前Buy持仓为0，则返回0',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3330,7 +3400,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    获得当前Buy持仓的最后一个建仓以来的最低价，返回值为浮点数。\n' +
-                                  '    若策略当前Buy持仓为0，则返回0。',
+                                  '    若策略当前Buy持仓为0，则返回0',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3344,7 +3414,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    获得当前Sell持仓的最后一个建仓以来的最高价，返回值为浮点数。\n' +
-                                  '    若策略当前Sell持仓为0，则返回0。',
+                                  '    若策略当前Sell持仓为0，则返回0',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3358,7 +3428,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    获得当前Sell持仓的最后一个建仓以来的最低价，返回值为浮点数。\n' +
-                                  '    若策略当前Sell持仓为0，则返回0。',
+                                  '    若策略当前Sell持仓为0，则返回0',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3372,7 +3442,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    获得当前持仓的最后一个建仓位置的时间，返回值为0.HHMMSSmmm格式的时间。\n' +
-                                  '    若策略当前持仓为0，则返回0。',
+                                  '    若策略当前持仓为0，则返回0',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3422,7 +3492,7 @@ function init_function_info() {
                                   '    返回最后一次满足条件时距离当前的bar数。\n' +
                                   '\n' +
                                   '示例：\n' +
-                                  '    BarsLast(Close >Open); 从当前Bar开始，最近出现Close>Open的Bar到当前Bar的偏移值。如果为0，即当前Bar为最近的满足条件的Bar。',
+                                  '    BarsLast(Close >Open) 从当前Bar开始，最近出现Close>Open的Bar到当前Bar的偏移值。如果为0，即当前Bar为最近的满足条件的Bar',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3444,7 +3514,7 @@ function init_function_info() {
                                   '    float FloatProfit(string contractNo=\'\')\n' +
                                   '\n' +
                                   '参数：\n' +
-                                  '    contractNo 合约编号，为空时返回基准合约的浮动盈亏。',
+                                  '    contractNo 合约编号，默认为基准合约',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3466,7 +3536,7 @@ function init_function_info() {
                                   '    float Margin(string contractNo=\'\')\n' +
                                   '\n' +
                                   '参数：\n' +
-                                  '    contractNo 合约编号，为空时返回基准合约的浮动盈亏。',
+                                  '    contractNo 合约编号，默认为基准合约',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3544,7 +3614,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    返回当前公式应用的交易帐户ID，返回值为字符串，无效时返回空串。\n' +
-                                  '    注：不能用于历史测试，仅适用于实时行情交易。',
+                                  '    注：不能用于历史测试，仅适用于实时行情交易',
                 kind            : monaco.languages.CompletionItemKind.Function
             },{
                 label           : 'A_AllAccountID()',
@@ -3554,7 +3624,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    没有账号登录时，返回空列表\n' +
-                                  '    注：不能用于历史测试，仅适用于实时行情交易。',
+                                  '    注：不能用于历史测试，仅适用于实时行情交易',
                 kind            : monaco.languages.CompletionItemKind.Function
             },{
                 label           : 'A_GetAllPositionSymbol(userNo=\'\')',
@@ -3566,7 +3636,7 @@ function init_function_info() {
                                   '    userNo  指定的交易账户，默认当前账户\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    该参数返回类型为字符串列表，列表内容为账户所有持仓合约列表。',
+                                  '    该参数返回类型为字符串列表，列表内容为账户所有持仓合约列表',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3579,7 +3649,7 @@ function init_function_info() {
                                   '    userNo  指定的交易账户，默认当前账户\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    返回指定交易帐户的手续费，返回值为浮点数。',
+                                  '    返回指定交易帐户的手续费，返回值为浮点数',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3592,7 +3662,7 @@ function init_function_info() {
                                   '    userNo  指定的交易账户，默认当前账户\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    返回指定交易帐户的动态权益，返回值为浮点数。',
+                                  '    返回指定交易帐户的动态权益，返回值为浮点数',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3606,7 +3676,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    返回指定交易帐户的可用资金，返回值为浮点数。\n' +
-                                  '    注：不能使用于历史测试，仅适用于实时行情交易。',
+                                  '    注：不能使用于历史测试，仅适用于实时行情交易',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3620,7 +3690,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    返回指定交易帐户的持仓保证金，返回值为浮点数。\n' +
-                                  '    注：不能使用于历史测试，仅适用于实时行情交易。',
+                                  '    注：不能使用于历史测试，仅适用于实时行情交易',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3634,7 +3704,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    返回指定交易帐户的浮动盈亏，返回值为浮点数。\n' +
-                                  '    注：不能使用于历史测试，仅适用于实时行情交易。',
+                                  '    注：不能使用于历史测试，仅适用于实时行情交易',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3648,7 +3718,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    返回指定交易帐户的平仓盈亏，返回值为浮点数。\n' +
-                                  '    注：不能使用于历史测试，仅适用于实时行情交易。',
+                                  '    注：不能使用于历史测试，仅适用于实时行情交易',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3662,7 +3732,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    返回指定交易帐户的冻结资金，返回值为浮点数。\n' +
-                                  '    注：不能使用于历史测试，仅适用于实时行情交易。',
+                                  '    注：不能使用于历史测试，仅适用于实时行情交易',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3677,7 +3747,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    返回指定帐户下当前商品的买入持仓均价，返回值为浮点数。\n' +
-                                  '    注：不能使用于历史测试，仅适用于实时行情交易。',
+                                  '    注：不能使用于历史测试，仅适用于实时行情交易',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3695,7 +3765,7 @@ function init_function_info() {
                                   '    注：不能使用于历史测试，仅适用于实时行情交易。\n' +
                                   '\n' +
                                   '示例：\n' +
-                                  '    当前持多仓2手，A_BuyPosition返回2。',
+                                  '    当前持多仓2手，A_BuyPosition返回2',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3724,7 +3794,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    返回指定帐户下当前商品的买入持仓盈亏，返回值为浮点数。\n' +
-                                  '    注：不能使用于历史测试，仅适用于实时行情交易。',
+                                  '    注：不能使用于历史测试，仅适用于实时行情交易',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3739,7 +3809,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    返回指定帐户下当前商品的卖出持仓均价，返回值为浮点数。\n' +
-                                  '    注：不能使用于历史测试，仅适用于实时行情交易。',
+                                  '    注：不能使用于历史测试，仅适用于实时行情交易',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3757,7 +3827,7 @@ function init_function_info() {
                                   '    注：不能使用于历史测试，仅适用于实时行情交易。\n' +
                                   '\n' +
                                   '示例：\n' +
-                                  '    当前持空仓3手，A_SellPosition返回3。',
+                                  '    当前持空仓3手，A_SellPosition返回3',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3786,7 +3856,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    返回指定帐户下当前商品的卖出持仓盈亏，返回值为浮点数。\n' +
-                                  '    注：不能使用于历史测试，仅适用于实时行情交易。',
+                                  '    注：不能使用于历史测试，仅适用于实时行情交易',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3801,7 +3871,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    返回指定帐户下当前商品的持仓均价，返回值为浮点数。\n' +
-                                  '    注：不能使用于历史测试，仅适用于实时行情交易。',
+                                  '    注：不能使用于历史测试，仅适用于实时行情交易',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3817,7 +3887,7 @@ function init_function_info() {
                                   '备注：\n' +
                                   '    返回指定帐户下当前商品的总持仓，返回值为浮点数。\n' +
                                   '    该持仓为所有持仓的合计值，正数表示多仓，负数表示空仓，零为无持仓。\n' +
-                                  '    注：不能使用于历史测试，仅适用于实时行情交易。',
+                                  '    注：不能使用于历史测试，仅适用于实时行情交易',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3832,7 +3902,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    返回指定帐户下当前商品的总持仓盈亏，返回值为浮点数。\n' +
-                                  '    注：不能使用于历史测试，仅适用于实时行情交易。',
+                                  '    注：不能使用于历史测试，仅适用于实时行情交易',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3847,7 +3917,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    返回指定帐户下当前商品的当日买入持仓，返回值为浮点数。\n' +
-                                  '    注：不能使用于历史测试，仅适用于实时行情交易。',
+                                  '    注：不能使用于历史测试，仅适用于实时行情交易',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3862,7 +3932,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    返回指定帐户下当前商品的当日卖出持仓，返回值为浮点数。\n' +
-                                  '    注：不能使用于历史测试，仅适用于实时行情交易。',
+                                  '    注：不能使用于历史测试，仅适用于实时行情交易',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3925,7 +3995,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    返回指定帐户下当前商品的某个委托单的成交数量，返回值为浮点数。\n' +
-                                  '    注：不能使用于历史测试，仅适用于实时行情交易。',
+                                  '    注：不能使用于历史测试，仅适用于实时行情交易',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3940,7 +4010,7 @@ function init_function_info() {
                                   '备注：\n' +
                                   '    返回指定帐户下当前商品的某个委托单的成交价格，返回值为浮点数。\n' +
                                   '    该成交价格可能为多个成交价格的平均值。\n' +
-                                  '    注：不能使用于历史测试，仅适用于实时行情交易。',
+                                  '    注：不能使用于历史测试，仅适用于实时行情交易',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3954,7 +4024,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    返回指定帐户下当前商品的某个委托单的委托数量，返回值为浮点数。\n' +
-                                  '    注：不能使用于历史测试，仅适用于实时行情交易。',
+                                  '    注：不能使用于历史测试，仅适用于实时行情交易',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -3968,7 +4038,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    返回指定帐户下当前商品的某个委托单的委托价格，返回值为浮点数。\n' +
-                                  '    注：不能使用于历史测试，仅适用于实时行情交易。',
+                                  '    注：不能使用于历史测试，仅适用于实时行情交易',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -4003,7 +4073,7 @@ function init_function_info() {
                                   '    H : 完全触发\n' +
                                   '    I : 余单失败\n' +
                                   '    该函数返回值可以与委托状态枚举函数Enum_Sended、Enum_Accept等函数进行比较，根据类型不同分别处理。\n' +
-                                  '    注：不能使用于历史测试，仅适用于实时行情交易。',
+                                  '    注：不能使用于历史测试，仅适用于实时行情交易',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -4016,7 +4086,7 @@ function init_function_info() {
                                   '    localOrderId 定单号，或者使用A_SendOrder返回的下单编号。\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    当委托单是完结状态，返回True，否则返回False。',
+                                  '    当委托单是完结状态，返回True，否则返回False',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -4030,7 +4100,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    返回指定帐户下当前商品的某个委托单的委托时间，返回格式为YYYYMMDD.hhmmss的数值。\n' +
-                                  '    注：不能使用于历史测试，仅适用于实时行情交易。',
+                                  '    注：不能使用于历史测试，仅适用于实时行情交易',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -4046,7 +4116,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    若返回值为-1，表示没有任何订单，否则，返回第一个订单的索引值，\n' +
-                                  '    该函数经常和A_NextOrderNo函数合用，用于遍历所有的订单。',
+                                  '    该函数经常和A_NextOrderNo函数合用，用于遍历所有的订单',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -4063,7 +4133,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    若返回值为-1，表示没有任何订单，否则，返回处在OrderNo后面的订单索引值，\n' +
-                                  '    该函数常和A_FirstOrderNo联合使用。',
+                                  '    该函数常和A_FirstOrderNo联合使用',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -4078,7 +4148,7 @@ function init_function_info() {
                                   '    userNo  指定的交易账户，默认当前账户\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    若返回值为-1，表示没有任何订单，否则，返回最后一个订单的索引值。',
+                                  '    若返回值为-1，表示没有任何订单，否则，返回最后一个订单的索引值',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -4094,7 +4164,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    若返回值为-1，表示没有任何可撤排队订单，否则，返回第一个订单的索引值。，\n' +
-                                  '    该函数经常和A_NextQueueOrderNo函数合用，用于遍历排队中的订单。',
+                                  '    该函数经常和A_NextQueueOrderNo函数合用，用于遍历排队中的订单',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -4111,7 +4181,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    若返回值为-1，表示没有任何排队订单，否则，返回处在OrderNo后面的订单索引值，\n' +
-                                  '    该函数常和A_FirstQueueOrderNo联合使用。',
+                                  '    该函数常和A_FirstQueueOrderNo联合使用',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -4125,7 +4195,7 @@ function init_function_info() {
                                   '    userNo  指定的交易账户，默认当前账户\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    若返回值为空列表，表示没有任何排队订单，否则，返回包含处于排队中的委托定单号的列表。',
+                                  '    若返回值为空列表，表示没有任何排队订单，否则，返回包含处于排队中的委托定单号的列表',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -4139,7 +4209,7 @@ function init_function_info() {
                                   '    userNo  指定的交易账户，默认当前账户\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    若返回值为-1，表示没有对应的完全成交的委托，否则，返回最新一笔完全成交委托单对应的时间，返回格式为YYYYMMDD.hhmmss的数值。',
+                                  '    若返回值为-1，表示没有对应的完全成交的委托，否则，返回最新一笔完全成交委托单对应的时间，返回格式为YYYYMMDD.hhmmss的数值',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -4164,7 +4234,7 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    返回结果如：\"ZCE|F|TA|305\"等，\n' +
-                                  '    如果localOrderId没有对应的委托单，则返回结果为字符串。',
+                                  '    如果localOrderId没有对应的委托单，则返回结果为字符串',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -4244,7 +4314,7 @@ function init_function_info() {
                                   '\n' +
                                   '示例：\n' +
                                   '    retCode, retMsg = A_SendOrder(Enum_Buy(), Enum_Exit(), 1, Q_AskPrice())\n' +
-                                  '    当retCode为0时表明发送订单信息成功，retMsg为返回的下单编号localOrderId。',
+                                  '    当retCode为0时表明发送订单信息成功，retMsg为返回的下单编号localOrderId',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -4313,7 +4383,7 @@ function init_function_info() {
                                   '备注：\n' +
                                   '    针对指定帐户、订单发送改单指令，发送成功返回True, 发送失败返回False。\n' +
                                   '    该函数直接发单，不经过任何确认，并会在每次公式计算时发送，一般需要配合着仓位头寸进行条件处理，在不清楚运行机制的情况下，请慎用。\n' +
-                                  '    注：不能使用于历史测试，仅适用于实时行情交易。',
+                                  '    注：不能使用于历史测试，仅适用于实时行情交易',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -4328,7 +4398,7 @@ function init_function_info() {
                                   '备注：\n' +
                                   '    针对指定帐户、商品发送撤单指令，发送成功返回True, 发送失败返回False。\n' +
                                   '    该函数直接发单，不经过任何确认，并会在每次公式计算时发送，一般需要配合着仓位头寸进行条件处理，在不清楚运行机制的情况下，请慎用。\n' +
-                                  '    注：不能使用于历史测试，仅适用于实时行情交易。',
+                                  '    注：不能使用于历史测试，仅适用于实时行情交易',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -4966,7 +5036,7 @@ function init_function_info() {
             },{
                 label           : 'Enum_Data_Median()',
                 insertText      : 'Enum_Data_Median()',
-                detail          : '# 返回中间价的枚举值，中间价=（最高价+最低价）/ 2\n' +
+                detail          : '# 返回中间价的枚举值，中间价=(最高价+最低价)/ 2\n' +
                                   '    char Enum_Data_Median()\n' +
                                   '\n' +
                                   '备注：\n' +
@@ -4975,7 +5045,7 @@ function init_function_info() {
             },{
                 label           : 'Enum_Data_Typical()',
                 insertText      : 'Enum_Data_Typical()',
-                detail          : '# 返回标准价的枚举值，标准价=（最高价+最低价+收盘价）/ 3\n' +
+                detail          : '# 返回标准价的枚举值，标准价=(最高价+最低价+收盘价)/ 3\n' +
                                   '    char Enum_Data_Typical()\n' +
                                   '\n' +
                                   '备注：\n' +
@@ -4984,7 +5054,7 @@ function init_function_info() {
             },{
                 label           : 'Enum_Data_Weighted()',
                 insertText      : 'Enum_Data_Weighted()',
-                detail          : '# 返回加权收盘价的枚举值，加权收盘价=（最高价+最低价+开盘价+收盘价）/ 4\n' +
+                detail          : '# 返回加权收盘价的枚举值，加权收盘价=(最高价+最低价+开盘价+收盘价)/ 4\n' +
                                   '    char Enum_Data_Weighted()\n' +
                                   '\n' +
                                   '备注：\n' +
@@ -5058,13 +5128,15 @@ function init_function_info() {
                                   '    对于相同的合约，如果使用该函数设置不同的K线类型(barType)和周期(barInterval)，则系统会同时订阅指定的K线类型和周期的行情数据\n' +
                                   '    如果使用该方法订阅了多个合约，则第一条合约为基准合约\n' +
                                   '    如果在策略中使用SetBarInterval方法订阅了合约，则在设置界面选中的基准合约便不再订阅\n' +
+                                  '    若要订阅秒线数据，可以设置K线类型为\'T\'，K线类型为n(n>0)，则表示订阅n秒的K线\n' +
                                   '\n' +
                                   '示例：\n' +
                                   '    SetBarInterval(\'ZCE|F|SR|906\', \'M\', 3, \'A\') 订阅合约ZCE|F|SR|906的3分钟K线数据，并使用所有K线样本进行历史回测\n' +
                                   '    SetBarInterval(\'ZCE|F|SR|906\', \'M\', 3, \'N\') 订阅合约ZCE|F|SR|906的3分钟K线数据，并不使用K线样本进行历史回测\n' +
                                   '    SetBarInterval(\'ZCE|F|SR|906\', \'M\', 3, 2000) 订阅合约ZCE|F|SR|906的3分钟K线数据，并使用2000根K线样本进行历史回测\n' +
                                   '    SetBarInterval(\'ZCE|F|SR|906\', \'M\', 3) 订阅合约ZCE|F|SR|906的3分钟K线数据，由于sampleConfig的默认值为2000，所以使用2000根K线样本进行历史回测\n' +
-                                  '    SetBarInterval(\'ZCE|F|SR|906\', \'M\', 3, \'20190430\') 订阅合约ZCE|F|SR|906的3分钟K线数据，并使用2019-04-30起的K线进行历史回测',
+                                  '    SetBarInterval(\'ZCE|F|SR|906\', \'M\', 3, \'20190430\') 订阅合约ZCE|F|SR|906的3分钟K线数据，并使用2019-04-30起的K线进行历史回测\n' +
+                                  '    SetBarInterval(\'ZCE|Z|SR|MAIN\', \'T\', 1, 2000) 订阅合约ZCE|Z|SR|MAIN的1秒钟K线数据，并使用2000根K线样本进行历史回测',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -5263,7 +5335,7 @@ function init_function_info() {
             },{
                 label           : 'SetWinPoint(winPoint, nPriceType=0, nAddTick=0, contractNo=\"\")',
                 insertText      : 'SetWinPoint(${1})',
-                detail          : '# 设置触发方式\n' +
+                detail          : '# 设置止盈点\n' +
                                   '    SetWinPoint(int winPoint, int nPriceType = 0, int nAddTick = 0, string contractNo = \"\")\n' +
                                   '\n' +
                                   '参数：\n' +
@@ -5273,16 +5345,16 @@ function init_function_info() {
                                   '    contractNo 合约代码，默认为基准合约。\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    该函数仅对虚拟持仓有效，即对历史阶段的持仓和实时阶段Buy、SellShort生成的持仓有效。\n' +
+                                  '    该函数仅对虚拟持仓有效，即对历史阶段的持仓和实时阶段Buy、SellShort生成的持仓有效\n' +
                                   '\n' +
                                   '示例：\n' +
-                                  '    SetWinPoint(10) # 当价格相对于最近一次开仓价格超过10个点，进行止盈平仓。如郑棉合约多头：开仓价格为15000，当前价格大于或等于5*10=50时，即达到15050，则进行平仓。',
+                                  '    SetWinPoint(10) # 当价格相对于最近一次开仓价格超过10个点，进行止盈平仓。如郑棉合约多头：开仓价格为15000，当前价格大于或等于5*10=50时，即达到15050，则进行平仓',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
                 label           : 'SetStopPoint(stopPoint, nPriceType=0, nAddTick=0, contractNo=\"\")',
                 insertText      : 'SetStopPoint(${1})',
-                detail          : '# 设置触发方式\n' +
+                detail          : '# 设置止损点\n' +
                                   '    SetStopPoint(int stopPoint, int nPriceType = 0, int nAddTick = 0, string contractNo = \"\")\n' +
                                   '\n' +
                                   '参数：\n' +
@@ -5292,16 +5364,16 @@ function init_function_info() {
                                   '    contractNo 合约代码，默认为基准合约。\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    该函数仅对虚拟持仓有效，即对历史阶段的持仓和实时阶段Buy、SellShort生成的持仓有效。\n' +
+                                  '    该函数仅对虚拟持仓有效，即对历史阶段的持仓和实时阶段Buy、SellShort生成的持仓有效\n' +
                                   '\n' +
                                   '示例：\n' +
-                                  '    SetStopPoint(10) # 当价格跌破10个点，进行止损平仓。 如：如郑棉合约多头：开仓价格为15000，当前价格小于或等于5*10=50时，即达到14950，则进行平仓。',
+                                  '    SetStopPoint(10) # 当价格跌破10个点，进行止损平仓。 如：如郑棉合约多头：开仓价格为15000，当前价格小于或等于5*10=50时，即达到14950，则进行平仓',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
                 label           : 'SetFloatStopPoint(startPoint, stopPoint, nPriceType=0, nAddTick=0, contractNo=\"\")',
                 insertText      : 'SetFloatStopPoint(${1})',
-                detail          : '# 设置触发方式\n' +
+                detail          : '# 设置浮动止损点\n' +
                                   '    int SetFloatStopPoint(int startPoint, int stopPoint, int nPriceType = 0, int nAddTick = 0, string contractNo = \"\")\n' +
                                   '\n' +
                                   '参数：\n' +
@@ -5312,11 +5384,11 @@ function init_function_info() {
                                   '    contractNo 合约代码，默认为基准合约。\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    该函数仅对虚拟持仓有效，即对历史阶段的持仓和实时阶段Buy、SellShort生成的持仓有效。\n' +
+                                  '    该函数仅对虚拟持仓有效，即对历史阶段的持仓和实时阶段Buy、SellShort生成的持仓有效\n' +
                                   '\n' +
                                   '示例：\n' +
                                   '    SetFloatStopPoint(20,10)\n' +
-                                  '    举例：郑棉合约，多头方向。开仓价格为15000，当前价格突破15100后开启浮动止损，若此，止损点会随着价格上升而不断上升。假如价格上涨到15300，则此时的止损价格为(15300-50),即15250，若价格从15300回落到15250，则进行自动平仓。',
+                                  '    举例：郑棉合约，多头方向。开仓价格为15000，当前价格突破15100后开启浮动止损，若此，止损点会随着价格上升而不断上升。假如价格上涨到15300，则此时的止损价格为(15300-50),即15250，若价格从15300回落到15250，则进行自动平仓',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -5330,7 +5402,8 @@ function init_function_info() {
                                   '    kt  K线类型必须为 \'D\', \'M\', \'T\'，中的一个\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    返回整型，0成功，-1失败',
+                                  '    返回整型，0成功，-1失败\n' +
+                                  '    该函数仅对虚拟持仓有效，即对历史阶段的持仓和实时阶段Buy、SellShort生成的持仓有效',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -5352,7 +5425,7 @@ function init_function_info() {
                                   '    contractNo 合约编号，为空不做任何操作\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    该方法可用策略中的initialize(context)方法中订阅指定合约的即时行情，也可在handle_data(context)方法中动态的订阅指定合约的即使行情。\n' +
+                                  '    该方法可用在策略的initialize(context)方法中订阅指定合约的即时行情，也可在handle_data(context)方法中动态的订阅指定合约的即使行情。\n' +
                                   '\n' +
                                   '示例：\n' +
                                   '    SubQuote(\"ZCE|F|TA|909\") 订阅合约TA909的即时行情；\n' +
@@ -5370,19 +5443,19 @@ function init_function_info() {
                                   '    contractNo 合约编号\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    该方法可用策略中的initialize(context)方法中退订指定合约的即时行情，也可在handle_data(context)方法中动态的退订指定合约的即使行情。\n' +
+                                  '    该方法可用在策略的initialize(context)方法中退订指定合约的即时行情，也可在handle_data(context)方法中动态的退订指定合约的即使行情。\n' +
                                   '\n' +
                                   '示例：\n' +
                                   '    UnsubQuote(\'ZCE|F|SR|909\') 退订合约\'ZCE|F|SR|909\'的即时行情；\n' +
                                   '    UnsubQuote(\'ZCE|F|SR|909\', \'ZCE|F|SR|910\') 退订合约\'ZCE|F|SR|909\'和\'ZCE|F|SR|910\'的即时行情；\n' +
-                                  '    UnsubQuote(\'ZCE|F|SR\') 退订合约商品\'ZCE|F|SR\'对应的所有合约的即时行情。',
+                                  '    UnsubQuote(\'ZCE|F|SR\') 退订合约商品\'ZCE|F|SR\'对应的所有合约的即时行情',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
                 label           : 'PlotNumeric(name,float value,int color,bool main, axis, barsback=0)',
                 insertText      : 'PlotNumeric(${1})',
                 detail          : '# 在当前Bar输出一个数值\n' +
-                                  '    float PlotNumeric(string name,float value,int color,bool main, char axis, int barsback=0)\n' +
+                                  '    PlotNumeric(string name,float value,int color,bool main, char axis, int barsback=0)\n' +
                                   '\n' +
                                   '参数：\n' +
                                   '    name  输出值的名称，不区分大小写；\n' +
@@ -5390,35 +5463,35 @@ function init_function_info() {
                                   '    color 输出值的显示颜色，默认表示使用属性设置框中的颜色；\n' +
                                   '    main  指标是否加载到主图，True-主图，False-幅图，默认主图\n' +
                                   '    axis  指标是否使用独立坐标，True-独立坐标，False-非独立坐标，默认非独立坐标\n' +
-                                  '    barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar。\n' +
+                                  '    barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    在当前Bar输出一个数值，输出的值用于在上层调用模块显示。返回数值型，即输入的Number。\n' +
+                                  '    在当前Bar输出一个数值，输出的值用于在上层调用模块显示\n' +
                                   '\n' +
                                   '示例：\n' +
-                                  '    例1：PlotNumeric (\"MA1\",Ma1Value);\n' +
-                                  '    输出MA1的值。',
+                                  '    例1：PlotNumeric (\"MA1\",Ma1Value)\n' +
+                                  '    输出MA1的值',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
                 label           : 'PlotIcon(Value,int Icon, main, barsback=0)',
                 insertText      : 'PlotIcon(${1})',
                 detail          : '# 在当前Bar输出一个图标\n' +
-                                  '    float PlotIcon(float Value,int Icon, bool main, int barsback=0)\n' +
+                                  '    PlotIcon(float Value,int Icon, bool main, int barsback=0)\n' +
                                   '\n' +
                                   '参数：\n' +
                                   '    value 输出的值\n' +
                                   '    icon 图标类型，0-默认图标，1-笑脸，2-哭脸，3-上箭头，4-下箭头，5-上箭头2, 6-下箭头2\n' +
                                   '    7-喇叭，8-加锁，9-解锁，10-货币+，11-货币-，12-加号，13-减号，14-叹号，15-叉号\n' +
                                   '    main  指标是否加载到主图，True-主图，False-幅图，默认主图\n' +
-                                  '    barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar。\n' +
+                                  '    barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    在当前Bar输出一个数值，输出的值用于在上层调用模块显示。返回数值型，即输入的Number。\n' +
+                                  '    在当前Bar输出一个图标，输出的值用于在上层调用模块显示\n' +
                                   '\n' +
                                   '示例：\n' +
-                                  '    例1：PlotIcon(10,14);\n' +
-                                  '    输出MA1的值。',
+                                  '    例1：PlotIcon(10,14)\n' +
+                                  '    输出MA1的值',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -5432,10 +5505,10 @@ function init_function_info() {
                                   '    icon  图标类型0-14，共15种样式，包括箭头，圆点，三角等\n' +
                                   '    color 输出值的显示颜色，默认表示使用属性设置框中的颜色；\n' +
                                   '    main  指标是否加载到主图，True-主图，False-幅图，默认主图\n' +
-                                  '    barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar。\n' +
+                                  '    barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    在当前Bar输出一个数值，输出的值用于在上层调用模块显示。返回数值型，即输入的Number。\n' +
+                                  '    在当前Bar输出一个点，输出的值用于在上层调用模块显示\n' +
                                   '\n' +
                                   '示例：\n' +
                                   '    PlotDot(name=\"Dot\", value=Close()[-1], main=True)',
@@ -5454,10 +5527,10 @@ function init_function_info() {
                                   '    color 输出值的显示颜色，默认表示使用属性设置框中的颜色；\n' +
                                   '    main  指标是否加载到主图，True-主图，False-幅图，默认主图\n' +
                                   '    filled 是否填充, 默认填充\n' +
-                                  '    barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar。\n' +
+                                  '    barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    在当前Bar输出一个数值，输出的值用于在上层调用模块显示。返回数值型，即输入的Number。\n' +
+                                  '    在当前Bar输出一个Bar，输出的值用于在上层调用模块显示\n' +
                                   '\n' +
                                   '示例：\n' +
                                   '    PlotBar(\"BarExample1\", Vol()[-1], 0, RGB_Red())',
@@ -5474,29 +5547,29 @@ function init_function_info() {
                                   '    text 输出的字符串，最多支持19个英文字符\n' +
                                   '    color 输出值的显示颜色，默认表示使用属性设置框中的颜色；\n' +
                                   '    main  指标是否加载到主图，True-主图，False-幅图，默认主图\n' +
-                                  '    barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar。\n' +
+                                  '    barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    在当前Bar输出字符串，输出的值用于在上层调用模块显示。返回数值型，即输入的Number。\n' +
+                                  '    在当前Bar输出字符串，输出的值用于在上层调用模块显示\n' +
                                   '\n' +
                                   '示例：\n' +
-                                  '    例1：PlotText(2603, \"ORDER\");',
+                                  '    例1：PlotText(Close()[-1], \"ORDER\", main=True) ',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
                 label           : 'PlotVertLine(color, main, axis, barsback=0)',
                 insertText      : 'PlotVertLine(${1})',
                 detail          : '# 在当前Bar输出一个竖线\n' +
-                                  '    float PlotVertLine(color, bool main, bool axis, int barsback=0)\n' +
+                                  '   void PlotVertLine(color, bool main, bool axis, int barsback=0)\n' +
                                   '\n' +
                                   '参数：\n' +
                                   '    color 输出值的显示颜色，默认表示使用属性设置框中的颜色；\n' +
                                   '    main  指标是否加载到主图，True-主图，False-幅图，默认主图\n' +
                                   '    axis  指标是否使用独立坐标，True-独立坐标，False-非独立坐标，默认非独立坐标\n' +
-                                  '    barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar。\n' +
+                                  '    barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    在当前Bar输出一个数值，输出的值用于在上层调用模块显示。返回数值型，即输入的Number。\n' +
+                                  '    在当前Bar输出一条竖线，输出的值用于在上层调用模块显示\n' +
                                   '\n' +
                                   '示例：\n' +
                                   '    PlotVertLine(main=True, axis = True)',
@@ -5520,7 +5593,7 @@ function init_function_info() {
                                   '    width  线段宽度，默认1\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    在当前Bar输出一个数值，输出的值用于在上层调用模块显示。返回数值型，即输入的Number。\n' +
+                                  '    在指定区间输出一个斜线，输出的值用于在上层调用模块显示\n' +
                                   '\n' +
                                   '示例：\n' +
                                   '    idx1 = CurrentBar()\n' +
@@ -5544,10 +5617,10 @@ function init_function_info() {
                                   '    color 输出值的显示颜色，默认表示使用属性设置框中的颜色；\n' +
                                   '    main  指标是否加载到主图，True-主图，False-幅图，默认主图\n' +
                                   '    axis  指标是否使用独立坐标，True-独立坐标，False-非独立坐标，默认非独立坐标\n' +
-                                  '    barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar。\n' +
+                                  '    barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    在当前Bar输出一个数值，输出的值用于在上层调用模块显示。返回数值型，即输入的Number。\n' +
+                                  '    在当前Bar输出一个竖线段，输出的值用于在上层调用模块显示\n' +
                                   '\n' +
                                   '示例：\n' +
                                   '    PlotStickLine(\"StickLine\", Close()[-1], Open()[-1], RGB_Blue(), True, True, 0)',
@@ -5564,7 +5637,7 @@ function init_function_info() {
                                   '    barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar。\n' +
                                   '\n' +
                                   '示例：\n' +
-                                  '    UnPlotText();',
+                                  '    UnPlotText() ',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -5578,7 +5651,7 @@ function init_function_info() {
                                   '    barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar。\n' +
                                   '\n' +
                                   '示例：\n' +
-                                  '    UnPlotIcon();',
+                                  '    UnPlotIcon()',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -5592,7 +5665,7 @@ function init_function_info() {
                                   '    barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar。\n' +
                                   '\n' +
                                   '示例：\n' +
-                                  '    UnPlotVertLine();',
+                                  '    UnPlotVertLine()',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -5607,7 +5680,7 @@ function init_function_info() {
                                   '    barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar。\n' +
                                   '\n' +
                                   '示例：\n' +
-                                  '    UnPlotDot();',
+                                  '    UnPlotDot()',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -5622,7 +5695,7 @@ function init_function_info() {
                                   '    barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar。\n' +
                                   '\n' +
                                   '示例：\n' +
-                                  '    UnPlotBar(“Bar”);',
+                                  '    UnPlotBar(“Bar”)',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -5769,8 +5842,8 @@ function init_function_info() {
                                   '    Length不能小于0\n' +
                                   '\n' +
                                   '示例：\n' +
-                                  '    REF(Close, 1); 获得上一周期的收盘价，等价于Close[-2]\n' +
-                                  '    REF((Close + High + Low)/ 3, 10); 返回10周期前的高低收价格的平均值。',
+                                  '    REF(Close(), 1) 获得上一周期的收盘价，等价于Close()[-2]\n' +
+                                  '    REF((Close() + High() + Low())/ 3, 10) 返回10周期前的高低收价格的平均值',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -5812,8 +5885,8 @@ function init_function_info() {
                                   '    当price的类型不是list或者price的长度为0时，则返回为空的numpy.array()\n' +
                                   '\n' +
                                   '示例：\n' +
-                                  '    Highest (Close(), 12); 计算12周期以来的收盘价的最高值；\n' +
-                                  '    Highest (HisData(Enum_Data_Typical()), 10); 计算10周期以来高低收价格的平均值的最高值。',
+                                  '    Highest (Close(), 12) 计算12周期以来的收盘价的最高值；\n' +
+                                  '    Highest (HisData(Enum_Data_Typical()), 10) 计算10周期以来高低收价格的平均值的最高值',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -5831,15 +5904,15 @@ function init_function_info() {
                                   '    当price的类型不是list或者price的长度为0时，则返回为空的numpy.array()\n' +
                                   '\n' +
                                   '示例：\n' +
-                                  '    Highest (Close(), 12); 计算12周期以来的收盘价的最低值；\n' +
-                                  '    Lowest (HisData(Enum_Data_Typical()), 10); 计算10周期以来高低收价格的平均值的最低值。',
+                                  '    Highest (Close(), 12) 计算12周期以来的收盘价的最低值；\n' +
+                                  '    Lowest (HisData(Enum_Data_Typical()), 10) 计算10周期以来高低收价格的平均值的最低值',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
                 label           : 'CountIf(condition, period):',
                 insertText      : 'CountIf(${1})',
                 detail          : '# 获取最近N周期条件满足的计数\n' +
-                                  '    int CountIf(condition, period):\n' +
+                                  '    int CountIf(bool condition, int period):\n' +
                                   '\n' +
                                   '参数：\n' +
                                   '    condition 传入的条件表达式；\n' +
@@ -5849,7 +5922,7 @@ function init_function_info() {
                                   '    获取最近N周期条件满足的计数\n' +
                                   '\n' +
                                   '示例：\n' +
-                                  '    CountIf(Close() >Open() , 10); 最近10周期出现Close>Open的周期总数',
+                                  '    CountIf(Close() >Open() , 10) 最近10周期出现Close>Open的周期总数',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -5866,9 +5939,9 @@ function init_function_info() {
                                   '    该函数返回Price1数值型序列值是否上穿Price2数值型序列值，返回值为布尔型。\n' +
                                   '\n' +
                                   '示例：\n' +
-                                  '    CrossOver(Close[1], AvgPrice); 判断上一个Bar的收盘价Close是否上穿AvgPrice.\n' +
+                                  '    CrossOver(Close[1], AvgPrice) 判断上一个Bar的收盘价Close是否上穿AvgPrice.\n' +
                                   '    注意：在使用判断穿越的函数时，要尽量避免使用例如close等不确定的元素，否则会导致信号消失，\n' +
-                                  '    一般情况下，Close可以改用High和Low分别判断向上突破（函数CrossOver）和向下突破（函数CrossUnder）。',
+                                  '    一般情况下，Close可以改用High和Low分别判断向上突破(函数CrossOver)和向下突破(函数CrossUnder)',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -5885,9 +5958,9 @@ function init_function_info() {
                                   '    该函数返回Price1数值型序列值是否上穿Price2数值型序列值，返回值为布尔型。\n' +
                                   '\n' +
                                   '示例：\n' +
-                                  '    CrossOver(Close[1], AvgPrice); 判断上一个Bar的收盘价Close是否上穿AvgPrice.\n' +
+                                  '    CrossOver(Close[1], AvgPrice) 判断上一个Bar的收盘价Close是否上穿AvgPrice.\n' +
                                   '    注意：在使用判断穿越的函数时，要尽量避免使用例如close等不确定的元素，否则会导致信号消失，\n' +
-                                  '    一般情况下，Close可以改用High和Low分别判断向上突破（函数CrossOver）和向下突破（函数CrossUnder）。',
+                                  '    一般情况下，Close可以改用High和Low分别判断向上突破(函数CrossOver)和向下突破(函数CrossUnder)',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -5907,7 +5980,7 @@ function init_function_info() {
                                   '    当序列值的CurrentBar小于Length时，该函数返回-1.0\n' +
                                   '\n' +
                                   '示例：\n' +
-                                  '    SwingHigh(Close, 10, 1, 2);计算Close在最近10个周期的波峰点的值，最高点两侧每侧至少需要2个Bar。',
+                                  '    SwingHigh(Close(), 10, 1, 2) 计算Close在最近10个周期的波峰点的值，最高点两侧每侧至少需要2个Bar',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -5927,7 +6000,7 @@ function init_function_info() {
                                   '    当序列值的CurrentBar小于Length时，该函数返回-1.0\n' +
                                   '\n' +
                                   '示例：\n' +
-                                  '    SwingLow(Close, 10, 1, 2);计算Close在最近10个周期的波谷点的值，最低点两侧需要至少2个Bar。',
+                                  '    SwingLow(Close, 10, 1, 2) 计算Close在最近10个周期的波谷点的值，最低点两侧需要至少2个Bar',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -5945,13 +6018,13 @@ function init_function_info() {
                                   '    多行提示信息需要自行换行，例如：\n' +
                                   '    AlertStr = \'合约: \' + contNo + \'\n' +
                                   '    \'                       \'方向: \' + self._bsMap[direct] + self._ocMap[offset] + \'\n' +
-                                  '    \' +                       \'数量: \' + str(share) + \'\n' +
+                                  '    \' +                       \'数量: \' + str(orderQty) + \'\n' +
                                   '    \' +                       \'价格: \' + str(price) + \'\n' +
                                   '    \' +                       \'时间: \' + str(curBar[\'DateTimeStamp\']) + \'\n' +
                                   '    \'\n' +
                                   '\n' +
                                   '示例：\n' +
-                                  '    Alert(\"Hello\"); 弹出提示',
+                                  '    Alert(\"Hello\") 弹出提示',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -6092,7 +6165,7 @@ function init_function_info() {
             },{
                 label           : 'co_varnames',
                 insertText      : 'co_varnames',
-                detail          : '# 函数所有的局部变量名称（包括函数参数）组成的元组, 顺序和实际可能不一致',
+                detail          : '# 函数所有的局部变量名称(包括函数参数)组成的元组, 顺序和实际可能不一致',
                 kind            : monaco.languages.CompletionItemKind.Field
             },{
                 label           : 'co_freevars',
@@ -6456,15 +6529,15 @@ function init_function_info() {
                                   '    使用ADX指标，指标判断盘整、振荡和单边趋势。\n' +
                                   '\n' +
                                   '公式：\n' +
-                                  '    一、先决定股价趋势（Directional Movement，DM）是上涨或下跌：\n' +
+                                  '    一、先决定股价趋势(Directional Movement，DM)是上涨或下跌：\n' +
                                   '    “所谓DM值，今日股价波动幅度大于昨日股价波动幅部分的最大值，可能是创高价的部分或创低价的部分；如果今日股价波动幅度较前一日小，则DM = 0。”\n' +
                                   '    若股价高点持续走高，为上涨趋势，记作 +DM。\n' +
-                                  '    若为下跌趋势，记作 -DM。-DM的负号（–）是表示反向趋势（下跌），并非数值为负数。\n' +
+                                  '    若为下跌趋势，记作 -DM。-DM的负号(–)是表示反向趋势(下跌)，并非数值为负数。\n' +
                                   '    其他状况：DM = 0。\n' +
-                                  '    二、寻找股价的真实波幅（True Range，TR）：\n' +
-                                  '    所谓真实波幅（TR）是以最高价，最低价，及前一日收盘价三个价格做比较，求出当日股价波动的最大幅度。\n' +
+                                  '    二、寻找股价的真实波幅(True Range，TR)：\n' +
+                                  '    所谓真实波幅(TR)是以最高价，最低价，及前一日收盘价三个价格做比较，求出当日股价波动的最大幅度。\n' +
                                   '    三、趋势方向需经由一段时间来观察，研判上才有意义。一般以14天为指标的观察周期：\n' +
-                                  '    先计算出 +DM、–DM及TR的14日算术平均数，得到 +DM14、–DM14及TR14三组数据作为起始值，再计算各自的移动平均值（EMA）。\n' +
+                                  '    先计算出 +DM、–DM及TR的14日算术平均数，得到 +DM14、–DM14及TR14三组数据作为起始值，再计算各自的移动平均值(EMA)。\n' +
                                   '        +DI14 = +DM/TR14*100\n' +
                                   '        -DI14 = +DM/TR14*100\n' +
                                   '         DX = |(+DI14)-(-DI14)| / |(+DI14)+(-DI14)|\n' +
@@ -6480,8 +6553,8 @@ function init_function_info() {
                                   '应用：\n' +
                                   '    +DI与–DI表示多空相反的二个动向，当据此绘出的两条曲线彼此纠结相缠时，代表上涨力道与下跌力道相当，多空势均力敌。当 +DI与–DI彼此穿越时，由下往上的一方其力道开始压过由上往下的另一方，此时出现买卖讯号。\n' +
                                   '    ADX可作为趋势行情的判断依据，当行情明显朝多空任一方向进行时，ADX数值都会显著上升，趋势走强。若行情呈现盘整格局时，ADX会低于 +DI与–DI二条线。若ADX数值低于20，则不论DI表现如何，均显示市场没有明显趋势。\n' +
-                                  '    ADX持续偏高时，代表“超买”（Overbought）或“超卖”（Oversold）的现象，行情反转的机会将增加，此时则不适宜顺势操作。当ADX数值从上升趋势转为下跌时，则代表行情即将反转；若ADX数值由下跌趋势转为上升时，行情将止跌回升。\n' +
-                                  '    总言之，DMI指标包含4条线：+DI、-DI、ADX和ADXR。+DI代表买盘的强度、-DI代表卖盘的强度；ADX代表趋势的强度、ADXR则为ADX的移动平均。',
+                                  '    ADX持续偏高时，代表“超买”(Overbought)或“超卖”(Oversold)的现象，行情反转的机会将增加，此时则不适宜顺势操作。当ADX数值从上升趋势转为下跌时，则代表行情即将反转；若ADX数值由下跌趋势转为上升时，行情将止跌回升。\n' +
+                                  '    总言之，DMI指标包含4条线：+DI、-DI、ADX和ADXR。+DI代表买盘的强度、-DI代表卖盘的强度；ADX代表趋势的强度、ADXR则为ADX的移动平均',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -6506,7 +6579,7 @@ function init_function_info() {
                                   '\n' +
                                   '简介：\n' +
                                   '    \n' +
-                                  '    该指标是通过计算自价格达到近期最高值和最低值以来所经过的期间数，阿隆指标帮助你预测价格趋势到趋势区域（或者反过来，从趋势区域到趋势）的变化。\n' +
+                                  '    该指标是通过计算自价格达到近期最高值和最低值以来所经过的期间数，阿隆指标帮助你预测价格趋势到趋势区域(或者反过来，从趋势区域到趋势)的变化。\n' +
                                   '\n' +
                                   '公式：\n' +
                                   '    \n' +
@@ -6519,7 +6592,7 @@ function init_function_info() {
                                   '    2. 平行运动\n' +
                                   '    如果两条线平行运动时，表明市场趋势被打破。可以预期该状况将持续下去，只到由极值水平或交叉穿行西安市出方向性运动为止。\n' +
                                   '    3. 交叉穿行\n' +
-                                  '    当下行线上穿上行线时，表明潜在弱势，预期价格开始趋于下跌。反之，表明潜在强势，预期价格趋于走高。',
+                                  '    当下行线上穿上行线时，表明潜在弱势，预期价格开始趋于下跌。反之，表明潜在强势，预期价格趋于走高',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -6548,11 +6621,11 @@ function init_function_info() {
                                   '应用：\n' +
                                   '    1. 当CCI指标曲线在+100线～-100线的常态区间里运行时,CCI指标参考意义不大，可以用KDJ等其它技术指标进行研判。\n' +
                                   '    2. 当CCI指标曲线从上向下突破+100线而重新进入常态区间时，表明市场价格的上涨阶段可能结束，将进入一个比较长时间的震荡整理阶段，应及时平多做空。\n' +
-                                  '    3. 当CCI指标曲线从上向下突破-100线而进入另一个非常态区间（超卖区）时，表明市场价格的弱势状态已经形成，将进入一个比较长的寻底过程，可以持有空单等待更高利润。如果CCI指标曲线在超卖区运行了相当长的一段时间后开始掉头向上，表明价格的短期底部初步探明，可以少量建仓。CCI指标曲线在超卖区运行的时间越长，确认短期的底部的准确度越高。\n' +
+                                  '    3. 当CCI指标曲线从上向下突破-100线而进入另一个非常态区间(超卖区)时，表明市场价格的弱势状态已经形成，将进入一个比较长的寻底过程，可以持有空单等待更高利润。如果CCI指标曲线在超卖区运行了相当长的一段时间后开始掉头向上，表明价格的短期底部初步探明，可以少量建仓。CCI指标曲线在超卖区运行的时间越长，确认短期的底部的准确度越高。\n' +
                                   '    4. CCI指标曲线从下向上突破-100线而重新进入常态区间时，表明市场价格的探底阶段可能结束，有可能进入一个盘整阶段，可以逢低少量做多。\n' +
                                   '    5. CCI指标曲线从下向上突破+100线而进入非常态区间(超买区)时，表明市场价格已经脱离常态而进入强势状态，如果伴随较大的市场交投，应及时介入成功率将很大。\n' +
                                   '    6. CCI指标曲线从下向上突破+100线而进入非常态区间(超买区)后，只要CCI指标曲线一直朝上运行，表明价格依然保持强势可以继续持有待涨。但是，如果在远离+100线的地方开始掉头向下时，则表明市场价格的强势状态将可能难以维持，涨势可能转弱，应考虑卖出。如果前期的短期涨幅过高同时价格回落时交投活跃，则应该果断逢高卖出或做空。\n' +
-                                  '    7. CCI主要是在超买和超卖区域发生作用，对急涨急跌的行情检测性相对准确。非常适用于股票、外汇、贵金属等市场的短期操作。',
+                                  '    7. CCI主要是在超买和超卖区域发生作用，对急涨急跌的行情检测性相对准确。非常适用于股票、外汇、贵金属等市场的短期操作',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -6562,17 +6635,17 @@ function init_function_info() {
                                   '    float CMO(close, timeperiod=14)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    与其他动量指标摆动指标如相对强弱指标（RSI）和随机指标（KDJ）不同，钱德动量指标在计算公式的分子中采用上涨日和下跌日的数据。\n' +
+                                  '    与其他动量指标摆动指标如相对强弱指标(RSI)和随机指标(KDJ)不同，钱德动量指标在计算公式的分子中采用上涨日和下跌日的数据。\n' +
                                   '\n' +
                                   '公式：\n' +
-                                  '    CMO=（Su－Sd）*100/（Su+Sd）\n' +
-                                  '    其中：Su是今日收盘价与昨日收盘价（上涨日）差值加总。若当日下跌，则增加值为0；Sd是今日收盘价与做日收盘价（下跌日）差值的绝对值加总。若当日上涨，则增加值为0；指标应用:\n' +
+                                  '    CMO=(Su－Sd)*100/(Su+Sd)\n' +
+                                  '    其中：Su是今日收盘价与昨日收盘价(上涨日)差值加总。若当日下跌，则增加值为0；Sd是今日收盘价与做日收盘价(下跌日)差值的绝对值加总。若当日上涨，则增加值为0；指标应用:\n' +
                                   '    本指标类似RSI指标。\n' +
                                   '    当本指标下穿-50水平时是买入信号，上穿+50水平是卖出信号。\n' +
                                   '    钱德动量摆动指标的取值介于-100和100之间。\n' +
                                   '    本指标也能给出良好的背离信号。\n' +
                                   '    当股票价格创出新低而本指标未能创出新低时，出现牛市背离；    当股票价格创出新高而本指标未能创出新高时，当出现熊市背离时。\n' +
-                                  '    我们可以用移动均值对该指标进行平滑。',
+                                  '    我们可以用移动均值对该指标进行平滑',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -6592,7 +6665,7 @@ function init_function_info() {
                                   '    macd, macdsignal, macdhist = MACD(close, fastperiod=12, slowperiod=26, signalperiod=9)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    利用收盘价的短期（常用为12日）指数移动平均线与长期（常用为26日）指数移动平均线之间的聚合与分离状况，对买进、卖出时机作出研判的技术指标。',
+                                  '    利用收盘价的短期(常用为12日)指数移动平均线与长期(常用为26日)指数移动平均线之间的聚合与分离状况，对买进、卖出时机作出研判的技术指标',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -6670,7 +6743,7 @@ function init_function_info() {
                                   '    float PPO(close, fastperiod=12, slowperiod=26, matype=0)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    价格震荡百分比指标（PPO）是一个和MACD指标非常接近的指标。\n' +
+                                  '    价格震荡百分比指标(PPO)是一个和MACD指标非常接近的指标。\n' +
                                   '    PPO标准设定和MACD设定非常相似：12,26,9和PPO，和MACD一样说明了两条移动平均线的差距，但是它们有一个差别是PPO是用百分比说明',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
@@ -6712,7 +6785,7 @@ function init_function_info() {
                                   '    float RSI(close, timeperiod=14)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    是通过比较一段时期内的平均收盘涨数和平均收盘跌数来分析市场买沽盘的意向和实力，从而作出未来市场的走势。',
+                                  '    是通过比较一段时期内的平均收盘涨数和平均收盘跌数来分析市场买沽盘的意向和实力，从而作出未来市场的走势',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -6750,7 +6823,7 @@ function init_function_info() {
                                   '    float ULTOSC(high, low, close, timeperiod1=7, timeperiod2=14, timeperiod3=28)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    UOS是一种多方位功能的指标，除了趋势确认及超买超卖方面的作用之外，它的“突破”讯号不仅可以提供最适当的交易时机之外，更可以进一步加强指标的可靠度。',
+                                  '    UOS是一种多方位功能的指标，除了趋势确认及超买超卖方面的作用之外，它的“突破”讯号不仅可以提供最适当的交易时机之外，更可以进一步加强指标的可靠度',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -6760,7 +6833,7 @@ function init_function_info() {
                                   '    float WILLR(high, low, close, timeperiod=14)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    WMS表示的是市场处于超买还是超卖状态。股票投资分析方法主要有如下三种：基本分析、技术分析、演化分析。在实际应用中，它们既相互联系，又有重要区别。',
+                                  '    WMS表示的是市场处于超买还是超卖状态。股票投资分析方法主要有如下三种：基本分析、技术分析、演化分析。在实际应用中，它们既相互联系，又有重要区别',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -6790,7 +6863,7 @@ function init_function_info() {
                                   '    float EMA(close, timeperiod=30)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    是一种趋向类指标，其构造原理是仍然对价格收盘价进行算术平均，并根据计算结果来进行分析，用于判断价格未来走势的变动趋势。',
+                                  '    是一种趋向类指标，其构造原理是仍然对价格收盘价进行算术平均，并根据计算结果来进行分析，用于判断价格未来走势的变动趋势',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -6800,7 +6873,7 @@ function init_function_info() {
                                   '    float HT_TRENDLINE(close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    是一种趋向类指标，其构造原理是仍然对价格收盘价进行算术平均，并根据计算结果来进行分析，用于判断价格未来走势的变动趋势。',
+                                  '    是一种趋向类指标，其构造原理是仍然对价格收盘价进行算术平均，并根据计算结果来进行分析，用于判断价格未来走势的变动趋势',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -6810,7 +6883,7 @@ function init_function_info() {
                                   '    float KAMA(close, timeperiod=30)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    短期均线贴近价格走势，灵敏度高，但会有很多噪声，产生虚假信号；长期均线在判断趋势上一般比较准确, 但是长期均线有着严重滞后的问题。我们想得到这样的均线，当价格沿一个方向快速移动时，短期的移动平均线是最合适的；当价格在横盘的过程中，长期移动平均线是合适的。',
+                                  '    短期均线贴近价格走势，灵敏度高，但会有很多噪声，产生虚假信号；长期均线在判断趋势上一般比较准确, 但是长期均线有着严重滞后的问题。我们想得到这样的均线，当价格沿一个方向快速移动时，短期的移动平均线是最合适的；当价格在横盘的过程中，长期移动平均线是合适的',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -6858,7 +6931,7 @@ function init_function_info() {
                                   '    float SAR(high, low, acceleration=0, maximum=0)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    抛物线转向也称停损点转向，是利用抛物线方式，随时调整停损点位置以观察买卖点。由于停损点（又称转向点SAR）以弧形的方式移动，故称之为抛物线转向指标',
+                                  '    抛物线转向也称停损点转向，是利用抛物线方式，随时调整停损点位置以观察买卖点。由于停损点(又称转向点SAR)以弧形的方式移动，故称之为抛物线转向指标',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -6885,7 +6958,7 @@ function init_function_info() {
                                   '    float T3(close, timeperiod=5, vfactor=0)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    TRIX长线操作时采用本指标的讯号，长时间按照本指标讯号交易，获利百分比大于损失百分比，利润相当可观。 比如日线MA5指5天内的收盘价除以5 。',
+                                  '    TRIX长线操作时采用本指标的讯号，长时间按照本指标讯号交易，获利百分比大于损失百分比，利润相当可观。 比如日线MA5指5天内的收盘价除以5 ',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -6919,7 +6992,7 @@ function init_function_info() {
                                   '    int CDL2CROWS(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    三日K线模式，第一天长阳，第二天高开收阴，第三天再次高开继续收阴，收盘比前一日收盘价低，预示股价下跌。',
+                                  '    三日K线模式，第一天长阳，第二天高开收阴，第三天再次高开继续收阴，收盘比前一日收盘价低，预示股价下跌',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -6929,7 +7002,7 @@ function init_function_info() {
                                   '    int CDL3BLACKCROWS(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    三日K线模式，连续三根阴线，每日收盘价都下跌且接近最低价，每日开盘价都在上根K线实体内，预示股价下跌。',
+                                  '    三日K线模式，连续三根阴线，每日收盘价都下跌且接近最低价，每日开盘价都在上根K线实体内，预示股价下跌',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -6939,7 +7012,7 @@ function init_function_info() {
                                   '    int CDL3INSIDE(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    三日K线模式，母子信号+长K线，以三内部上涨为例，K线为阴阳阳，第三天收盘价高于第一天开盘价，第二天K线在第一天K线内部，预示着股价上涨。',
+                                  '    三日K线模式，母子信号+长K线，以三内部上涨为例，K线为阴阳阳，第三天收盘价高于第一天开盘价，第二天K线在第一天K线内部，预示着股价上涨',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -6949,7 +7022,7 @@ function init_function_info() {
                                   '    int CDL3LINESTRIKE(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    四日K线模式，前三根阳线，每日收盘价都比前一日高，开盘价在前一日实体内，第四日市场高开，收盘价低于第一日开盘价，预示股价下跌。',
+                                  '    四日K线模式，前三根阳线，每日收盘价都比前一日高，开盘价在前一日实体内，第四日市场高开，收盘价低于第一日开盘价，预示股价下跌',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -6959,7 +7032,7 @@ function init_function_info() {
                                   '    int CDL3OUTSIDE(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    三日K线模式，与三内部上涨和下跌类似，K线为阴阳阳，但第一日与第二日的K线形态相反，以三外部上涨为例，第一日K线在第二日K线内部，预示着股价上涨。',
+                                  '    三日K线模式，与三内部上涨和下跌类似，K线为阴阳阳，但第一日与第二日的K线形态相反，以三外部上涨为例，第一日K线在第二日K线内部，预示着股价上涨',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -6969,7 +7042,7 @@ function init_function_info() {
                                   '    int CDL3STARSINSOUTH(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    三日K线模式，与大敌当前相反，三日K线皆阴，第一日有长下影线，第二日与第一日类似，K线整体小于第一日，第三日无下影线实体信号，成交价格都在第一日振幅之内，预示下跌趋势反转，股价上升。',
+                                  '    三日K线模式，与大敌当前相反，三日K线皆阴，第一日有长下影线，第二日与第一日类似，K线整体小于第一日，第三日无下影线实体信号，成交价格都在第一日振幅之内，预示下跌趋势反转，股价上升',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -6979,7 +7052,7 @@ function init_function_info() {
                                   '    int CDL3WHITESOLDIERS(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    三日K线模式，三日K线皆阳，每日收盘价变高且接近最高价，开盘价在前一日实体上半部，预示股价上升。',
+                                  '    三日K线模式，三日K线皆阳，每日收盘价变高且接近最高价，开盘价在前一日实体上半部，预示股价上升',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -6989,7 +7062,7 @@ function init_function_info() {
                                   '    int CDLABANDONEDBABY(open, high, low, close, penetration=0)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    三日K线模式，第二日价格跳空且收十字星（开盘价与收盘价接近，最高价最低价相差不大），预示趋势反转，发生在顶部下跌，底部上涨。',
+                                  '    三日K线模式，第二日价格跳空且收十字星(开盘价与收盘价接近，最高价最低价相差不大)，预示趋势反转，发生在顶部下跌，底部上涨',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -6999,7 +7072,7 @@ function init_function_info() {
                                   '    int CDLADVANCEBLOCK(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    三日K线模式，三日都收阳，每日收盘价都比前一日高，开盘价都在前一日实体以内，实体变短，上影线变长。',
+                                  '    三日K线模式，三日都收阳，每日收盘价都比前一日高，开盘价都在前一日实体以内，实体变短，上影线变长',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7009,7 +7082,7 @@ function init_function_info() {
                                   '    int CDLBELTHOLD(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    两日K线模式，下跌趋势中，第一日阴线，第二日开盘价为最低价，阳线，收盘价接近最高价，预示价格上涨。',
+                                  '    两日K线模式，下跌趋势中，第一日阴线，第二日开盘价为最低价，阳线，收盘价接近最高价，预示价格上涨',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7019,7 +7092,7 @@ function init_function_info() {
                                   '    int CDLBREAKAWAY(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    五日K线模式，以看涨脱离为例，下跌趋势中，第一日长阴线，第二日跳空阴线，延续趋势开始震荡，第五日长阳线，收盘价在第一天收盘价与第二天开盘价之间，预示价格上涨。',
+                                  '    五日K线模式，以看涨脱离为例，下跌趋势中，第一日长阴线，第二日跳空阴线，延续趋势开始震荡，第五日长阳线，收盘价在第一天收盘价与第二天开盘价之间，预示价格上涨',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7029,7 +7102,7 @@ function init_function_info() {
                                   '    int CDLCLOSINGMARUBOZU(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    一日K线模式，以阳线为例，最低价低于开盘价，收盘价等于最高价，预示着趋势持续。',
+                                  '    一日K线模式，以阳线为例，最低价低于开盘价，收盘价等于最高价，预示着趋势持续',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7039,7 +7112,7 @@ function init_function_info() {
                                   '    int CDLCONCEALBABYSWALL(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    四日K线模式，下跌趋势中，前两日阴线无影线，第二日开盘、收盘价皆低于第二日，第三日倒锤头，第四日开盘价高于前一日最高价，收盘价低于前一日最低价，预示着底部反转。',
+                                  '    四日K线模式，下跌趋势中，前两日阴线无影线，第二日开盘、收盘价皆低于第二日，第三日倒锤头，第四日开盘价高于前一日最高价，收盘价低于前一日最低价，预示着底部反转',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7049,7 +7122,7 @@ function init_function_info() {
                                   '    int CDLCOUNTERATTACK(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    二日K线模式，与分离线类似。',
+                                  '    二日K线模式，与分离线类似',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7059,7 +7132,7 @@ function init_function_info() {
                                   '    int CDLDARKCLOUDCOVER(open, high, low, close, penetration=0)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    二日K线模式，第一日长阳，第二日开盘价高于前一日最高价，收盘价处于前一日实体中部以下，预示着股价下跌。',
+                                  '    二日K线模式，第一日长阳，第二日开盘价高于前一日最高价，收盘价处于前一日实体中部以下，预示着股价下跌',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7069,7 +7142,7 @@ function init_function_info() {
                                   '    int CDLDOJI(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    一日K线模式，开盘价与收盘价基本相同。',
+                                  '    一日K线模式，开盘价与收盘价基本相同',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7079,7 +7152,7 @@ function init_function_info() {
                                   '    int CDLDOJISTAR(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    一日K线模式，开盘价与收盘价基本相同，上下影线不会很长，预示着当前趋势反转。',
+                                  '    一日K线模式，开盘价与收盘价基本相同，上下影线不会很长，预示着当前趋势反转',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7089,7 +7162,7 @@ function init_function_info() {
                                   '    int CDLDRAGONFLYDOJI(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    一日K线模式，开盘后价格一路走低，之后收复，收盘价与开盘价相同，预示趋势反转。',
+                                  '    一日K线模式，开盘后价格一路走低，之后收复，收盘价与开盘价相同，预示趋势反转',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7099,7 +7172,7 @@ function init_function_info() {
                                   '    int CDLENGULFING(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    两日K线模式，分多头吞噬和空头吞噬，以多头吞噬为例，第一日为阴线，第二日阳线，第一日的开盘价和收盘价在第二日开盘价收盘价之内，但不能完全相同。',
+                                  '    两日K线模式，分多头吞噬和空头吞噬，以多头吞噬为例，第一日为阴线，第二日阳线，第一日的开盘价和收盘价在第二日开盘价收盘价之内，但不能完全相同',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7109,7 +7182,7 @@ function init_function_info() {
                                   '    int CDLEVENINGDOJISTAR(open, high, low, close, penetration=0)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    三日K线模式，基本模式为暮星，第二日收盘价和开盘价相同，预示顶部反转。',
+                                  '    三日K线模式，基本模式为暮星，第二日收盘价和开盘价相同，预示顶部反转',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7119,7 +7192,7 @@ function init_function_info() {
                                   '    int CDLEVENINGSTAR(open, high, low, close, penetration=0)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    三日K线模式，与晨星相反，上升趋势中, 第一日阳线，第二日价格振幅较小，第三日阴线，预示顶部反转。',
+                                  '    三日K线模式，与晨星相反，上升趋势中, 第一日阳线，第二日价格振幅较小，第三日阴线，预示顶部反转',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7129,7 +7202,7 @@ function init_function_info() {
                                   '    int CDLGAPSIDESIDEWHITE(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    二日K线模式，上升趋势向上跳空，下跌趋势向下跳空, 第一日与第二日有相同开盘价，实体长度差不多，则趋势持续。',
+                                  '    二日K线模式，上升趋势向上跳空，下跌趋势向下跳空, 第一日与第二日有相同开盘价，实体长度差不多，则趋势持续',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7139,7 +7212,7 @@ function init_function_info() {
                                   '    int CDLGRAVESTONEDOJI(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    一日K线模式，开盘价与收盘价相同，上影线长，无下影线，预示底部反转。',
+                                  '    一日K线模式，开盘价与收盘价相同，上影线长，无下影线，预示底部反转',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7149,7 +7222,7 @@ function init_function_info() {
                                   '    int CDLHAMMER(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    一日K线模式，实体较短，无上影线，下影线大于实体长度两倍，处于下跌趋势底部，预示反转。',
+                                  '    一日K线模式，实体较短，无上影线，下影线大于实体长度两倍，处于下跌趋势底部，预示反转',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7159,7 +7232,7 @@ function init_function_info() {
                                   '    int CDLHANGINGMAN(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    一日K线模式，形状与锤子类似，处于上升趋势的顶部，预示着趋势反转。',
+                                  '    一日K线模式，形状与锤子类似，处于上升趋势的顶部，预示着趋势反转',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7169,7 +7242,7 @@ function init_function_info() {
                                   '    int CDLHARAMI(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    二日K线模式，分多头母子与空头母子，两者相反，以多头母子为例，在下跌趋势中，第一日K线长阴，第二日开盘价收盘价在第一日价格振幅之内，为阳线，预示趋势反转，股价上升。',
+                                  '    二日K线模式，分多头母子与空头母子，两者相反，以多头母子为例，在下跌趋势中，第一日K线长阴，第二日开盘价收盘价在第一日价格振幅之内，为阳线，预示趋势反转，股价上升',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7179,7 +7252,7 @@ function init_function_info() {
                                   '    int CDLHARAMICROSS(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    二日K线模式，与母子县类似，若第二日K线是十字线，便称为十字孕线，预示着趋势反转。',
+                                  '    二日K线模式，与母子县类似，若第二日K线是十字线，便称为十字孕线，预示着趋势反转',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7189,7 +7262,7 @@ function init_function_info() {
                                   '    int CDLHIGHWAVE(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    三日K线模式，具有极长的上/下影线与短的实体，预示着趋势反转。',
+                                  '    三日K线模式，具有极长的上/下影线与短的实体，预示着趋势反转',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7199,7 +7272,7 @@ function init_function_info() {
                                   '    int CDLHIKKAKE(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    三日K线模式，与母子类似，第二日价格在前一日实体范围内, 第三日收盘价高于前两日，反转失败，趋势继续。',
+                                  '    三日K线模式，与母子类似，第二日价格在前一日实体范围内, 第三日收盘价高于前两日，反转失败，趋势继续',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7209,7 +7282,7 @@ function init_function_info() {
                                   '    int CDLHIKKAKEMOD(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    三日K线模式，与陷阱类似，上升趋势中，第三日跳空高开；下跌趋势中，第三日跳空低开，反转失败，趋势继续。',
+                                  '    三日K线模式，与陷阱类似，上升趋势中，第三日跳空高开；下跌趋势中，第三日跳空低开，反转失败，趋势继续',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7219,7 +7292,7 @@ function init_function_info() {
                                   '    int CDLHOMINGPIGEON(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    二日K线模式，与母子线类似，不同的的是二日K线颜色相同，第二日最高价、最低价都在第一日实体之内，预示着趋势反转。',
+                                  '    二日K线模式，与母子线类似，不同的的是二日K线颜色相同，第二日最高价、最低价都在第一日实体之内，预示着趋势反转',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7229,7 +7302,7 @@ function init_function_info() {
                                   '    int CDLIDENTICAL3CROWS(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    三日K线模式，上涨趋势中，三日都为阴线，长度大致相等，每日开盘价等于前一日收盘价，收盘价接近当日最低价，预示价格下跌。',
+                                  '    三日K线模式，上涨趋势中，三日都为阴线，长度大致相等，每日开盘价等于前一日收盘价，收盘价接近当日最低价，预示价格下跌',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7239,7 +7312,7 @@ function init_function_info() {
                                   '    int CDLINNECK(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    二日K线模式，下跌趋势中，第一日长阴线，第二日开盘价较低，收盘价略高于第一日收盘价，阳线，实体较短，预示着下跌继续。',
+                                  '    二日K线模式，下跌趋势中，第一日长阴线，第二日开盘价较低，收盘价略高于第一日收盘价，阳线，实体较短，预示着下跌继续',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7249,7 +7322,7 @@ function init_function_info() {
                                   '    int CDLINVERTEDHAMMER(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    一日K线模式，上影线较长，长度为实体2倍以上，无下影线，在下跌趋势底部，预示着趋势反转。',
+                                  '    一日K线模式，上影线较长，长度为实体2倍以上，无下影线，在下跌趋势底部，预示着趋势反转',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7259,7 +7332,7 @@ function init_function_info() {
                                   '    int CDLKICKING(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    二日K线模式，与分离线类似，两日K线为秃线，颜色相反，存在跳空缺口。',
+                                  '    二日K线模式，与分离线类似，两日K线为秃线，颜色相反，存在跳空缺口',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7269,7 +7342,7 @@ function init_function_info() {
                                   '    int CDLKICKINGBYLENGTH(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    二日K线模式，与反冲形态类似，较长缺影线决定价格的涨跌。',
+                                  '    二日K线模式，与反冲形态类似，较长缺影线决定价格的涨跌',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7279,7 +7352,7 @@ function init_function_info() {
                                   '    int CDLLADDERBOTTOM(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    五日K线模式，下跌趋势中，前三日阴线，开盘价与收盘价皆低于前一日开盘、收盘价，第四日倒锤头，第五日开盘价高于前一日开盘价，阳线，收盘价高于前几日价格振幅，预示着底部反转。',
+                                  '    五日K线模式，下跌趋势中，前三日阴线，开盘价与收盘价皆低于前一日开盘、收盘价，第四日倒锤头，第五日开盘价高于前一日开盘价，阳线，收盘价高于前几日价格振幅，预示着底部反转',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7289,7 +7362,7 @@ function init_function_info() {
                                   '    int CDLLONGLEGGEDDOJI(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    一日K线模式，开盘价与收盘价相同居当日价格中部，上下影线长，表达市场不确定性。',
+                                  '    一日K线模式，开盘价与收盘价相同居当日价格中部，上下影线长，表达市场不确定性',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7299,7 +7372,7 @@ function init_function_info() {
                                   '    int CDLLONGLINE(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    一日K线模式，K线实体长，无上下影线。',
+                                  '    一日K线模式，K线实体长，无上下影线',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7309,7 +7382,7 @@ function init_function_info() {
                                   '    int CDLMARUBOZU(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    一日K线模式，上下两头都没有影线的实体，阴线预示着熊市持续或者牛市反转，阳线相反。',
+                                  '    一日K线模式，上下两头都没有影线的实体，阴线预示着熊市持续或者牛市反转，阳线相反',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7319,7 +7392,7 @@ function init_function_info() {
                                   '    int CDLMATCHINGLOW(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    二日K线模式，下跌趋势中，第一日长阴线，第二日阴线，收盘价与前一日相同，预示底部确认，该价格为支撑位。',
+                                  '    二日K线模式，下跌趋势中，第一日长阴线，第二日阴线，收盘价与前一日相同，预示底部确认，该价格为支撑位',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7329,7 +7402,7 @@ function init_function_info() {
                                   '    int CDLMATHOLD(open, high, low, close, penetration=0)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    五日K线模式，上涨趋势中，第一日阳线，第二日跳空高开影线，第三、四日短实体影线，第五日阳线，收盘价高于前四日，预示趋势持续。',
+                                  '    五日K线模式，上涨趋势中，第一日阳线，第二日跳空高开影线，第三、四日短实体影线，第五日阳线，收盘价高于前四日，预示趋势持续',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7339,7 +7412,7 @@ function init_function_info() {
                                   '    int CDLMORNINGDOJISTAR(open, high, low, close, penetration=0)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    三日K线模式，基本模式为晨星，第二日K线为十字星，预示底部反转。',
+                                  '    三日K线模式，基本模式为晨星，第二日K线为十字星，预示底部反转',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7349,7 +7422,7 @@ function init_function_info() {
                                   '    int CDLMORNINGSTAR(open, high, low, close, penetration=0)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    三日K线模式，下跌趋势，第一日阴线，第二日价格振幅较小，第三天阳线，预示底部反转。',
+                                  '    三日K线模式，下跌趋势，第一日阴线，第二日价格振幅较小，第三天阳线，预示底部反转',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7359,7 +7432,7 @@ function init_function_info() {
                                   '    int CDLONNECK(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    二日K线模式，下跌趋势中，第一日长阴线，第二日开盘价较低，收盘价与前一日最低价相同，阳线，实体较短，预示着延续下跌趋势。',
+                                  '    二日K线模式，下跌趋势中，第一日长阴线，第二日开盘价较低，收盘价与前一日最低价相同，阳线，实体较短，预示着延续下跌趋势',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7369,7 +7442,7 @@ function init_function_info() {
                                   '    int CDLPIERCING(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    两日K线模式，下跌趋势中，第一日阴线，第二日收盘价低于前一日最低价，收盘价处在第一日实体上部，预示着底部反转。',
+                                  '    两日K线模式，下跌趋势中，第一日阴线，第二日收盘价低于前一日最低价，收盘价处在第一日实体上部，预示着底部反转',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7379,7 +7452,7 @@ function init_function_info() {
                                   '    int CDLRICKSHAWMAN(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    一日K线模式，与长腿十字线类似，若实体正好处于价格振幅中点，称为黄包车夫。',
+                                  '    一日K线模式，与长腿十字线类似，若实体正好处于价格振幅中点，称为黄包车夫',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7389,7 +7462,7 @@ function init_function_info() {
                                   '    int CDLRISEFALL3METHODS(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '     五日K线模式，以上升三法为例，上涨趋势中，第一日长阳线，中间三日价格在第一日范围内小幅震荡，第五日长阳线，收盘价高于第一日收盘价，预示股价上升。',
+                                  '     五日K线模式，以上升三法为例，上涨趋势中，第一日长阳线，中间三日价格在第一日范围内小幅震荡，第五日长阳线，收盘价高于第一日收盘价，预示股价上升',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7399,7 +7472,7 @@ function init_function_info() {
                                   '    int CDLSEPARATINGLINES(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    二日K线模式，上涨趋势中，第一日阴线，第二日阳线，第二日开盘价与第一日相同且为最低价，预示着趋势继续。',
+                                  '    二日K线模式，上涨趋势中，第一日阴线，第二日阳线，第二日开盘价与第一日相同且为最低价，预示着趋势继续',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7429,7 +7502,7 @@ function init_function_info() {
                                   '    int CDLSPINNINGTOP(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    一日K线，实体小。',
+                                  '    一日K线，实体小',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7449,7 +7522,7 @@ function init_function_info() {
                                   '    int CDLSTICKSANDWICH(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    三日K线模式，第一日长阴线，第二日阳线，开盘价高于前一日收盘价，第三日开盘价高于前两日最高价，收盘价于第一日收盘价相同。',
+                                  '    三日K线模式，第一日长阴线，第二日阳线，开盘价高于前一日收盘价，第三日开盘价高于前两日最高价，收盘价于第一日收盘价相同',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7459,7 +7532,7 @@ function init_function_info() {
                                   '    int CDLTAKURI(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    一日K线模式，大致与蜻蜓十字相同，下影线长度长。',
+                                  '    一日K线模式，大致与蜻蜓十字相同，下影线长度长',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7469,7 +7542,7 @@ function init_function_info() {
                                   '    int CDLTASUKIGAP(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    三日K线模式，分上涨和下跌，以上升为例，前两日阳线，第二日跳空，第三日阴线，收盘价于缺口中，上升趋势持续。',
+                                  '    三日K线模式，分上涨和下跌，以上升为例，前两日阳线，第二日跳空，第三日阴线，收盘价于缺口中，上升趋势持续',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7479,7 +7552,7 @@ function init_function_info() {
                                   '    int CDLTHRUSTING(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    二日K线模式，与颈上线类似，下跌趋势中，第一日长阴线，第二日开盘价跳空，收盘价略低于前一日实体中部，与颈上线相比实体较长，预示着趋势持续。',
+                                  '    二日K线模式，与颈上线类似，下跌趋势中，第一日长阴线，第二日开盘价跳空，收盘价略低于前一日实体中部，与颈上线相比实体较长，预示着趋势持续',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7489,7 +7562,7 @@ function init_function_info() {
                                   '    int CDLTRISTAR(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    三日K线模式，由三个十字组成，第二日十字必须高于或者低于第一日和第三日，预示着反转。',
+                                  '    三日K线模式，由三个十字组成，第二日十字必须高于或者低于第一日和第三日，预示着反转',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7499,7 +7572,7 @@ function init_function_info() {
                                   '    int CDLUNIQUE3RIVER(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    三日K线模式，下跌趋势中，第一日长阴线，第二日为锤头，最低价创新低，第三日开盘价低于第二日收盘价，收阳线，收盘价不高于第二日收盘价，预示着反转，第二日下影线越长可能性越大。',
+                                  '    三日K线模式，下跌趋势中，第一日长阴线，第二日为锤头，最低价创新低，第三日开盘价低于第二日收盘价，收阳线，收盘价不高于第二日收盘价，预示着反转，第二日下影线越长可能性越大',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7509,7 +7582,7 @@ function init_function_info() {
                                   '    int CDLUPSIDEGAP2CROWS(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    三日K线模式，第一日阳线，第二日跳空以高于第一日最高价开盘，收阴线，第三日开盘价高于第二日，收阴线，与第一日比仍有缺口。',
+                                  '    三日K线模式，第一日阳线，第二日跳空以高于第一日最高价开盘，收阴线，第三日开盘价高于第二日，收阴线，与第一日比仍有缺口',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7519,7 +7592,7 @@ function init_function_info() {
                                   '    int CDLXSIDEGAP3METHODS(open, high, low, close)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    五日K线模式，以上升跳空三法为例，上涨趋势中，第一日长阳线，第二日短阳线，第三日跳空阳线，第四日阴线，开盘价与收盘价于前两日实体内，第五日长阳线，收盘价高于第一日收盘价，预示股价上升。',
+                                  '    五日K线模式，以上升跳空三法为例，上涨趋势中，第一日长阳线，第二日短阳线，第三日跳空阳线，第四日阴线，开盘价与收盘价于前两日实体内，第五日长阳线，收盘价高于第一日收盘价，预示股价上升',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7560,7 +7633,7 @@ function init_function_info() {
                                   '    一种风险指数，用来衡量个别股票或股票基金相对于整个股市的价格波动情况\n' +
                                   '    贝塔系数衡量股票收益相对于业绩评价基准收益的总体波动性，是一个相对指标。 β 越高，意味着股票相对于业绩评价基准的波动性越大。 β 大于 1 ，    则股票的波动性大于业绩评价基准的波动性。反之亦然。\n' +
                                   '用途：\n' +
-                                  '    1）计算资本成本，做出投资决策（只有回报率高于资本成本的项目才应投资）；    2）计算资本成本，制定业绩考核及激励标准；    3）计算资本成本，进行资产估值（Beta是现金流贴现模型的基础）；    4）确定单个资产或组合的系统风险，用于资产组合的投资管理，特别是股指期货或其他金融衍生品的避险（或投机）',
+                                  '    1)计算资本成本，做出投资决策(只有回报率高于资本成本的项目才应投资)；    2)计算资本成本，制定业绩考核及激励标准；    3)计算资本成本，进行资产估值(Beta是现金流贴现模型的基础)；    4)确定单个资产或组合的系统风险，用于资产组合的投资管理，特别是股指期货或其他金融衍生品的避险(或投机)',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7570,8 +7643,8 @@ function init_function_info() {
                                   '    float CORREL(high, low, timeperiod=30)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    用于度量两个变量X和Y之间的相关（线性相关），其值介于-1与1之间\n' +
-                                  '    皮尔逊相关系数是一种度量两个变量间相关程度的方法。它是一个介于 1 和 -1 之间的值，    其中，1 表示变量完全正相关， 0 表示无关，-1 表示完全负相关。',
+                                  '    用于度量两个变量X和Y之间的相关(线性相关)，其值介于-1与1之间\n' +
+                                  '    皮尔逊相关系数是一种度量两个变量间相关程度的方法。它是一个介于 1 和 -1 之间的值，    其中，1 表示变量完全正相关， 0 表示无关，-1 表示完全负相关',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7596,7 +7669,7 @@ function init_function_info() {
                                   '    float LINEARREG_ANGLE(close, timeperiod=14)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    来确定价格的角度变化。',
+                                  '    来确定价格的角度变化',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7640,7 +7713,7 @@ function init_function_info() {
                                   '    float VAR(close, timeperiod=5, nbdev=1)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    方差用来计算每一个变量（观察值）与总体均数之间的差异。为避免出现离均差总和为零，离均差平方和受样本含量的影响，统计学采用平均离均差平方和来描述变量的变异程',
+                                  '    方差用来计算每一个变量(观察值)与总体均数之间的差异。为避免出现离均差总和为零，离均差平方和受样本含量的影响，统计学采用平均离均差平方和来描述变量的变异程',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7650,7 +7723,7 @@ function init_function_info() {
                                   '    float ATR(high, low, close, timeperiod=14)\n' +
                                   '\n' +
                                   '简介：\n' +
-                                  '    真实波动幅度均值（ATR)是以 N 天的指数移动平均数平均後的交易波动幅度。 \n' +
+                                  '    真实波动幅度均值(ATR)是以 N 天的指数移动平均数平均後的交易波动幅度。 \n' +
                                   '\n' +
                                   '公式：\n' +
                                   '    一天的交易幅度只是单纯地 最大值 - 最小值。\n' +
@@ -7660,7 +7733,7 @@ function init_function_info() {
                                   '特性：\n' +
                                   '    波动幅度的概念表示可以显示出交易者的期望和热情。\n' +
                                   '    大幅的或增加中的波动幅度表示交易者在当天可能准备持续买进或卖出股票。\n' +
-                                  '    波动幅度的减少则表示交易者对股市没有太大的兴趣。',
+                                  '    波动幅度的减少则表示交易者对股市没有太大的兴趣',
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
@@ -7688,8 +7761,8 @@ function init_function_info() {
                                   '\n' +
                                   '公式：\n' +
                                   '    A/D = 昨日A/D + 多空对比 * 今日成交量\n' +
-                                  '    多空对比 = [（收盘价- 最低价） - （最高价 - 收盘价）] / （最高价 - 最低价)\n' +
-                                  '    若最高价等于最低价： 多空对比 = （收盘价 / 昨收盘） - 1\n' +
+                                  '    多空对比 = [(收盘价- 最低价) - (最高价 - 收盘价)] / (最高价 - 最低价)\n' +
+                                  '    若最高价等于最低价： 多空对比 = (收盘价 / 昨收盘) - 1\n' +
                                   '\n' + 
                                   '研判：\n' +
                                   '    1. A/D测量资金流向，向上的A/D表明买方占优势，而向下的A/D表明卖方占优势\n' +
@@ -7726,7 +7799,7 @@ function init_function_info() {
                                   '\n' +
                                   '公式：\n' +
                                   '    以某日为基期，逐日累计每日上市股票总成交量，若隔日指数或股票上涨，则基期OBV加上本日成交量为本日OBV。隔日指数或股票下跌，则基期OBV减去本日成交量为本日OBV\n' +  
-                                  '    多空比率净额 = [（收盘价－最低价）－（最高价-收盘价）] ÷（ 最高价－最低价）×成交量\n' +
+                                  '    多空比率净额 = [(收盘价－最低价)－(最高价-收盘价)] ÷ (最高价－最低价)×成交量\n' +
                                   '\n' + 
                                   '研判：\n' +
                                   '    1. 以“N”字型为波动单位，一浪高于一浪称“上升潮”，下跌称“跌潮”；上升潮买进，跌潮卖出\n' +
