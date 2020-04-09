@@ -161,6 +161,16 @@ class StrategyTrade(TradeModel):
         if not userNo:
             userNo = self._selectedUserNo
             
+        return self.getDataFromTMoneyModel(userNo, 'FloatProfit')
+
+    def getPerProfitLoss(self, userNo):
+        '''
+        :return:当前公式应用的交易帐户的逐笔浮盈
+        '''
+        # 默认usrNo为空字符串（''），此时取当前用户
+        if not userNo:
+            userNo = self._selectedUserNo
+
         return self.getDataFromTMoneyModel(userNo, 'FloatProfitTBT')
 
     def getCoverProfit(self, userNo):
@@ -168,6 +178,13 @@ class StrategyTrade(TradeModel):
         if not userNo:
             userNo = self._selectedUserNo
             
+        return self.getDataFromTMoneyModel(userNo, 'CoverProfit')
+
+    def getPerCoverProfit(self, userNo):
+        # 默认usrNo为空字符串（''），此时取当前用户
+        if not userNo:
+            userNo = self._selectedUserNo
+
         return self.getDataFromTMoneyModel(userNo, 'CoverProfitTBT')
 
     def getTotalFreeze(self, userNo):

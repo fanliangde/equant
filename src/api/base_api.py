@@ -3341,6 +3341,26 @@ class BaseApi(object):
         '''
         return self._dataModel.getProfitLoss(userNo)
 
+    def A_PerProfitLoss(self, userNo):
+        """
+        【说明】
+              返回当前账户的逐笔浮盈。
+
+        【语法】
+              float A_PerProfitLoss(string userNo='')
+
+        【参数】
+              userNo  指定的交易账户，默认当前账户
+
+        【备注】
+              返回指定交易帐户的逐笔浮盈，返回值为浮点数。
+              注：不能使用于历史测试，仅适用于实时行情交易。
+
+        【示例】
+              无
+        """
+        return self._dataModel.getPerProfitLoss(userNo)
+
     def A_CoverProfit(self, userNo):
         '''
         【说明】
@@ -3360,6 +3380,27 @@ class BaseApi(object):
               无
         '''
         return self._dataModel.getCoverProfit(userNo)
+
+    def A_PerCoverProfit(self, userNo):
+        """
+        【说明】
+              返回当前账户的逐笔平盈。
+
+        【语法】
+              float A_PerProfitLoss(string userNo='')
+
+        【参数】
+              userNo  指定的交易账户，默认当前账户
+
+        【备注】
+              返回指定交易帐户的逐笔浮盈，返回值为浮点数。
+              注：不能使用于历史测试，仅适用于实时行情交易。
+
+        【示例】
+              无
+        """
+        return self._dataModel.getPerCoverProfit(userNo)
+
 
     def A_TotalFreeze(self, userNo):
         '''
@@ -7377,8 +7418,14 @@ def A_Margin(userNo=''):
 def A_ProfitLoss(userNo=''):
     return baseApi.A_ProfitLoss(userNo)
 
+def A_PerProfitLoss(userNo=''):
+    return baseApi.A_PerProfitLoss(userNo)
+
 def A_CoverProfit(userNo=''):
     return baseApi.A_CoverProfit(userNo)
+
+def A_PerCoverProfit(userNo=''):
+    return baseApi.A_PerCoverProfit(userNo)
 
 def A_TotalFreeze(userNo=''):
     return baseApi.A_TotalFreeze(userNo)
