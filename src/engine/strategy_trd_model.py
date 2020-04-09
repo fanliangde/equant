@@ -330,7 +330,7 @@ class StrategyTrade(TradeModel):
         if not userNo:
             userNo = self._selectedUserNo
             
-        return self.getItemSumFromPositionModel(userNo, 'B', contNo, 'FloatProfitTBT', lastPrice, contUnit)
+        return self.getItemSumFromPositionModel(userNo, 'B', contNo, 'FloatProfit', lastPrice, contUnit)
 
     def getSellAvgPrice(self, userNo, contNo):
         '''
@@ -392,7 +392,7 @@ class StrategyTrade(TradeModel):
         if not userNo:
             userNo = self._selectedUserNo
             
-        return self.getItemSumFromPositionModel(userNo, 'S', contNo, 'FloatProfitTBT', lastPrice, contUnit)
+        return self.getItemSumFromPositionModel(userNo, 'S', contNo, 'FloatProfit', lastPrice, contUnit)
 
     def getTotalAvgPrice(self, userNo, contNo):
         '''

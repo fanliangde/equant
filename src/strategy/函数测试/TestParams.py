@@ -24,6 +24,5 @@ g_params['日内平仓'] = False
 def initialize(context):
     SetBarInterval("DCE|Z|I|MAIN", 'M', 1, 1)
 
-
 def handle_data(context):
     LogInfo("Lots",  g_params)
