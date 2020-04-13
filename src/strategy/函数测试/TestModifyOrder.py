@@ -8,6 +8,10 @@ cnt = 0
 
 def initialize(context): 
     SetBarInterval("NYMEX|Z|CL|MAIN", 'M', 1, 200)
+
+    #SetBarInterval("NYMEX|F|CL|1910", 'D', 50, 200)
+    #SetBarInterval("ZCE|F|CF|001", 'M', 1, 200)   
+    #SetBarInterval("DCE|F|J|2001", 'D', 30, 10)
     SetActual()
 
 

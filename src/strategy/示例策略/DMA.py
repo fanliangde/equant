@@ -10,6 +10,7 @@ qty = 1
 def initialize(context):
     SetOrderWay(2)
     SetActual()
+
     
 # 历史测回执行逻辑
 def his_trigger(ma1, ma2):
