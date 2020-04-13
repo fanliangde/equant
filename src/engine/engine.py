@@ -301,6 +301,8 @@ class StrategyEngine(object):
                 self.logger.warn(f"engine向策略发事件时阻塞，策略id:{strategyId}, 事件号: {event.getEventCode()}")
 
     def _sendEvent2AllStrategy(self, event):
+        # eg2stQueueDict = copy.deepcopy(self._eg2stQueueDict)
+        # for strategyId in eg2stQueueDict:
         for strategyId in self._eg2stQueueDict:
             eventCopy = copy.deepcopy(event)
             eventCopy.setStrategyId(strategyId)

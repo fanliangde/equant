@@ -1022,7 +1022,7 @@ class Strategy:
         popSessionList  = []
         
         for k, v in self._localOrder.items():
-            if v_userNo in userDict:
+            if v in userDict:
                 popSessionList.append(k)
                     
         for eid in popSessionList:
@@ -1058,6 +1058,12 @@ class Strategy:
     def getOrderFilledPrice(self, eSessionId):
         if eSessionId not in self._localOrder:
             return 0
+        tradeRecord = self._localOrder[eSessionId]
+        return tradeRecord._matchPrice
+
+    def getOrderFilledList(self, eSessionId):
+        if eSessionId not in self._localOrder:
+            return {}
         tradeRecord = self._localOrder[eSessionId]
         return tradeRecord._matchPrice
 

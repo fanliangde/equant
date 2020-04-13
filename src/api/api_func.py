@@ -210,6 +210,7 @@ _all_func_ = {
                     ['A_OrderEntryOrExit'  , '开平标识'],
                     ['A_OrderFilledLot'    , '定单成交数量'],
                     ['A_OrderFilledPrice'  , '定单成交价格'],
+                    ['A_OrderFilledList', '订单的成交情况'],
                     ['A_OrderLot'          , '委托数量'],
                     ['A_OrderPrice'        , '委托价格'],
                     ['A_OrderStatus'       , '定单状态'],

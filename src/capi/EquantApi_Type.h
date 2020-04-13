@@ -982,6 +982,7 @@ typedef struct EEquMatchNotice
 	EEquUpdateTimeType				MatchDateTime;			//更新时间
 	EEquBoolType					AddOne;					//T+1成交
 	EEquBoolType					Deleted;				//是否删除
+	EEquMatchNoType					MatchNo;				//成交号 20200410
 }EEquMatchNotice;
 
 //持仓查询请求结构

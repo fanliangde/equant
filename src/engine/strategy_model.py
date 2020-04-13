@@ -920,6 +920,9 @@ class StrategyModel(object):
     def getOrderFilledPrice(self, userNo, eSession):
         return self._trdModel.getOrderFilledPrice(userNo, eSession)
 
+    def getOrderFilledList(self, userNo, eSession):
+        return self._trdModel.getOrderFilledList(userNo, eSession)
+
     def getOrderLot(self, userNo, eSession):
         return self._trdModel.getOrderLot(userNo, eSession)
 

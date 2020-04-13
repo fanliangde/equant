@@ -522,6 +522,34 @@ class StrategyTrade(TradeModel):
         '''
         return self.getDataByOrderId(eSession, 'MatchPrice', 0.0)
 
+    def getOrderFilledList(self, userNo, eSession):
+        if isinstance(eSession, str) and '-' in eSession:
+            orderId = self._strategy.getOrderId(eSession)
+        else:
+            orderId = eSession
+
+        if not orderId:
+            return []
+
+        realUserNo = self.getUserNoByOrderId(orderId)
+        if realUserNo not in self._userInfo:
+            if not realUserNo:
+                self.logger.error('user(%s) not login!'%realUserNo)
+            return []
+        order = self._userInfo[realUserNo].getOrderDict()
+        if orderId not in order:
+            return []
+
+        orderNo = order[orderId].getMetaData()["OrderNo"]        # 订单信息
+        matchDict = self._userInfo[realUserNo].getMatchDict()   # 成交信息
+        if orderNo not in matchDict:
+            return []
+        # print("AAAAAAAAA: ", matchDict)
+        data = matchDict[orderNo].getMetaData()
+        rlt = []
+        for value in data.values():
+            rlt.append(value)
+        return rlt
 
     def getOrderLot(self, userNo, eSession):
         '''

@@ -1550,6 +1550,7 @@ class PyAPI(object):
                 'MatchDateTime'    : data.MatchDateTime.decode('utf-8'),
                 'AddOne'           : data.AddOne.decode('utf-8'),
                 'Deleted'          : data.Deleted.decode('utf-8'),
+                'MatchNo'          : data.MatchNo.decode('utf-8'),
                 "StrategyId"       : None,
                 "StrategyOrderId"  : None,
             }
@@ -1576,7 +1577,13 @@ class PyAPI(object):
             dataList[i]["StrategyOrderId"] = apiEvent.getESessionId()
         # ==============================================================================================================
         # 发送到引擎
-        apiEvent.setData(dataList)
+        dct = {}
+        for data in dataList:
+            key = (data["MatchNo"], data["Cont"], data["Direct"])
+            dct[key] = data
+
+        # apiEvent.setData(dataList)
+        apiEvent.setData([dct])
         self._api2egQueue.put(apiEvent)
         
     def _onPositionData(self, apiEvent):

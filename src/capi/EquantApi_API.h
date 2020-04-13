@@ -2,7 +2,7 @@
 #define EQUANTAPI_API_H
 
 #include "EquantApi_Type.h"
-
+#include <functional>
 #ifdef LIB_TRADER_API_EXPORT
 #define TRADER_API_EXPORT __declspec(dllexport)
 #else
@@ -11,6 +11,7 @@
 
 //回调函数指针定义
 typedef EEquRetType(*EEqu_SrvFunc)(EEquServiceInfo* service);
+//typedef std::function<EEquRetType(EEquServiceInfo* service)> *EEqu_SrvFunc;
 
 extern "C"
 {

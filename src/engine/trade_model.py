@@ -288,21 +288,25 @@ class TMatchModel:
         self.updateMatch(data)
         
     def updateMatch(self, data):
-        self._metaData['UserNo']            =  data['UserNo']          #             
-        self._metaData['Sign']              =  data['Sign']           
-        self._metaData['Cont']              =  data['Cont']              # 行情合约
-        self._metaData['Direct']            =  data['Direct']            # 买卖方向
-        self._metaData['Offset']            =  data['Offset']            # 开仓平仓 或 应价买入开平
-        self._metaData['Hedge']             =  data['Hedge']             # 投机保值
-        self._metaData['OrderNo']           =  data['OrderNo']           # 委托号
-        self._metaData['MatchPrice']        =  data['MatchPrice']        # 成交价
-        self._metaData['MatchQty']          =  data['MatchQty']          # 成交量
-        self._metaData['FeeCurrency']       =  data['FeeCurrency']       # 手续费币种
-        self._metaData['MatchFee']          =  data['MatchFee']          # 手续费
-        self._metaData['MatchDateTime']     =  data['MatchDateTime']     # 成交时间
-        self._metaData['AddOne']            =  data['AddOne']            # T+1成交
-        self._metaData['Deleted']           =  data['Deleted']           # 是否删除
-        
+        dct = {}
+        dct['UserNo'] = data['UserNo']  #
+        dct['Sign'] = data['Sign']
+        dct['Cont'] = data['Cont']  # 行情合约
+        dct['Direct'] = data['Direct']  # 买卖方向
+        dct['Offset'] = data['Offset']  # 开仓平仓 或 应价买入开平
+        dct['Hedge'] = data['Hedge']  # 投机保值
+        dct['OrderNo'] = data['OrderNo']  # 委托号
+        dct['MatchPrice'] = data['MatchPrice']  # 成交价
+        dct['MatchQty'] = data['MatchQty']  # 成交量
+        dct['FeeCurrency'] = data['FeeCurrency']  # 手续费币种
+        dct['MatchFee'] = data['MatchFee']  # 手续费
+        dct['MatchDateTime'] = data['MatchDateTime']  # 成交时间
+        dct['AddOne'] = data['AddOne']  # T+1成交
+        dct['Deleted'] = data['Deleted']  # 是否删除
+        dct['MatchNo'] = data['MatchNo']  # 成交号
+
+        key = (dct["MatchNo"], dct["Cont"], dct["Direct"])
+        self._metaData[key] = dct
         #self.logger.info("MATCH:%s"%self._metaData)
         
     def getMetaData(self):
@@ -507,13 +511,14 @@ class TradeModel:
     def updateMatchData(self, apiEvent):
         dataList = apiEvent.getData()
         #self.logger.debug("updateMatchData:%s"%dataList)
-        for data in dataList:
-            userNo = data['UserNo']
-            if userNo not in self._userInfo:
-                self.logger.error("[updateMatchData]The user account(%s) doesn't login!"%userNo)
-                continue
-            #self.logger.debug('[MATCH]%s'%data)
-            self._userInfo[userNo].updateMatch(data)
+        for dct in dataList:
+            for key in dct:
+                userNo = dct[key]['UserNo']
+                if userNo not in self._userInfo:
+                    self.logger.error("[updateMatchData]The user account(%s) doesn't login!" % userNo)
+                    continue
+                    # self.logger.debug('[MATCH]%s'%data)
+                self._userInfo[userNo].updateMatch(dct[key])
             
     def updatePosData(self, apiEvent):
         dataList = apiEvent.getData()

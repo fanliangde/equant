@@ -1193,6 +1193,7 @@ class EEquMatchNotice(Structure):
         ('MatchDateTime', c_char*21),		              # 更新时间
         ('AddOne', c_char),					              # T+1成交
         ('Deleted', c_char),				              # 是否删除
+        ('MatchNo', c_char * 21),                         # 成交号
     ]
 
 

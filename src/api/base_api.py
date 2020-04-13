@@ -3790,6 +3790,45 @@ class BaseApi(object):
          '''
         return self._dataModel.getOrderFilledPrice(userNo, localOrderId)
 
+    def A_OrderFilledList(self, userNo, localOrderId):
+        """
+        【说明】
+              返回订单的成交情况信息
+
+        【语法】
+              list A_OrderFilledList(int|string localOrderId='')
+
+        【参数】
+              localOrderId 订单号，或者使用A_SendOrder返回的下单编号。
+
+        【备注】
+              返回指定帐户下当前商品的某个订单的成交信息，返回值为列表，列表中为字典类型，字典类型中包含成交明细。
+              包含信息：
+              'UserNo':          用户名
+              'Sign':            关键字，用于区分连接的服务器
+              'Cont':            行情合约
+              'Direct':          买卖方向
+              'Offset':          开仓平仓 或 应价买入开平
+              'Hedge':           投机保值
+              'OrderNo':         委托号
+              'MatchPrice':      成交价
+              'MatchQty':        成交量
+              'FeeCurrency':     手续费币种
+              'MatchFee':        手续费
+              'MatchDateTime':   成交时间
+              'AddOne':          T+1成交
+              'Deleted':         是否删除
+              'MatchNo':         成交号
+              若订单号所对应的订单无成交信息，则返回空列表[]。
+              注：不能使用于历史测试，仅适用于实时行情交易。
+
+        【示例】
+              无
+        """
+        return self._dataModel.getOrderFilledList(userNo, localOrderId)
+
+
+
     def A_OrderLot(self, userNo, localOrderId):
         '''
         【说明】
@@ -4252,6 +4291,7 @@ class BaseApi(object):
               triggerPrice 触发价格，默认价格为0。
 
         【备注】
+              改单只对下单数量和下单价格生效。
               针对指定帐户、订单发送改单指令，发送成功返回True, 发送失败返回False。
               该函数直接发单，不经过任何确认，并会在每次公式计算时发送，一般需要配合着仓位头寸进行条件处理，在不清楚运行机制的情况下，请慎用。
               注：不能使用于历史测试，仅适用于实时行情交易。
@@ -7483,6 +7523,9 @@ def A_OrderFilledLot(localOrderId):
 
 def A_OrderFilledPrice(localOrderId):
     return baseApi.A_OrderFilledPrice('', localOrderId)
+
+def A_OrderFilledList(localOrderId=0):
+    return baseApi.A_OrderFilledList('', localOrderId)
 
 def A_OrderLot(localOrderId):
     return baseApi.A_OrderLot('', localOrderId)
