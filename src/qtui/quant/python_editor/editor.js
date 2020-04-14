@@ -663,7 +663,7 @@ function get_contents(curr_word) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 /// 代码自动完成
-/// 支持python关键字和操作符
+/// 支持python关键字和操作符及语法块
 /// 支持程序化的所有关键字、函数及其参数
 /// 支持talib函数及其参数
 //////////////////////////////////////////////////////////////////////////////////////////// 
@@ -4457,6 +4457,36 @@ function init_function_info() {
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
+                label           : 'A_PerProfitLoss(userNo)',
+                insertText      : 'A_PerProfitLoss(${1})',
+                detail          : '# 返回指定交易帐户的逐笔浮盈\n' +
+                                  '    float A_PerProfitLoss(string userNo=\'\')\n' +
+                                  '\n' +
+                                  '参数：\n' +
+                                  '    userNo  指定的交易账户，默认当前账户\n' +
+                                  '\n' +
+                                  '备注：\n' +
+                                  '    返回指定交易帐户的逐笔浮盈，返回值为浮点数。\n' +
+                                  '    注：不能使用于历史测试，仅适用于实时行情交易。\n',
+                kind            : monaco.languages.CompletionItemKind.Function,
+                insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            },{
+                label           : 'A_PerCoverProfit(userNo)',
+                insertText      : 'A_PerCoverProfit(${1})',
+                detail          : '# 返回当前账户的逐笔平盈\n' +
+                                  '    float A_PerCoverProfit(string userNo=\'\')\n' +
+                                  '\n' +
+                                  '参数：\n' +
+                                  '    userNo  指定的交易账户，默认当前账户n' +
+                                  '\n' +
+                                  '备注：\n' +
+                                  '    返回当前账户的逐笔平盈，返回值为浮点数。\n' +
+                                  '    注：不能使用于历史测试，仅适用于实时行情交易。\n',
+                kind            : monaco.languages.CompletionItemKind.Function,
+                insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            },
+
+            {
                 label           : 'DeleteAllOrders(contractNo=\'\', userNo=\'\')',
                 insertText      : 'DeleteAllOrders(${1})',
                 detail          : '# 批量撤单函数。\n' +
