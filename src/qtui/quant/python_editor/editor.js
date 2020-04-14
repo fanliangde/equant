@@ -4426,6 +4426,37 @@ function init_function_info() {
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
+                label           : 'A_OrderFilledList(int|string)',
+                insertText      : 'A_OrderFilledList(${1})',
+                detail          : '# 返回指定订单的成交数据列表\n' +
+                                  '    list A_OrderFilledList(int|string localOrderId)\n' +
+                                  '\n' +
+                                  '参数：\n' +
+                                  '    localOrderId: 订单号, 或者使用A_SendOrder返回的下单编号。\n' +
+                                  '\n' +
+                                  '备注：\n' +
+                                  '    返回指定订单的成交数据列表，列表中的每一项都是一笔成交数据，成交数据字典的形式保存。\n' +
+                                  '    以下是每笔成交数据包含的字段信息：\n' +
+                                  '        \'UserNo\'       : 用户名\n' +
+                                  '        \'Sign\'         : 关键字，用于区分连接的服务器\n' +
+                                  '        \'Cont\'         : 行情合约\n' +
+                                  '        \'Direct\'       : 买卖方向\n' +
+                                  '        \'Offset\'       : 开仓平仓 或 应价买入开平\n' +
+                                  '        \'Hedge\'        : 投机保值\n' +
+                                  '        \'OrderNo\'      : 委托号\n' +
+                                  '        \'MatchPrice\'   : 成交价\n' +
+                                  '        \'MatchQty\'     : 成交量\n' +
+                                  '        \'FeeCurrency\'  : 手续费币种\n' +
+                                  '        \'MatchFee\'     : 手续费\n' +
+                                  '        \'MatchDateTime\': 成交时间\n' +
+                                  '        \'AddOne\'       : T+1成交\n' +
+                                  '        \'Deleted\'      : 是否删除\n' +
+                                  '        \'MatchNo\'      : 成交号\n' +
+                                  '    若订单号所对应的订单无成交信息，则返回空列表[]。\n' +
+                                  '    注：不能使用于历史测试，仅适用于实时行情交易。\n',
+                kind            : monaco.languages.CompletionItemKind.Function,
+                insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            },{
                 label           : 'DeleteAllOrders(contractNo=\'\', userNo=\'\')',
                 insertText      : 'DeleteAllOrders(${1})',
                 detail          : '# 批量撤单函数。\n' +

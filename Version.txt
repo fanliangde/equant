@@ -1,4 +1,34 @@
-﻿equant V1.2.0 20200115
+﻿equant V1.2.2 20200414
+
+一、新功能：
+	1. 极星9.5客户端支持深色背景，并且默认为黑色背景
+	2. 保存量化主窗口位置
+	3. 测报告窗增加最大化支持
+	4. 用户参数g_params在initialize函数中生效
+	5. 增加订单成交详情函数A_OrderFilledList()
+	6. 增加量化主进程退出后子进程自动终止（防止python进程残留）
+	7. 增加即时行情函数: 昨收盘价Q_PreClose、结算价Q_SettlePrice、现手(最新成交量)Q_LastVol、委买总量Q_BuyTotalVol、委卖总量Q_SellTotalVol
+	5. 更新资金方式由量化主动查询改为由9.5推送资金信息的方式，解决有些账户函数获取资金存在滞后的问题
+	7. 增加获取逐笔盈亏的函数: 逐笔浮盈A_PerProfitLoss、逐笔平盈A_PerCoverProfit
+
+二、功能改进：
+	1. 修改TimeDiff函数返回值不正确问题
+	2. 修改账户函数取外盘资金信息取不到值问题
+	3. 修改A_TotalProfitLoss、A_BuyProfitLoss、A_SellProfitLoss输出结果错误问题
+	4. 修改获取浮动盈亏A_ProfitLoss、平仓盈亏A_CoverProfit返回值不正确问题
+	5. 修改回测报告成交额计算错误问题
+	6. 修改界面滚动条属性设置方便拖动
+	7. 修复策略恢复文件StrategyContext.json读取失败问题
+	8. 修改实盘阶段发单当日有效字段不正确问题
+	9. 函数GetSessionStartTime()、GetSessionEndTime()增加索引判断
+	10. 修改登录账户断线重连后取不到资金问题
+	11. 修改极星9.5客户端在程序化页面切换策略会出现程序崩溃问题
+	12. 修改极星9.5客户端一直提示连接超时问题
+	13. 修改极星9.5客户端期权策略看涨看跌bug
+
+
+
+equant V1.2.0 20200115
 
 一、新功能：
     1. 代码编辑器的代码自动完成功能, 支持Ctrl + Shift + 空格
