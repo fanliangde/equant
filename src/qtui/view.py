@@ -1763,7 +1763,7 @@ class QuantApplication(QWidget):
 
             preX, preY, preWidth, preHeight = preRect.x(), preRect.y(), preRect.width(), preRect.height()
             pxLeft, pyLeft = (preX, preY)
-            pxRight, pyRight = (preX + preWidth, preY + preHeight)
+            pxRight, pyRight = (preX + preWidth, preY)
             for i in range(srnCount):
                 screenRect = desktop.availableGeometry(i)
                 x, y, sWidth, sHeight = (screenRect.x(), screenRect.y(), screenRect.width(), screenRect.height())
