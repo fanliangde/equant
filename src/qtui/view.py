@@ -1757,9 +1757,28 @@ class QuantApplication(QWidget):
             self.main_splitter.setSizes([self.width * 0.4, self.width * 0.1])
         # 设置主窗口位置
         if self.settings.contains('geometry'):
-            self._master.setGeometry(self.settings.value('geometry'))
+            preRect = self.settings.value('geometry')   # 保存的窗口大小和位置
+            desktop = QApplication.desktop()
+            srnCount = desktop.screenCount()
+
+            preX, preY, preWidth, preHeight = preRect.x(), preRect.y(), preRect.width(), preRect.height()
+            pxLeft, pyLeft = (preX, preY)
+            pxRight, pyRight = (preX + preWidth, preY + preHeight)
+            for i in range(srnCount):
+                screenRect = desktop.availableGeometry(i)
+                x, y, sWidth, sHeight = (screenRect.x(), screenRect.y(), screenRect.width(), screenRect.height())
+                xRight, yRight = (x + sWidth, y + sHeight)
+
+                if (x < pxLeft < xRight and y < pyLeft < yRight) or (x < pxRight < xRight and y < pyRight < yRight):
+                    self._master.setGeometry(self.settings.value('geometry'))
+                    break
+            else:   # 保存的位置不在屏幕显示范围内则显示在默认位置
+                screen = QDesktopWidget().availableGeometry()
+                self._master.setGeometry(screen.width() * 0.1, screen.height() * 0.1, screen.width() * 0.8,
+                                         screen.height() * 0.8)
+
         else:
-            screen = QDesktopWidget().screenGeometry()
+            screen = QDesktopWidget().availableGeometry()
             self._master.setGeometry(screen.width() * 0.1, screen.height() * 0.1, screen.width() * 0.8,
                                      screen.height() * 0.8)
 
