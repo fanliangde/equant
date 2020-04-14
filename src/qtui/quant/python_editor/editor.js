@@ -611,6 +611,15 @@ function add_completions() {
         }
     });
 
+    // 定义
+    // monaco.languages.registerDefinitionProvider('*', {
+    //     provideDefinition: function(model, position) {
+    //         var iword = model.getWordAtPosition(position);
+    //         var curr_word = iword ? iword.word : '';
+    //         return { contents: get_contents(curr_word) };
+    //     }
+    // });
+
     // 函数提示(快捷键提示)
     g_editor.addCommand(monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.Space, function(){
         g_editor.trigger('', 'editor.action.triggerSuggest');
