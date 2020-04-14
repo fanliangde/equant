@@ -7,7 +7,7 @@
 4. 实盘交易需要用户使用各自有效的期货交易账号，并在极星9.5上完成登录。
 
 #### 安装教程  
-1. 下载[极星量化安装包](https://equant-1255628687.cos.ap-beijing.myqcloud.com/equant_pkg_1.2.exe)  
+1. 下载[极星量化安装包](https://equant-1255628687.cos.ap-beijing.myqcloud.com/equant_pkg1.2.2.exe)  
 
 2. 安装过程持续5-10分钟，请勿关闭安装窗口，如需杀毒软件阻拦，请"允许所有操作"  
 
