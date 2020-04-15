@@ -22,8 +22,8 @@ EPVERURl = "https://gitee.com/epolestar/equant/raw/master/EpVerNo.txt"
 equantUrl    = "https://epolestar-master-1255628687.cos.ap-beijing.myqcloud.com/"
 epolestarUrl = "https://epolestar95-1255628687.cos.ap-beijing.myqcloud.com/epolestar.zip"
 
-urls         = [equantUrl, epolestarUrl]
-tags         = ["equant", "epolestar"]
+#urls         = [equantUrl, epolestarUrl]
+#tags         = ["equant", "epolestar"]
 EPOURLTAG    = [epolestarUrl, "epolestar"]
 EQUURLTAG    = [equantUrl, "equant"]
 zipname      = ["equant.zip", "epolestar.zip"]
@@ -47,6 +47,15 @@ logPath = os.path.join(workDir, "equant-master\\src\\log")
 tempPath1 = os.path.join(dirPath, "src\\strategy")
 tempPath2 = os.path.join(dirPath, "src\\config")
 tempPath3 = os.path.join(dirPath, "src\\log")
+
+# 版本号文件名
+verName = "EPOVERSION.txt"
+
+# 服务器上解压后需要删除的文件夹名称
+equDelPath = os.path.join(workDir, "equant-master")
+epoDelPath = os.path.join(workDir, "epolestar")
+verDelPath = os.path.join(workDir, verName)
+
 
 
 # 备份用户文件
@@ -138,8 +147,8 @@ def delzip(filename):
 
 
 def delFile(path):
+    """删除文件夹"""
     if os.path.exists(path):
-        print('%s存在先删除' % path)
         shutil.rmtree(path, onerror=readonly_handler)
         return 1
     return 0
@@ -233,6 +242,7 @@ def checkEquUpdate():
 def checkEpoUpdate():
     global EPVERSION
     try:
+        # 读取epolestar文件夹中的本地版本号和服务器端版本号比对
         if os.path.exists('../epolestar/update.ini'):
             conf_reader = configparser.ConfigParser()
             conf_reader.read('../epolestar/update.ini')
@@ -243,12 +253,12 @@ def checkEpoUpdate():
         rsp = ssn.get(EPVERURl, timeout=10)
         if rsp.status_code == 200:
             rvstr = rsp.content.decode('utf-8')
-            with open('EPOVERSION.txt', 'w') as f:
+            with open(verName, 'w') as f:
                 f.write(rvstr)
 
-            if os.path.exists('EPOVERSION.txt'):
+            if os.path.exists(verName):
                 conf_reader = configparser.ConfigParser()
-                conf_reader.read('EPOVERSION.txt')
+                conf_reader.read(verName)
                 ver = conf_reader.get("version", "cur")
             rmv = ver
             
@@ -265,6 +275,7 @@ def checkEpoUpdate():
 
 
 def main(versionNo=None):
+
     inp = input("------有新版本可以升级！-------\n"
                 "升级过程将自动关闭极星9.5客户端和量化终端；\n"
                 "升级过程将覆盖本地代码，升级程序会自动备份本地代码；\n"
@@ -315,7 +326,7 @@ def main(versionNo=None):
         if chkEpoRlt:
             directory = os.path.abspath(os.path.join(dirPath, "..\\epolestar"))
             #dest = os.path.join(workDir, time_now)
-            dest = os.path.abspath(os.path.join(workDir, "..\\epolestarbackup"+time_now))
+            dest = os.path.abspath(os.path.join(workDir, "..\\epolestarbackup\\"+time_now))
             epobacRlt = backup(directory, dest)
             if epobacRlt == 0:  # 路径不存在
                 print("equant备份数据过程出错！")
@@ -366,6 +377,13 @@ def main(versionNo=None):
                 print("极星客户端升级出错: %s" % ''.join([s.decode('gbk') for s in p.stdout.readlines()]))
                 
         print("更新完成！")
+
+    if os.path.exists(equDelPath):
+        delFile(equDelPath)
+    if os.path.exists(epoDelPath):
+        delFile(epoDelPath)
+    if os.path.exists(verDelPath):
+        os.remove(verDelPath)
 
 
 if __name__ == '__main__':
