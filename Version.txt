@@ -8,8 +8,9 @@
 	5. 增加订单成交详情函数A_OrderFilledList()
 	6. 增加量化主进程退出后子进程自动终止（防止python进程残留）
 	7. 增加即时行情函数: 昨收盘价Q_PreClose、结算价Q_SettlePrice、现手(最新成交量)Q_LastVol、委买总量Q_BuyTotalVol、委卖总量Q_SellTotalVol
-	5. 更新资金方式由量化主动查询改为由9.5推送资金信息的方式，解决有些账户函数获取资金存在滞后的问题
-	7. 增加获取逐笔盈亏的函数: 逐笔浮盈A_PerProfitLoss、逐笔平盈A_PerCoverProfit
+	8. 更新资金方式由量化主动查询改为由9.5推送资金信息的方式，解决有些账户函数获取资金存在滞后的问题
+	9. 增加获取逐笔盈亏的函数: 逐笔浮盈A_PerProfitLoss、逐笔平盈A_PerCoverProfit
+	10. 增加安装日志
 
 二、功能改进：
 	1. 修改TimeDiff函数返回值不正确问题
