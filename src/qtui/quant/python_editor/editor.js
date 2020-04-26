@@ -73,13 +73,17 @@ function init_editor(layoutid, code_str, theme) {
                 scrollBeyondLastLine: true,
                 lineHeight: 24,
                 mouseWheelZoom: true,
+                hover: { 
+                    delay: 1000, 
+                    enabled: true,
+                },
                 scrollbar: {
-                    vertical: 1,
-                    horizontal: 1,
+                    vertical: 'visible',
+                    horizontal: 'visible',
                     useShadows: true,
                     horizontalSliderSize: 7,
-                    verticalSliderSize: 7,
                     horizontalScrollbarSize: 7,
+                    verticalSliderSize: 7,
                     verticalScrollbarSize: 7,
                 },
             }
