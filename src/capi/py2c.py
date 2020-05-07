@@ -1662,12 +1662,12 @@ class PyAPI(object):
         apiEvent.setData(dataList)
         self._api2egQueue.put(apiEvent)
 
-    # 合约映射查询请求
-    def reqSpreadContractMapping(self):
-        sessionId = c_uint()
-        req = EEquSpreadMappingReq()
-        self._cDll.E_ReqQrySpreadMapping(byref(sessionId), byref(req))
-        self._setSessionId(sessionId.value, 0)
+    # # 合约映射查询请求
+    # def reqSpreadContractMapping(self):
+    #     sessionId = c_uint()
+    #     req = EEquSpreadMappingReq()
+    #     self._cDll.E_ReqQrySpreadMapping(byref(sessionId), byref(req))
+    #     self._setSessionId(sessionId.value, 0)
 
     #
     def _onSpreadContractMapping(self, apiEvent):

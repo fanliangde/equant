@@ -1537,16 +1537,17 @@ class ContractSelect(QWidget):
                      "S": "跨期套利", "M": "品种套利", "s": "", "m": "",
                      "y": "", "T": "股票", "X": "外汇",
                      "I": "外汇", "C": "外汇"}
+
     # 外盘保留品种
     FCommodity = {"NYMEX": ["美原油"],
                   "COMEX": ["美铜", "美黄金"],
-                  "HKEX": ["恒指", "小恒指", "H股指", "美元兑人民币", "小H股指"],
+                  # "HKEX": ["恒指", "小恒指", "H股指", "美元兑人民币", "小H股指"],
+                  "HKEX": ["恒指", "小恒指", "H股指", "小H股指"],
                   "CME": ["小标普", "小纳指"],
                   "CBOT": ["小道指", "美黄豆", "美豆粕", "美玉米"],
-                  "ICUS": ["糖11号", "美棉花"],
-                  "ICEU": ["布伦特原油", "富时指数"],
+                  # "ICUS": ["糖11号", "美棉花"],
+                  # "ICEU": ["布伦特原油", "富时指数"],
                   "SGX": ["A50指数"]}
-
     def __init__(self, exchange, commodity, contract, parent=None):
         super().__init__(parent)
         main_layout = QVBoxLayout()
@@ -2613,6 +2614,10 @@ class QuantApplication(QWidget):
     def create_strategy_policy_win(self, param, path, flag):
         # 运行点击槽函数，弹出策略属性设置窗口
         if path:
+            # 判断path是否存在
+            if not os.path.exists(path):
+                MyMessageBox.warning(self, '提示', '策略路径不存在', QMessageBox.Ok)
+                return
             pGeometry = self._controller.mainWnd.frameGeometry()
             self.main_strategy_policy_win = FramelessWindow()
             self.main_strategy_policy_win.resize(pGeometry.width() * 0.4, pGeometry.height() * 0.7)
