@@ -604,7 +604,7 @@ class StrategyEngine(object):
                 if self._stRunStatus[id] != ST_STATUS_CONTINUES:
                     continue
 
-                strategyPos[id] = self._strategyPosDict[id]
+                strategyPos[id] = copy.deepcopy(self._strategyPosDict[id])
             
             posInfo = {
                     "Account"  : accPos,
