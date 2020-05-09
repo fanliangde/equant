@@ -148,7 +148,7 @@ class StrategyConfig_new(object):
         if argDict and isinstance(argDict, dict):
             self._metaData = deepcopy(argDict)
             return
-            
+
         self._metaData = {
             'SubContract' : [],     # 订阅的合约信息，列表中的第一个合约为基准合约
             'Sample'      : {
@@ -333,13 +333,24 @@ class StrategyConfig_new(object):
 
         trigger = self._metaData['Trigger']
 
-        if (setByUI and not trigger['SetByUI']) or (not setByUI and trigger['SetByUI']):
-            # 清空原有Trigger设置信息
-            trigger['SetByUI'] = setByUI
-            trigger['SnapShot'] = False
-            trigger['Trade'] = False
-            trigger['Cycle'] = None
-            trigger['Timer'] = []
+        # if (setByUI and not trigger['SetByUI']) or (not setByUI and trigger['SetByUI']):
+        #     # 清空原有Trigger设置信息
+        #     trigger['SetByUI'] = setByUI
+        #     trigger['SnapShot'] = False
+        #     trigger['Trade'] = False
+        #     trigger['Cycle'] = None
+        #     trigger['Timer'] = []
+        #
+        # if type == 1:
+        #     trigger['SnapShot'] = True
+        # elif type == 2:
+        #     trigger['Trade'] = True
+        # elif type == 3:
+        #     trigger['Cycle'] = value
+        # elif type == 4:
+        #     trigger['Timer'] = value
+        # elif type == 5:
+        #     trigger['KLine'] = True
 
         if type == 1:
             trigger['SnapShot'] = True
@@ -348,7 +359,9 @@ class StrategyConfig_new(object):
         elif type == 3:
             trigger['Cycle'] = value
         elif type == 4:
-            trigger['Timer'] = value
+            for item in value:
+                if item not in trigger['Timer']:
+                    trigger['Timer'].append(item)
         elif type == 5:
             trigger['KLine'] = True
 
