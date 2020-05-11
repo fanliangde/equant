@@ -1274,8 +1274,9 @@ class StrategyHisQuote(object):
         
         # 处理止损止盈
         # latestPos = self._calc.getLatestOpenOrder(contractNo)
-        latestBuyPos = self._calc.getLatestBuyOpenOrder(contractNo)["Order"]
-        latestSellPos = self._calc.getLatestSellOpenOrder(contractNo)["Order"]
+        contNo = self._dataModel.getIndexMap(contractNo)
+        latestBuyPos = self._calc.getLatestBuyOpenOrder(contNo)["Order"]
+        latestSellPos = self._calc.getLatestSellOpenOrder(contNo)["Order"]
         
         # 没有设置止损止盈, 或者没有持仓
         if (not stopLoseParams and not stopWinParams) or (not latestBuyPos and not latestSellPos):
@@ -1462,8 +1463,9 @@ class StrategyHisQuote(object):
     def _stopFloatWinLose(self, contractNo, isHis, data):
         floatStopParams = self._config.getFloatStopPoint(contractNo)
         #latestPos = self._calc.getLatestOpenOrder(contractNo)
-        latestBuyPos = self._calc.getLatestBuyOpenOrder(contractNo)["Order"]
-        latestSellPos = self._calc.getLatestSellOpenOrder(contractNo)["Order"]
+        contNo = self._dataModel.getIndexMap(contractNo)
+        latestBuyPos = self._calc.getLatestBuyOpenOrder(contNo)["Order"]
+        latestSellPos = self._calc.getLatestSellOpenOrder(contNo)["Order"]
     
         if not floatStopParams or (not latestBuyPos and not latestSellPos):
             return
