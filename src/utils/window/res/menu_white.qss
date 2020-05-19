@@ -1,5 +1,5 @@
 QMenu {
-    border: 0px solid #32414B;
+    border: 1px solid #C0C0C0;
     color: #F0F0F0;
     margin: 0px;
 }

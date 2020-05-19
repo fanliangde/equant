@@ -1947,12 +1947,18 @@ class QuantApplication(QWidget):
                     item_path = os.path.split(item_path)[0]
                 desktop = os.path.join(os.path.expanduser("~"), 'Desktop')
                 fname, ftype = QFileDialog.getOpenFileName(self, "打开...", desktop, "python文件(*.py *pyw)")
+                print("AAAAAAAAAAAAA: ", fname, ftype)
                 if fname:
                     _path = item_path + '/' + os.path.split(fname)[1]
+                    (_, temp_file_name) = os.path.split(_path)
+                    (filename, _) = os.path.splitext(temp_file_name)
                     if os.path.exists(_path):
                         reply = MyMessageBox.question(self, '提示', '所选的分组中存在同名文件，是否覆盖？', QMessageBox.Ok | QMessageBox.Cancel)
                         if reply == QMessageBox.Ok:
                             shutil.copy(fname, _path)
+                    elif len(filename.encode()) > 50:
+                        MyMessageBox.warning(self, '提示', '导入策略名长度超过50字节！！', QMessageBox.Ok)
+                        return
                     else:
                         shutil.copy(fname, _path)
                     self.contentEdit.sendOpenSignal(_path)
@@ -1966,7 +1972,8 @@ class QuantApplication(QWidget):
                 item_path = os.path.split(item_path)[0]
             value = ''
             while True:
-                value, ok = getText(self, '新增', '策略名称：')
+                value, ok = getText(self, '新增', '策略名称：', text=value)
+
                 if not value.strip().endswith('.py'):
                     path = '%s/%s.py' % (item_path, value.strip())
                 else:
@@ -1975,6 +1982,9 @@ class QuantApplication(QWidget):
                     MyMessageBox.warning(self, '提示', '策略名%s在选择的分组已经存在！！！' % value.strip(), QMessageBox.Ok)
                 elif not ok:
                     break
+                elif len(value.encode()) > 50:
+                    MyMessageBox.warning(self, '提示', '策略名编码长度超过50字节！！！', QMessageBox.Ok)
+                    continue
                 else:
                     with open(path, 'w', encoding='utf-8') as w:
                         w.write('import talib\n'
@@ -2056,6 +2066,9 @@ class QuantApplication(QWidget):
                         new_path = '%s/%s' % (file_path, value.strip())
                     if os.path.exists(new_path) and ok:
                         MyMessageBox.warning(self, '提示', '策略名%s在此分组中已经存在！！！' % value.strip(), QMessageBox.Ok)
+                    elif len(value.encode()) > 50:
+                        MyMessageBox.warning(self, '提示', '策略名编码长度超过50字节！！！', QMessageBox.Ok)
+                        continue
                     elif not ok:
                         break
                     else:

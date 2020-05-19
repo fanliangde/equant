@@ -4,6 +4,7 @@ from .com_types import *
 from .event import *
 from datetime import datetime
 import numpy as np
+from utils.utils import subString
 
 class PyAPI(object):
     '''与9.5交互api类，单例模式'''
@@ -324,7 +325,7 @@ class PyAPI(object):
         req = EEquKLineStrategySwitch()
         data = event.getData()
         req.StrategyId = event.getStrategyId()
-        req.StrategyName = data['StrategyName'].encode()
+        req.StrategyName = subString(data['StrategyName'].encode(), length=50)
 
         innerContractNo = self.getInnerContractNo(data["ContractNo"])
         req.ContractNo = innerContractNo.encode()
@@ -498,7 +499,8 @@ class PyAPI(object):
         data = event.getData()
         sessionId = c_uint(0)
         _data = EEquKLineSeriesInfo()
-        _data.ItemName = data['ItemName'].encode()  # 具体指标线 名称
+        _data.ItemName = subString(data['ItemName'].encode(), length=50)
+        # _data.ItemName = data['ItemName'].encode()  # 具体指标线 名称
         _data.Type = data['Type']                   # 线型
         _data.Color = data['Color']                 # 颜色
         _data.Thick = data['Thick']                 # 线宽
@@ -509,7 +511,8 @@ class PyAPI(object):
             
         _data.ParamNum = data['ParamNum']           # 参数个数
         _data.Groupid = data['Groupid']             # 组号
-        _data.GroupName = data['GroupName'].encode()    # 组名（指标名）
+        _data.GroupName = subString(data['GroupName'].encode(), length=50)
+        # _data.GroupName = data['GroupName'].encode()    # 组名（指标名）
         _data.Main = ord(data['Main'])              # 0 - 主图 1 - 副图1
         _data.StrategyId = event.getStrategyId()    # 策略ID
         errorCode = self._cDll.E_AddKLineSeriesInfo(byref(sessionId), byref(_data))
@@ -663,7 +666,7 @@ class PyAPI(object):
             data = EEquKLineSeries()
             data.KLineIndex  = d['KLineIndex']
             data.Value       = d['Value']
-            data.KLineSeriesUnion._KLineSeriesStructure5.Text = d['Text'].encode()
+            data.KLineSeriesUnion._KLineSeriesStructure5.Text = subString(d['Text'].encode(), length=19)
             curBuf = cbuf + sizeof(EEquKLineSeries) * i
             cData = string_at(addressof(data), sizeof(EEquKLineSeries))
             memmove(curBuf, cData, sizeof(EEquKLineSeries)) 
@@ -773,7 +776,8 @@ class PyAPI(object):
 
         req = EEquKLineSeriesResult()
         req.StrategyId = event.getStrategyId()
-        req.SeriesName = data['SeriesName'].encode()
+        req.SeriesName = subString(data['SeriesName'].encode(), length=50)
+        # req.SeriesName = data['SeriesName'].encode()
         req.SeriesType = data['SeriesType']
         req.IsMain = ord(data['IsMain'])
         req.Count = data['Count']
@@ -833,7 +837,8 @@ class PyAPI(object):
 
         req = EEquKLineSignalResult()
         req.StrategyId = event.getStrategyId()
-        req.SeriesName = data['SeriesName'].encode()
+        req.SeriesName = subString(data['SeriesName'].encode(), length=50)
+        # req.SeriesName = data['SeriesName'].encode()
         req.Count = data['Count']
         req.Data = cast(cbuf, POINTER(EEquSignalItem))
 

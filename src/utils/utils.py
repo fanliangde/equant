@@ -94,3 +94,38 @@ def parseTime(time):
     tempTime = datetime.strftime(now_, '%Y%m%d')
     return tempTime + time
 
+
+# 含中文字符串截断防止乱码
+def subString(string, length):
+    """
+    :param string: utf-8编码字符串
+    :param length: 字符数
+    :return:
+    """
+    if length >= len(string):
+        return string
+
+    result = ""
+    i = 0
+    p = 0
+    while True:
+        ch = ord(string[i]) if type(string[0]) == str else string[i]
+        if ch >= 252:
+            p = p + 6
+        elif ch >= 248:
+            p = p + 5
+        elif ch >= 240:
+            p = p + 4
+        elif ch >= 224:
+            p = p + 3
+        elif ch >= 192:
+            p = p + 2
+        else:
+            p = p + 1
+
+        if p > length:
+            break
+        else:
+            i = p
+    return string[0:i]
+
