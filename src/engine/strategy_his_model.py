@@ -256,14 +256,20 @@ class StrategyHisQuote(object):
             return -1
         firstIndex = kLineHisData[0]['KLineIndex']
         lastIndex  = kLineHisData[-1]['KLineIndex']
+
+        curBar = self._curBarDict[multiContKey].getCurBar()
+        curBarIndex = curBar['KLineIndex']
         
         if multiContKey in self._kLineNoticeData:
             kLineNoticeData = self._kLineNoticeData[multiContKey]['KLineData']
             if len(kLineNoticeData) > 0:
                 lastIndex = kLineNoticeData[-1]['KLineIndex']
+                # 实盘阶段时，直接给当前index赋值
+                if self._strategy.isRealTimeStatus():
+                    curBarIndex = lastIndex
 
-        curBar = self._curBarDict[multiContKey].getCurBar()
-        curBarIndex = curBar['KLineIndex']
+        # curBar = self._curBarDict[multiContKey].getCurBar()
+        # curBarIndex = curBar['KLineIndex']
         
         if curBarIndex == firstIndex:
             return 0
