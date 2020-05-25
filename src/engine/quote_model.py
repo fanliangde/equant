@@ -38,8 +38,10 @@ class QuoteModel:
     def updateExchangeStatus(self, apiEvent):
         dataList = apiEvent.getData()
         strategyId = apiEvent.getStrategyId()
+
         for dataDict in dataList:
             if dataDict['ExchangeNo'] not in self._exchangeData:
+                self._exchangeData[dataDict['ExchangeNo']] = ExchangeModel(self.logger, dataDict)
                 self.logger.error("updateExchangeStatus exchangeno(%s) error!"%dataDict['ExchangeNo'])
                 continue
             exchangeModel = self._exchangeData[dataDict['ExchangeNo']]

@@ -33,6 +33,24 @@ class StrategyEngine(object):
     def _initialize(self):
         '''进程中初始化函数'''
         self.logger.info('Initialize strategy engine!')
+
+        # _commodityFilter的位置有可能会影响交易所状态更新
+        self._commdityFilter = [
+            'SPD', 'DCE', 'SHFE', 'CFFEX', 'INE', 'LME',
+            'ZCE|F', 'ZCE|O', 'ZCE|M', 'ZCE|S', 'ZCE|Z',
+            'CBOT|F|YM', 'CBOT|F|S', 'CBOT|F|ZM', 'CBOT|F|C',
+            'CBOT|Z|YM', 'CBOT|Z|S', 'CBOT|Z|ZM', 'CBOT|Z|C',
+            'CME|F|ES', 'CME|F|NQ', 'COMEX|F|HG', 'COMEX|F|GC',
+            'CME|Z|ES', 'CME|Z|NQ', 'COMEX|Z|HG', 'COMEX|Z|GC',
+            'NYMEX|F|CL', 'ICUS|F|SB', 'ICUS|F|CT',
+            'NYMEX|Z|CL', 'ICUS|Z|SB', 'ICUS|Z|CT',
+            'NYMEX|O|CL', 'COMEX|O|GC',
+            'ICEU|F|B', 'ICEU|F|Z', 'SGX|F|CN',
+            'ICEU|Z|B', 'ICEU|Z|Z', 'SGX|Z|CN',
+            'HKEX|F|HSI', 'HKEX|F|MHI', 'HKEX|F|HHI', 'HKEX|F|ICUS', 'HKEX|F|MCH',
+            'HKEX|Z|HSI', 'HKEX|Z|MHI', 'HKEX|Z|HHI', 'HKEX|Z|ICUS', 'HKEX|Z|MCH',
+            'SGE',
+        ]
         
         # 数据模型
         self._dataModel = DataModel(self.logger)
@@ -100,23 +118,6 @@ class StrategyEngine(object):
         
         # 启动1秒定时器
         self._start1secondsTimer()
-        
-        self._commdityFilter = [
-            'SPD', 'DCE', 'SHFE', 'CFFEX', 'INE', 'LME',
-            'ZCE|F', 'ZCE|O', 'ZCE|M', 'ZCE|S', 'ZCE|Z',
-            'CBOT|F|YM', 'CBOT|F|S', 'CBOT|F|ZM', 'CBOT|F|C',
-            'CBOT|Z|YM', 'CBOT|Z|S', 'CBOT|Z|ZM', 'CBOT|Z|C',
-            'CME|F|ES', 'CME|F|NQ', 'COMEX|F|HG', 'COMEX|F|GC',
-            'CME|Z|ES', 'CME|Z|NQ', 'COMEX|Z|HG', 'COMEX|Z|GC',
-            'NYMEX|F|CL', 'ICUS|F|SB', 'ICUS|F|CT',
-            'NYMEX|Z|CL', 'ICUS|Z|SB', 'ICUS|Z|CT',
-            'NYMEX|O|CL', 'COMEX|O|GC',
-            'ICEU|F|B', 'ICEU|F|Z', 'SGX|F|CN',
-            'ICEU|Z|B', 'ICEU|Z|Z', 'SGX|Z|CN',
-            'HKEX|F|HSI','HKEX|F|MHI','HKEX|F|HHI','HKEX|F|ICUS','HKEX|F|MCH',
-            'HKEX|Z|HSI','HKEX|Z|MHI','HKEX|Z|HHI','HKEX|Z|ICUS','HKEX|Z|MCH',
-            'SGE',
-        ]
         
         self.logger.debug('Initialize strategy engine ok!')
 
