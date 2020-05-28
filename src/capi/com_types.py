@@ -603,6 +603,16 @@ LastPriceFromKLine          = 10001
 KLineFromHis                = 20000
 KLineFromRealTime           = 20001
 
+# 不同K线类型最大数量
+TickKLineMaxCount           = 160000        # 分笔
+SecondKLineMaxCount         = 160000        # 秒线
+DayKLineMaxCount            = 2000          # 日线
+MinuteKLineMaxCount         = 80000         # 分钟线
+
+
+# 按日期订阅Tick类型K线时每次取数据的最大根数
+MaxCountTick                = 40000
+
 class EEquExchangeReq(Structure):
     """交易所信息查询请求"""
     _pack_ = 1

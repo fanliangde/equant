@@ -1389,6 +1389,10 @@ class PyAPI(object):
 
             dataList.append(idict)
 
+        # print("收到数据长度: ", len(dataList))
+        # print("收到的第一个数据: ", dataList[0])
+        # print("收到的最后一个数据: ", dataList[-1])
+
         # 发送到引擎
         # print("[in py2c] ", len(dataList), apiEvent.getContractNo(), apiEvent.getKLineType(), apiEvent.getKLineSlice(), apiEvent.isChainEnd())
         apiEvent.setData(dataList)

@@ -500,6 +500,7 @@ class StrategyHisQuote(object):
     def _getKLineSlice(self):
         return self._config.getKLineSlice()
 
+    # 没用了
     def _getKLineCount(self, sampleDict):
         if not sampleDict['UseSample']:
             return 1
@@ -566,11 +567,30 @@ class StrategyHisQuote(object):
                 self.reqAndSubKLineByCount(key[0], key[1], key[2], countOrDate, EEQU_NOTICE_NEED)
             else:
                 self._isReqByDate[key] = True
-                self._isReqByDateEnd[key] = False
-                self._reqBeginDate[key] = int(countOrDate + (dateTimeStampLength - len(countOrDate)) * '0')
+                # 当为Tick数据时一次请求数据可能请求不完
+                self._isReqByDateEnd[key] = False if key[1] == EEQU_KLINE_TICK else True
+                if StrategyHisQuote.isVaildDate(countOrDate, "%Y%m%d"):
+                    self._reqBeginDate[key] = int(countOrDate + (dateTimeStampLength - len(countOrDate)) * '0')
+                else:
+                    raise("订阅数据时填入的日期格式不正确！")
                 self._reqKLineTimes[key] = 1
-                count = self._reqKLineTimes[key] * 4000
-                self.reqAndSubKLineByCount(key[0], key[1], key[2], count, EEQU_NOTICE_NOTNEED)
+                subCount = self.calBarCount(key[0], key[1], self._reqBeginDate[key])
+                # 按日期取K线转换为按K线数量取提高取数据速度
+                # 先算出设定的开始日期距离当前日期的天数，然后再按照K线类型计算不同K线类型能取的K线根数
+                # 对于K线类型为Tick和秒线的，按每次40000根取
+                if key[1] == EEQU_KLINE_TICK:
+                    # 等接收完数据再接收更新通知
+                    self.reqAndSubKLineByCount(key[0], key[1], key[2], subCount, EEQU_NOTICE_NOTNEED)
+                else:
+                    self.reqAndSubKLineByCount(key[0], key[1], key[2], subCount, EEQU_NOTICE_NEED)
+
+    @staticmethod
+    def isVaildDate(date, format):
+        try:
+            time.strptime(date, format)
+            return True
+        except:
+            return False
 
     def _handleKLineRspData(self, event):
         key = (event.getContractNo(), event.getKLineType(), event.getKLineSlice())
@@ -598,7 +618,8 @@ class StrategyHisQuote(object):
 
     def _handleKLineRspByDate(self, event):
         key = (event.getContractNo(), event.getKLineType(), event.getKLineSlice())
-        if not self._isReqByDateEnd[key]:
+
+        if not self._isReqByDateEnd[key]:    # 针对tick数据的情况
             self._insertHisRspData(event)
             self._updateRspDataRefDTS(event)
             if event.isChainEnd():
@@ -608,28 +629,72 @@ class StrategyHisQuote(object):
 
     #
     def _isReqByDateContinue(self,  event):
+
         assert event.isChainEnd(), " error call"
         key = (event.getContractNo(), event.getKLineType(), event.getKLineSlice())
+        subCount = self.calBarCount(key[0], key[1], self._reqBeginDate[key])
         if self._curEarliestKLineDateTimeStamp[key] <= self._reqBeginDate[key]:
             self._isReqByDateEnd[key] = True
-            self.reqAndSubKLineByCount(key[0], key[1], key[2], self._reqKLineTimes[key] * 4000, EEQU_NOTICE_NEED)
+            self.reqAndSubKLineByCount(key[0], key[1], key[2], self._reqKLineTimes[key] * subCount, EEQU_NOTICE_NEED)
+
         # 9.5 lack data
         elif self._curEarliestKLineDateTimeStamp[key] == self._lastEarliestKLineDateTimeStamp[key]:
             self._isReqByDateEnd[key] = True
-            self.reqAndSubKLineByCount(key[0], key[1], key[2], self._reqKLineTimes[key] * 4000, EEQU_NOTICE_NEED)
+            self.reqAndSubKLineByCount(key[0], key[1], key[2], self._reqKLineTimes[key] * subCount, EEQU_NOTICE_NEED)
         # local lack data
         elif self._curEarliestKLineDateTimeStamp[key] > self._reqBeginDate[key]:
             self._reqKLineTimes[key] += 1
-            self.reqAndSubKLineByCount(key[0], key[1], key[2], self._reqKLineTimes[key] * 4000, EEQU_NOTICE_NOTNEED)
+            self.reqAndSubKLineByCount(key[0], key[1], key[2], self._reqKLineTimes[key] * subCount, EEQU_NOTICE_NOTNEED)
             self._lastEarliestKLineDateTimeStamp[key] = self._curEarliestKLineDateTimeStamp[key]
         else:
             raise IndexError("can't be this case")
+
+    def calBarCount(self, contractNo, kLineType, date):
+        # 根据K线类型和订阅的K线开始时间计算
+        dayDelta = StrategyHisQuote.calDayDelta(date)
+        count = 0
+
+        if kLineType == EEQU_KLINE_DAY:
+            count = dayDelta
+
+        # TODO： 按交易时段计算count
+        elif kLineType == EEQU_KLINE_HOUR:
+            # 按每天24小时去取
+            count = 24 * dayDelta if count <= MinuteKLineMaxCount else MinuteKLineMaxCount
+        elif kLineType == EEQU_KLINE_MINUTE:
+            # 按每天最大的分钟数去取
+            count = 24*60 * dayDelta if count <= MinuteKLineMaxCount else MinuteKLineMaxCount
+        elif kLineType == EEQU_KLINE_SECOND:
+            # 按每天最大的秒数去取
+            count = 24 * 60 * 60 if count <= SecondKLineMaxCount else SecondKLineMaxCount
+
+        elif kLineType == EEQU_KLINE_TICK:
+            count = dayDelta * MaxCountTick if count <= TickKLineMaxCount else TickKLineMaxCount
+        else:
+           raise Exception("订阅的K线类型错误！")
+        return count
+
+    @staticmethod
+    def calDayDelta(date):
+        # 计算传入的日期与当前日期之间的天数
+        from dateutil.parser import parse
+        try:
+            beginDay = parse(str(date)[0:8])
+        except:
+            raise Exception("订阅K线时所填时间格式不正确！")
+
+        nowDayString = datetime.strftime(datetime.now(), "%Y%m%d")
+        nowDay = parse(nowDayString)
+
+        delta = (nowDay - beginDay).days + 1
+        return delta
 
     def _handleKLineRspByCount(self, event):
         self._handleKLineRspData(event)
 
     # response 数据
     def onHisQuoteRsp(self, event):
+
         key = (event.getContractNo(), event.getKLineType(), event.getKLineSlice())
         # print("key = ", key, len(event.getData()), event.isChainEnd(), key)
         # assert kindInfo in self._config.getKLineKindsInfo(), " Error "

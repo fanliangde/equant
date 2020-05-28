@@ -5,11 +5,9 @@ from copy import deepcopy
 import talib
 import time, sys
 import datetime
-from dateutil.relativedelta import relativedelta
 import copy
 import math
 import pandas as pd
-from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
 
@@ -788,6 +786,7 @@ class StrategyConfig_new(object):
         return kLineTypetupleList, kLineTypeDictList, subDict
 
     def _getKLineCount(self, sampleDict):
+        # 选择不使用样本数据则默认订阅一根K线
         if not sampleDict['UseSample']:
             return 1
 
@@ -798,21 +797,20 @@ class StrategyConfig_new(object):
             return sampleDict['BeginTime']
 
         if sampleDict['AllK']:
-            nowDateTime = datetime.now()
+            # 订阅所有K线时直接按客户端设置的K线最大数据量取
             if self.getKLineType() == EEQU_KLINE_DAY:
-                threeYearsBeforeDateTime = nowDateTime - relativedelta(years=3)
-                threeYearsBeforeStr = datetime.strftime(threeYearsBeforeDateTime, "%Y%m%d")
-                return threeYearsBeforeStr
+                return DayKLineMaxCount
             elif self.getKLineType() == EEQU_KLINE_HOUR or self.getKLineType() == EEQU_KLINE_MINUTE:
-                oneMonthBeforeDateTime = nowDateTime - relativedelta(months=1)
-                oneMonthBeforeStr = datetime.strftime(oneMonthBeforeDateTime, "%Y%m%d")
-                return oneMonthBeforeStr
+                return MinuteKLineMaxCount
             elif self.getKLineType() == EEQU_KLINE_SECOND:
-                oneWeekBeforeDateTime = nowDateTime - relativedelta(days=7)
-                oneWeekBeforeStr = datetime.strftime(oneWeekBeforeDateTime, "%Y%m%d")
-                return oneWeekBeforeStr
+                # oneWeekBeforeDateTime = nowDateTime - relativedelta(days=7)
+                # oneWeekBeforeStr = datetime.strftime(oneWeekBeforeDateTime, "%Y%m%d")
+                # return oneWeekBeforeStr
+                return SecondKLineMaxCount
+            elif self.getKLineType() == EEQU_KLINE_TICK:
+                return TickKLineMaxCount
             else:
-                raise NotImplementedError
+                raise Exception("订阅的K线类型错误！")
 
     def getKLineSubsInfo(self):
         kLineTypetupleList, kLineTypeDictList, subDict = self.getSampleInfo()
