@@ -20,21 +20,21 @@ def initialize(context):
 
 # 策略执行函数，策略触发事件每次触发时都会调用一次
 def handle_data(context):
-    # 全局变量, 若要将修改后的变量值保存下来，则需要在
+    # 全局变量, 若要将修改后的变量值保存下来，则需要用global在函数内对变量进行标记
     global ord_bar
 
     # 局部变量
     ind = CurrentBar()
 
     # 条件语句1
-    if ind > 10 and ind < 15:
-        print('A', ind)
-    elif ind > 20 and ind < 30:
-        print('B', ind)
-    elif ind == 18 or ind == 38:
-        print('C', ind)
+    if ind > 10 and ind < 20:
+        LogInfo('A', ind)
+    elif ind < 30 or ind > 40:
+        LogInfo('B', ind)
+    elif ind in [35, 38]:
+        LogInfo('C', ind)
     else:
-        print('D', ind)
+        LogInfo('D', ind)
         
     # 条件语句2
     val = Q_BidPrice() if Q_BidVol() > Q_AskVol() else Q_AskPrice()
@@ -43,13 +43,13 @@ def handle_data(context):
     for prc in Close():
         if prc > 2000:
             break
-        print(prc)
+        LogInfo(prc)
 
     # 循环语句2
     for i in Range(0, 9):
         if i == 5:
             continue
-        print(i)
+        LogInfo(i)
 
     # 策略参数的使用
     ma1 = talib.MA(Close(), g_params['p1'])    
@@ -72,6 +72,8 @@ def handle_data(context):
     # 绘制策略线
     PlotNumeric('ma1', ma1, 0xff0000)
     PlotNumeric('ma2', ma2, 0x0000ff)
+    # 盈亏曲线, 副图展示
+    PlotNumeric('profit', NetProfit() - TradeCost(), RGB_Purple(), False)
 
 # 历史回测阶段结束时执行该函数一次
 def hisover_callback(context):    

@@ -1948,12 +1948,15 @@ class StrategyModel(object):
         return float(currentTime)
         
     def _gethms(self, time):
-        itime = int((time + 1e-9) * 1000000)
+        itime = math.modf(time * 1000000)[1]
         hh,mm,ss = 0, 0, 0
-        if itime > 0:
+        if itime > 0:            
+            ss = int(itime % 100)
+            if ss >= 60:
+                itime += (100 - ss)
+                ss = int(itime % 100)
             hh = int(itime / 10000)
             mm = int((itime % (10000)) / 100)
-            ss = itime % 100
             
         return hh, mm, ss
         
