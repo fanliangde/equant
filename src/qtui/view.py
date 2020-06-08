@@ -304,8 +304,8 @@ class StrategyPolicy(QWidget):
         left_layout = QHBoxLayout()
         self.contractTableWidget = QTableWidget()
         self.contractTableWidget.setObjectName("ContractTableWidget")
-        self.contractTableWidget.setColumnCount(5)
-        self.contractTableWidget.setHorizontalHeaderLabels(['合约', 'K线类型', 'K线周期', '运算起始点', 'data'])
+        self.contractTableWidget.setColumnCount(6)
+        self.contractTableWidget.setHorizontalHeaderLabels(['合约', 'K线类型', 'K线周期', '运算起始点', 'data', ''])
         # self.contractTableWidget.horizontalHeader().setStretchLastSection(True)
         self.contractTableWidget.horizontalHeader().setHighlightSections(False)  # 关闭高亮头
         self.contractTableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
@@ -717,6 +717,11 @@ class StrategyPolicy(QWidget):
             row = self.contractWin.row
         else:
             row = self.contractTableWidget.rowCount()
+
+            # 设置基准合约标志
+            if row == 0:
+                items.append("基准合约")
+
             sample_dict_list = []
             for i in range(row):
                 sample_dict_list.append(json.loads(self.contractTableWidget.item(i, 4).text()))
@@ -912,7 +917,8 @@ class StrategyPolicy(QWidget):
         contsInfo = []
         for i in range(self.contractTableWidget.rowCount()):
             contValues = []
-            for j in range(self.contractTableWidget.columnCount()):
+            # 排除最后一列"基准合约"
+            for j in range(self.contractTableWidget.columnCount()-1):
                 contValues.append(self.contractTableWidget.item(i, j).text())
             contsInfo.append(contValues)
 
@@ -1293,6 +1299,11 @@ class StrategyPolicy(QWidget):
     def insert_contract_row(self, values):
         """在合约table中插入一行"""
         row = self.contractTableWidget.rowCount()
+
+        # 第一行增加"基准合约"标志
+        if row == 0:
+            values.append("基准合约")
+
         self.contractTableWidget.setRowCount(row + 1)
         for j in range(len(values)):
             item = QTableWidgetItem(str(values[j]))
