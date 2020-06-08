@@ -19,7 +19,7 @@ from tkinter import Tk
 
 
 
-class StartegyManager(object):
+class StrategyManager(object):
     '''策略进程管理器，负责进程创建、销毁、暂停等'''
 
     def __init__(self, logger, st2egQueue):
@@ -353,7 +353,12 @@ class Strategy:
 
         # 策略所在进程状态, Ready、Running、Exit、Pause
         self._strategyState = StrategyStatusReady
-        #
+
+        # 策略异常时策略是否在界面上的策略列表中显示
+        # 当策略没有执行handle_data就引起异常时，策略将不会在界面上显示
+        # 辅助更新本地保存的最大策略编号
+        self._isShowForException = True
+
         self._runStatus = ST_STATUS_NONE
         self._curTriggerSourceInfo = None
         self._firstTriggerQueueEmpty = True
@@ -508,6 +513,7 @@ class Strategy:
         except Exception as e:
             self._strategyState = StrategyStatusExit
             self._isSt2EgQueueEffective = False
+            self._isShowForException = False
             errorText = traceback.format_exc()
             # traceback.print_exc()
             self._exit(-1, errorText)
@@ -1204,15 +1210,19 @@ class Strategy:
         self._triggerQueue.put(event)
 
     def _exit(self, errorCode, errorText):
+        # "IsShowFlag"表示策略异常时是否在界面上
         event = Event({
             "EventCode": EV_EG2UI_CHECK_RESULT,
             "StrategyId": self._strategyId,
             "Data": {
+                "IsShowFlag": self._isShowForException,
                 "ErrorCode": errorCode,
                 "ErrorText": errorText,
             }
         })
+        # 策略调试信息发送到引擎，由引擎发送到界面
         self.sendEvent2EngineForce(event)
+
         self._onStrategyQuit(None, ST_STATUS_EXCEPTION)
 
     # 停止策略

@@ -7,6 +7,7 @@ import copy
 import math
 import pandas as pd
 import traceback
+from dateutil.parser import parse
 
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
@@ -569,11 +570,11 @@ class StrategyHisQuote(object):
                 self._isReqByDate[key] = True
                 # 当为Tick数据时一次请求数据可能请求不完
                 self._isReqByDateEnd[key] = False if key[1] == EEQU_KLINE_TICK else True
+                self._reqKLineTimes[key] = 1
                 if StrategyHisQuote.isVaildDate(countOrDate, "%Y%m%d"):
                     self._reqBeginDate[key] = int(countOrDate + (dateTimeStampLength - len(countOrDate)) * '0')
                 else:
                     raise("订阅数据时填入的日期格式不正确！")
-                self._reqKLineTimes[key] = 1
                 subCount = self.calBarCount(key[0], key[1], self._reqBeginDate[key])
                 # 按日期取K线转换为按K线数量取提高取数据速度
                 # 先算出设定的开始日期距离当前日期的天数，然后再按照K线类型计算不同K线类型能取的K线根数
@@ -677,7 +678,6 @@ class StrategyHisQuote(object):
     @staticmethod
     def calDayDelta(date):
         # 计算传入的日期与当前日期之间的天数
-        from dateutil.parser import parse
         try:
             beginDay = parse(str(date)[0:8])
         except:

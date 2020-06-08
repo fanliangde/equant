@@ -3,7 +3,7 @@
 from multiprocessing import Process, Queue
 import multiprocessing
 from threading import Thread
-from .strategy import StartegyManager
+from .strategy import StrategyManager
 from capi.py2c import PyAPI
 from capi.event import *
 from capi.com_types import *
@@ -73,7 +73,7 @@ class StrategyEngine(object):
         # 策略编号，自增
         self._maxStrategyId = 1
         # 创建策略管理器
-        self._strategyMgr = StartegyManager(self.logger, self._st2egQueue)
+        self._strategyMgr = StrategyManager(self.logger, self._st2egQueue)
         
         # 策略进程队列列表
         self._eg2stQueueDict = {} #{strategy_id, queue}
@@ -97,6 +97,9 @@ class StrategyEngine(object):
         
         # 查询sessionId和账号对应关系
         self._SessionUserMap = {}
+
+        # 策略在UI显示情况
+        self._isShowInUIDict = {}
         
         # 策略虚拟持仓
         self._strategyPosDict = {}
@@ -357,6 +360,8 @@ class StrategyEngine(object):
         return id
 
     def _loadStrategy(self, event, strategyId = None):
+        # 加载策略前先更新策略最大Id
+        self._updateMaxStrategyId()
         id = self._getStrategyId() if strategyId is None else strategyId
         eg2stQueue = Queue(20000)
         self._eg2stQueueDict[id] = eg2stQueue
@@ -364,9 +369,16 @@ class StrategyEngine(object):
         # broken pip error 修复
         self._isEffective[id] = True
         self._isSt2EngineDataEffective[id] = True
+        # 策略创建成功后在界面上显示的标志位设为True
+        self._isShowInUIDict[id] = True
 
         # =================
         self._sendEvent2Strategy(id, event)
+
+    def _updateMaxStrategyId(self):
+        ids = [k for k, v in self._isShowInUIDict.items() if v]
+
+        self._maxStrategyId = max(ids) + 1 if ids else 1
 
     def _loadStrategyResponse(self, event):
         self.sendEvent2UI(event)
@@ -1540,6 +1552,11 @@ class StrategyEngine(object):
         self.sendEvent2UI(event)
 
     def _checkResponse(self, event):
+        # 记录策略因为异常是否在界面上显示
+        sid = event.getStrategyId()
+        data = event.getData()
+        self._isShowInUIDict[sid] = data["IsShowFlag"]
+
         self.sendEvent2UI(event)
 
     def _monitorResponse(self, event):
@@ -1690,6 +1707,10 @@ class StrategyEngine(object):
         # 异常状态
         elif self._strategyMgr.getStrategyState(strategyId) == ST_STATUS_EXCEPTION:
             self._strategyMgr.removeExceptionStrategy(event)
+
+        # 策略移除时更新
+        self._isShowInUIDict.pop(event.getStrategyId())
+        self._updateMaxStrategyId()
 
     def _onStrategyRemoveCom(self, event):
         self.sendEvent2UI(event)
