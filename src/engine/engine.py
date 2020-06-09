@@ -1709,7 +1709,8 @@ class StrategyEngine(object):
             self._strategyMgr.removeExceptionStrategy(event)
 
         # 策略移除时更新
-        self._isShowInUIDict.pop(event.getStrategyId())
+        if event.getStrategyId() in self._isShowInUIDict.keys():
+            self._isShowInUIDict.pop(event.getStrategyId())
         self._updateMaxStrategyId()
 
     def _onStrategyRemoveCom(self, event):
