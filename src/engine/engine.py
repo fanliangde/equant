@@ -178,6 +178,7 @@ class StrategyEngine(object):
             })
             self.sendEvent2UI(fakeEvent)
             self._strategyMgr.insertResumedStrategy(strategyId, fakeEvent.getData())
+            self._isShowInUIDict[strategyId] = True
 
     def _regApiCallback(self):
         self._apiCallbackDict = {
@@ -379,6 +380,7 @@ class StrategyEngine(object):
         ids = [k for k, v in self._isShowInUIDict.items() if v]
 
         self._maxStrategyId = max(ids) + 1 if ids else 1
+
 
     def _loadStrategyResponse(self, event):
         self.sendEvent2UI(event)

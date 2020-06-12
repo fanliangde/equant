@@ -838,6 +838,7 @@ class StrategyConfig_new(object):
         for key in kLineTypetupleList:
             result.setdefault(key[0], key)
             lastKey = result.get(key[0])
+            # 为了避免小周期k线和大周期k线重复触发，只取小周期K线类型
             if self.periodSize[key[1]]*key[2] < self.periodSize[lastKey[1]]*lastKey[2]:
                 result[key[0]] = key
 

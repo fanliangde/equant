@@ -501,33 +501,33 @@ class StrategyHisQuote(object):
     def _getKLineSlice(self):
         return self._config.getKLineSlice()
 
-    # 没用了
-    def _getKLineCount(self, sampleDict):
-        if not sampleDict['UseSample']:
-            return 1
-
-        if sampleDict['KLineCount'] > 0:
-            return sampleDict['KLineCount']
-
-        if len(sampleDict['BeginTime']) > 0:
-            return sampleDict['BeginTime']
-
-        if sampleDict['AllK']:
-            nowDateTime = datetime.now()
-            if self._getKLineType() == EEQU_KLINE_DAY:
-                threeYearsBeforeDateTime = nowDateTime - relativedelta(years = 3)
-                threeYearsBeforeStr = datetime.strftime(threeYearsBeforeDateTime, "%Y%m%d")
-                return threeYearsBeforeStr
-            elif self._getKLineType() == EEQU_KLINE_HOUR or self._getKLineType() == EEQU_KLINE_MINUTE:
-                oneMonthBeforeDateTime = nowDateTime - relativedelta(months = 1)
-                oneMonthBeforeStr = datetime.strftime(oneMonthBeforeDateTime, "%Y%m%d")
-                return oneMonthBeforeStr
-            elif self._getKLineType() == EEQU_KLINE_SECOND:
-                oneWeekBeforeDateTime = nowDateTime - relativedelta(days = 7)
-                oneWeekBeforeStr = datetime.strftime(oneWeekBeforeDateTime, "%Y%m%d")
-                return oneWeekBeforeStr
-            else:
-                raise NotImplementedError
+    # # 没用了
+    # def _getKLineCount(self, sampleDict):
+    #     if not sampleDict['UseSample']:
+    #         return 1
+    #
+    #     if sampleDict['KLineCount'] > 0:
+    #         return sampleDict['KLineCount']
+    #
+    #     if len(sampleDict['BeginTime']) > 0:
+    #         return sampleDict['BeginTime']
+    #
+    #     if sampleDict['AllK']:
+    #         nowDateTime = datetime.now()
+    #         if self._getKLineType() == EEQU_KLINE_DAY:
+    #             threeYearsBeforeDateTime = nowDateTime - relativedelta(years = 3)
+    #             threeYearsBeforeStr = datetime.strftime(threeYearsBeforeDateTime, "%Y%m%d")
+    #             return threeYearsBeforeStr
+    #         elif self._getKLineType() == EEQU_KLINE_HOUR or self._getKLineType() == EEQU_KLINE_MINUTE:
+    #             oneMonthBeforeDateTime = nowDateTime - relativedelta(months = 1)
+    #             oneMonthBeforeStr = datetime.strftime(oneMonthBeforeDateTime, "%Y%m%d")
+    #             return oneMonthBeforeStr
+    #         elif self._getKLineType() == EEQU_KLINE_SECOND:
+    #             oneWeekBeforeDateTime = nowDateTime - relativedelta(days = 7)
+    #             oneWeekBeforeStr = datetime.strftime(oneWeekBeforeDateTime, "%Y%m%d")
+    #             return oneWeekBeforeStr
+    #         else:
+    #             raise NotImplementedError
 
     # //////////////////////////K线处理接口////////////////////////
     def reqAndSubKLineByCount(self, contractNo, kLineType, kLineSlice, count, notice):
@@ -848,6 +848,7 @@ class StrategyHisQuote(object):
 
 
     def _sendHisKLineTriggerEvent(self, key, data):
+        """运行历史数据阶段过程中实时阶段数据变为历史数据这部分数据放入队列"""
         if not data["IsKLineStable"] or not self._config.hasKLineTrigger() or key not in self._config.getKLineTriggerInfoSimple():
             return
 
@@ -866,13 +867,16 @@ class StrategyHisQuote(object):
         self._strategy.sendTriggerQueue(event)
 
     def _sendRealTimeKLineTriggerEvent(self, key, data):
+        """ 实时触发和k线稳定后触发数据"""
         self._triggerMgr.updateData(key, data)
         kLineTrigger = self._config.hasKLineTrigger()
+
         if not kLineTrigger or key not in self._config.getKLineTriggerInfoSimple():
             return
 
         assert self._strategy.isRealTimeStatus(), " Error "
         orderWay = str(self._config.getSendOrder())
+
         if orderWay == SendOrderRealTime or (orderWay == SendOrderStable and data["IsKLineStable"]):
             if not self._triggerMgr.isAllDataReady(key[0]):
                 return
@@ -1015,8 +1019,6 @@ class StrategyHisQuote(object):
         self._sendFlushEvent()
 
         while not self._isAllReady():
-            # print("waiting for data arrived ")
-            # self.printRspReady()
             time.sleep(1)
 
         allHisData = []
@@ -1033,6 +1035,15 @@ class StrategyHisQuote(object):
         newDF = pd.DataFrame(allHisData)
         test = newDF[["DateTimeStamp", "KLineType", "KLineSlice"]].values
         effectiveDTS = []
+        # slicePriority = []
+        #
+        # # 频率优先级字典，遵循数值越小优先级越高原则
+        # SlicePriorityDict = {
+        #     EEQU_KLINE_DAY:     24 * 3600,
+        #     EEQU_KLINE_MINUTE:  60,
+        #     EEQU_KLINE_TICK:    1,
+        #                      }
+        # 时间减去一个delta是为了历史阶段所有时间左对齐，
         for i, record in enumerate(test):
             curBarDTS = datetime.strptime(self.replaceDateStr(str(record[0])), "%Y%m%d%H%M%S%f")
             if record[1] == EEQU_KLINE_MINUTE:
@@ -1043,23 +1054,26 @@ class StrategyHisQuote(object):
                     curEffectiveDTS = curEffectiveDTS - relativedelta(days=1)
                 elif curEffectiveDTS.isoweekday() == 7:
                     curEffectiveDTS = curEffectiveDTS - relativedelta(days=2)
+                # # 将日线时间戳的时分秒位替换为开始时段的时间
+                # curEffectiveDTS = self.transformDayTime(record[3], curEffectiveDTS)
             elif record[1] == EEQU_KLINE_TICK:
                 curEffectiveDTS = curBarDTS-relativedelta(seconds=record[2])
             else:
                 raise NotImplementedError("未实现的k线类型支持")
             effectiveDTS.append(curEffectiveDTS.strftime("%Y%m%d%H%M%S%f"))
+            # slicePriority.append(SlicePriorityDict[record[1]] * record[2])
 
         newDF["DateTimeStampForSort"] = effectiveDTS
-        newDF.sort_values(['TradeDate', 'DateTimeStampForSort', 'Priority'], ascending=[True, True, False], inplace=True)
+        # newDF["SlicePriority"] = slicePriority
+        newDF.sort_values(['TradeDate', 'DateTimeStampForSort', 'Priority'],
+                          ascending=[True, True, False], inplace=True)
+        # newDF.sort_values(['TradeDate', 'DateTimeStampForSort', 'SlicePriority', 'Priority'],
+        #                   ascending=[True, True, True, False], inplace=True)
         newDF.reset_index(drop=True, inplace=True)
+        # print("new df is : ", newDF[["TradeDate", "DateTimeStampForSort", "DateTimeStamp", "KLineType", "KLineSlice"]])
 
-        # print("new df is ")
-        # print(newDF[["TradeDate", "DateTimeStampForSort", "DateTimeStamp", "KLineType"]])
         allHisData = newDF.to_dict(orient="index")
 
-        # print(newDF[["ContractNo", "TradeDate", "DateTimeStamp"]])
-        beginTime = datetime.now()
-        beginTimeStr = datetime.now().strftime('%H:%M:%S.%f')
         print('**************************** run his begin', len(allHisData))
         self.logger.info('[runReport] run report begin')
         beginPos = 0
@@ -1067,6 +1081,7 @@ class StrategyHisQuote(object):
         for index, row in allHisData.items():
             key = (row["ContractNo"], row["KLineType"], row["KLineSlice"])
             isShow = key == self._config.getKLineShowInfoSimple()
+
             lastBar = self.getCurBar(key)
             self._updateCurBar(key, row)
             curBar = self.getCurBar(key)
@@ -1076,6 +1091,8 @@ class StrategyHisQuote(object):
                 continue
 
             if isShow or key in self._config.getKLineTriggerInfoSimple():
+            # # 判断时间戳是否出现过，出现过则跳过这次触发
+            # if index == 0 or row["DateTimeStampForSort"] not in newDF["DateTimeStampForSort"][0: index].values:
                 args = {
                     "Status": ST_STATUS_HISTORY,
                     "TriggerType":ST_TRIGGER_HIS_KLINE,
@@ -1116,11 +1133,30 @@ class StrategyHisQuote(object):
             batchKLine = self._curBarDict[showKey].getBarList()[beginPos:]
             self._addBatchKLine(batchKLine)
         self._sendFlushEvent()
-        endTime = datetime.now()
-        endTimeStr = datetime.now().strftime('%H:%M:%S.%f')
         self.logger.debug('[runReport] run report completed!')
         # self.logger.debug('[runReport] run report completed!, k线数量: {}, 耗时: {}s'.format(len(allHisData), endTime-beginTime))
         # print('**************************** run his end')
+
+    def transformDayTime(self, contractNo, datetimestamp):
+        """
+        将日线的时间戳的时分秒位用开始时段的时间替换
+        :param contractNo: 合约编号
+        :param datetimestamp: 格式为datetime时间形式
+        """
+        startTimeStr = str(self._dataModel.getGetSessionStartTime(contractNo, 0))
+        # 延时交易所的交易时段返回值为0
+        try:
+            hhmmss = startTimeStr.split(".")[1]
+        except:
+            return datetimestamp
+        if 0 < len(hhmmss) <= 2:
+            return datetimestamp.replace(hour=int(hhmmss))
+        elif len(hhmmss) <= 4:
+            return datetimestamp.replace(hour=int(hhmmss[0:2]), minute=int(hhmmss[2:]))
+        elif 4 < len(hhmmss) <= 6:
+            return datetimestamp.replace(hour=int(hhmmss[0:2]), minute=int(hhmmss[2:4]), second=int(hhmmss[4:]))
+        else:
+            return datetimestamp
 
     def _addBatchKLine(self, data):
         event = Event({
