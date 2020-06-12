@@ -346,7 +346,10 @@ class GetEgData(object):
     def _onEgUserInfo(self, event):
         """获取引擎推送资金账户"""
         userInfo = event.getData()
-        self._userNo.extend(userInfo)
+
+        for user in userInfo:
+            if user not in self._userNo:
+                self._userNo.append(user)
 
         self._app.set_run_btn_state(True)
         #TODO: 接收exchange、commodity、contract、user信息一起打印
