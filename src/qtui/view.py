@@ -1542,7 +1542,7 @@ class ContractWin(QWidget):
 
 
 class ContractSelect(QWidget):
-    exchangeList = ["SPD", "ZCE", "DCE", "SHFE", "INE", "CFFEX",
+    exchangeList = ["SPD", "ZCE", "DCE", "SHFE", "INE", "CFFEX", "SGE",
                     "CME", "COMEX", "LME", "NYMEX", "HKEX", "CBOT", "ICUS", "ICEU", "SGX"]
     commodityType = {"P": "现货", "Y": "现货", "F": "期货", "O": "期权",
                      "S": "跨期套利", "M": "品种套利", "s": "", "m": "",
@@ -1656,6 +1656,12 @@ class ContractSelect(QWidget):
                 ePattern = r"\A" + exchangeNo[0] + "\|"
                 cPattern = r"\A" + "\|".join(commodityNo[0].split("|")) + "\|"
                 cZPattern = r"\A" + "\|".join(commodityNoZ.split("|")) + "\|"
+                # 括号需要转义，否则模式匹配失败
+                cPattern = cPattern.replace("(", "\(")
+                cPattern = cPattern.replace(")", "\)")
+                cZPattern = cZPattern.replace("(", "\(")
+                cZPattern = cZPattern.replace(")", "\)")
+
                 contract = self._contract.loc[
                     (self._contract.ContractNo.str.contains(ePattern))
                     & (
@@ -1958,7 +1964,6 @@ class QuantApplication(QWidget):
                     item_path = os.path.split(item_path)[0]
                 desktop = os.path.join(os.path.expanduser("~"), 'Desktop')
                 fname, ftype = QFileDialog.getOpenFileName(self, "打开...", desktop, "python文件(*.py *pyw)")
-                print("AAAAAAAAAAAAA: ", fname, ftype)
                 if fname:
                     _path = item_path + '/' + os.path.split(fname)[1]
                     (_, temp_file_name) = os.path.split(_path)
