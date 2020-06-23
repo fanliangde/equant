@@ -2601,6 +2601,8 @@ class StrategyModel(object):
     def getMargin(self, contNo):
         if not contNo:
             contNo = self._cfgModel.getBenchmark()
+
+        contNo = self.getIndexMap(contNo)
         return self._calcCenter._getHoldMargin(contNo)
 
     def getNetProfit(self):
