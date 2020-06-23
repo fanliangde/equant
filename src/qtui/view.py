@@ -2216,6 +2216,8 @@ class QuantApplication(QWidget):
             self.signal_log_widget.selectAll()
         elif action == clear:
             self.signal_log_widget.clear()
+            # 在交易日志中增加一个分割线分割上次清除和新增的日志
+            self._logger.trade_info("============================清除分隔线============================")
         elif action == refresh:
             self.loadSigLogFile()
 
@@ -2240,6 +2242,8 @@ class QuantApplication(QWidget):
             self.sys_log_widget.selectAll()
         elif action == clear:
             self.sys_log_widget.clear()
+            # 在系统日志中增加一个分割线分割上次清除和新增的日志
+            self._logger.info("============================清除分隔线============================")
         elif action == refresh:
             self.loadSysLogFile()
 
