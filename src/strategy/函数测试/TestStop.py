@@ -41,7 +41,7 @@ def initialize(context):
     SetBarInterval(contNo , 'M', 1, 2000)
     set_stop()
 
-def handle_data(context):    
+def handle_data(context):   
     if g_params['single']:
         single_test()
     else:

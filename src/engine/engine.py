@@ -916,7 +916,7 @@ class StrategyEngine(object):
         
             self._send2uiQueue(uiEvent)
             self._qteModel.updateExchange(apiEvent)
-            self._sendEvent2Strategy(apiEvent.getStrategyId(), apiEvent)
+            # self._sendEvent2Strategy(apiEvent.getStrategyId(), apiEvent)
 
         if apiEvent.isChainEnd():
             self._pyApi.reqExchangeStatus(Event({'StrategyId':0, 'Data':''}))
@@ -948,7 +948,7 @@ class StrategyEngine(object):
         
             self._qteModel.updateCommodity(apiEvent)
 
-            self._sendEvent2AllStrategy(apiEvent)
+            # self._sendEvent2AllStrategy(apiEvent)
 
         if apiEvent.isChainEnd():
             #self._pyApi.reqContract(Event({'StrategyId':0, 'Data':''}))
@@ -1434,7 +1434,7 @@ class StrategyEngine(object):
             data = v.getMoneyDict()
             for vv in data.values():
                 dataList.append(vv.getMetaData())
-        
+
         self._sendData2Strategy(event.getStrategyId(), EV_EG2ST_MONEY_RSP, dataList)
 
     def _onOrderReq(self, event):  

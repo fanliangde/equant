@@ -791,7 +791,8 @@ class Strategy:
     def _reqMoney(self):
         self._reqData(EV_ST2EG_MONEY_REQ)
 
-        self.logger.info("request money 0")
+        # self.logger.info("request money 0")
+        self.logger.info("request account money!")
         
     # 查询委托数据
     def _reqOrder(self):
