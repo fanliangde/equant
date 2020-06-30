@@ -713,8 +713,12 @@ class Strategy:
         timeList = self._dataModel.getConfigTimer()
         if timeList is None:
             timeList = []
-        self._isTimeTriggered = [False for i in timeList]
+        # self._isTimeTriggered = [False for i in timeList]
+        timeListLength = len(timeList)
+        self.setDefaultIsTimeTriggered(timeListLength)
         self._nowTime = datetime.now()
+        # 用于判断定时触发是否切换日期了
+        self._timeTriggerStartTime = datetime.now()
         '''秒级定时器'''
         while not self._isExit() and not self._isPause():
             # 定时触发
@@ -727,6 +731,13 @@ class Strategy:
             self._reportStrategyPosition()
             # 休眠100ms
             time.sleep(0.1)
+            # 日期切换时重置self._isTimeTriggerd
+            if (datetime.now() - self._timeTriggerStartTime).days >= 1:
+                self.setDefaultIsTimeTriggered(timeListLength)
+
+    def setDefaultIsTimeTriggered(self, length):
+        self._isTimeTriggered = [False for _ in range(length)]
+
 
     def _startStrategyTimer(self):
         self._stTimer = Thread(target=self._runTimer)
