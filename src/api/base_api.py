@@ -5405,7 +5405,7 @@ class BaseApi(object):
     def Enum_GTC(self):
         '''
         【说明】
-              返回订单有效类型当日有效的枚举值
+              返回订单有效类型长期有效的枚举值
 
         【语法】
               char Enum_GTC()

@@ -291,7 +291,7 @@ _all_func_ = {
                     ['Enum_Order_MarketOptionKeep','订单类型_做市商留仓'],
 
                     ['Enum_GFD'         , '订单有效类型_当日有效'],
-                    ['Enum_GTC'         , '订单有效类型_当日有效'],
+                    ['Enum_GTC'         , '订单有效类型_长期有效'],
                     ['Enum_GTD'         , '订单有效类型_限期有效'],
                     ['Enum_IOC'         , '订单有效类型_即时部分'],
                     ['Enum_FOK'         , '订单有效类型_即时全部'],
