@@ -898,6 +898,8 @@ class StrategyHisQuote(object):
         kindInfo = {"ContractNo": key[0], "KLineType": key[1], "KLineSlice": key[2]}
         # print("kind = ", event.getData()[0]["DateTimeStamp"], kindInfo)
         # 丢掉
+        if key not in self._kLineRspData:
+            return
         if not self._kLineRspData[key]["KLineReady"]:
             return
 
