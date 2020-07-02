@@ -3553,10 +3553,10 @@ function init_function_info() {
                 kind            : monaco.languages.CompletionItemKind.Function,
                 insertTextRules : monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             },{
-                label           : 'NetProfit()',
-                insertText      : 'NetProfit()',
-                detail          : '# 返回该账户下的平仓盈亏。\n' +
-                                  '    float NetProfit()',
+                label           : 'NetProfit(contractNo=\'\')',
+                insertText      : 'NetProfit(${1})',
+                detail          : '# 返回指定合约的平仓盈亏，参数为空则返回整个策略的平仓盈亏。\n' +
+                                  '    float NetProfit(string contractNo=\'\')',
                 kind            : monaco.languages.CompletionItemKind.Function
             },{
                 label           : 'NumEvenTrades()',
@@ -3607,10 +3607,10 @@ function init_function_info() {
                                   '    float PercentProfit()',
                 kind            : monaco.languages.CompletionItemKind.Function
             },{
-                label           : 'TradeCost()',
-                insertText      : 'TradeCost()',
-                detail          : '# 返回该账户交易产生的手续费。\n' +
-                                  '    float TradeCost()',
+                label           : 'TradeCost(contractNo=\'\')',
+                insertText      : 'TradeCost((${1})',
+                detail          : '# 返回指定合约产生的手续费，参数为空则返回整个策略的手续费\n' +
+                                  '    float TradeCost(string contractNo=\'\')',
                 kind            : monaco.languages.CompletionItemKind.Function
             },{
                 label           : 'TotalTrades()',

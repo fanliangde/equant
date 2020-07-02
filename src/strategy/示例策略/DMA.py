@@ -39,7 +39,7 @@ def handle_data(context):
     ma1 = talib.MA(Close(), p1)
     ma2 = talib.MA(Close(), p2)  
     
-    his = BarStatus() != 2
+    his = context.strategyStatus() == 'H'
     if his:
         his_trigger(ma1, ma2) 
     else: 

@@ -29,10 +29,6 @@ class CodeEditor(QWebEngineView):
         # 设置交互接口
         self.page().setWebChannel(self.channel)
 
-# 向UI发送保存完成信号
-    def sendSaveDoneSignal(self):
-        self.saveDoneSignal.emit()
-
 
 # 向js发送指令
     def sendOpenSignal(self, file):
@@ -78,13 +74,13 @@ class CodeEditor(QWebEngineView):
             print(e)
 
         # 保存完成信号发送到界面
-        self.sendSaveDoneSignal()
+        self.saveDoneSignal.emit()
 
         self.__mdy_files.remove(file)  
-
         if self.__save_mdy and not len(self.__mdy_files):
             self.__save_mdy = False
             self.on_saveMdySignal.emit()
+
 
     @pyqtSlot(str)
     def on_switch_file(self, path):

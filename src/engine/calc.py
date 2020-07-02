@@ -79,6 +79,23 @@ class CalcCenter(object):
         # limits
         self._limit = {}  # 下单限制
 
+        self._contStat = {}    
+
+    def _updateContStat(self, ord_ex): 
+        cont = ord_ex["Order"]["Cont"]
+        if cont not in self._contStat:
+            self._contStat[cont] = {'Profit':0.0, 'TradeCost':0.0}
+        stat = self._contStat[cont]
+
+        stat['Profit'] += ord_ex['LiquidateProfit'] 
+        stat['TradeCost'] += ord_ex['Cost']    
+
+    def getcontStat(self, contNo):
+        if contNo in  self._contStat:
+            return self._contStat[contNo]
+        else:
+            return None    
+
     def initArgs(self, args):
         """初始化参数"""
         self._strategy = args
@@ -526,6 +543,8 @@ class CalcCenter(object):
         self._calcTradeInfo()    # 计算交易信息
         self._updateTradeDate(order["TradeDate"])
         # print("end:", datetime.now().strftime('%H:%M:%S.%f'))
+        
+        self._updateContStat(eo)
 
         return 1  # 订单发送成功
 

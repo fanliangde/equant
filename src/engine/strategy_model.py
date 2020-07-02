@@ -2605,9 +2605,13 @@ class StrategyModel(object):
         contNo = self.getIndexMap(contNo)
         return self._calcCenter._getHoldMargin(contNo)
 
-    def getNetProfit(self):
+    def getNetProfit(self, contNo):
         '''平仓盈亏'''
-        return self._calcCenter.getProfit()["LiquidateProfit"]
+        if not contNo:
+            return self._calcCenter.getProfit()["LiquidateProfit"]
+        else:
+            stat = self._calcCenter.getcontStat(contNo)
+            return stat['Profit'] if stat else 0.0
 
     def getNumEvenTrades(self):
         '''保本交易总手数'''
@@ -2646,9 +2650,13 @@ class StrategyModel(object):
         allTimes = self._calcCenter.getProfit()["AllTimes"]
         return winTimes / allTimes if allTimes > 0 else 0
 
-    def getTradeCost(self):
+    def getTradeCost(self, contNo):
         '''交易产生的手续费'''
-        return self._calcCenter.getProfit()["Cost"]
+        if not contNo:
+            return self._calcCenter.getProfit()["Cost"]
+        else:
+            stat = self._calcCenter.getcontStat(contNo)
+            return stat['TradeCost'] if stat else 0.0
 
     def getTotalTrades(self):
         '''交易总开仓手数'''

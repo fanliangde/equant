@@ -2972,16 +2972,16 @@ class BaseApi(object):
         '''
         return self._dataModel.getMargin(contractNo)
 
-    def NetProfit(self):
+    def NetProfit(self, contractNo):
         '''
         【说明】
-              返回该账户下的平仓盈亏。
+              返回指定合约的平仓盈亏。
 
         【语法】
-              float NetProfit()
+              float NetProfit(string contractNo='')
 
         【参数】
-              无
+              contractNo 合约编号，为空则返回整个策略的平仓盈亏
 
         【备注】
               无
@@ -2989,7 +2989,7 @@ class BaseApi(object):
         【示例】
               无
         '''
-        return self._dataModel.getNetProfit()
+        return self._dataModel.getNetProfit(contractNo)
 
     def NumEvenTrades(self):
         '''
@@ -3143,16 +3143,16 @@ class BaseApi(object):
         '''
         return self._dataModel.getPercentProfit()
 
-    def TradeCost(self):
+    def TradeCost(self, contractNo):
         '''
         【说明】
-              返回该账户交易产生的手续费。
+              返回指定合约产生的手续费。
 
         【语法】
-              float TradeCost()
+              float TradeCost(string contractNo='')
 
         【参数】
-              无
+              contractNo 合约编号，为空则返回整个策略的手续费。
 
         【备注】
               无
@@ -3160,7 +3160,7 @@ class BaseApi(object):
         【示例】
               无
         '''
-        return self._dataModel.getTradeCost()
+        return self._dataModel.getTradeCost(contractNo)
 
     def TotalTrades(self, contractNo):
         '''
@@ -3168,10 +3168,10 @@ class BaseApi(object):
               返回该账户的交易总开仓手数。
 
         【语法】
-              int TotalTrades()
+              int TotalTrades(string contractNo)
 
         【参数】
-              无
+              contractNo 合约编号
 
         【备注】
               无
@@ -7420,8 +7420,8 @@ def GrossProfit():
 def Margin(contractNo=''):
     return baseApi.Margin(contractNo)
 
-def NetProfit():
-    return baseApi.NetProfit()
+def NetProfit(contractNo=''):
+    return baseApi.NetProfit(contractNo)
 
 def NumEvenTrades():
     return baseApi.NumEvenTrades()
@@ -7447,8 +7447,8 @@ def NumEventTimes():
 def PercentProfit():
     return baseApi.PercentProfit()
 
-def TradeCost():
-    return baseApi.TradeCost()
+def TradeCost(contractNo=''):
+    return baseApi.TradeCost(contractNo)
 
 def TotalTrades(contractNo=''):
     return baseApi.TotalTrades(contractNo)
