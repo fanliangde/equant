@@ -734,6 +734,7 @@ class Strategy:
             # 日期切换时重置self._isTimeTriggerd
             if (datetime.now() - self._timeTriggerStartTime).days >= 1:
                 self.setDefaultIsTimeTriggered(timeListLength)
+                self._timeTriggerStartTime = datetime.now()
 
     def setDefaultIsTimeTriggered(self, length):
         self._isTimeTriggered = [False for _ in range(length)]

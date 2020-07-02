@@ -1129,6 +1129,8 @@ class PyAPI(object):
             }
             dataList.append(idict)
             self._exchangeCount += 1
+        dataList.append({'ExchangeNo': "ZCE", "ExchangeName": "郑商所"})
+        self._exchangeCount += 1
 
         #发送到引擎
         apiEvent.setData(dataList)
