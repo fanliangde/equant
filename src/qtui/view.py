@@ -1693,6 +1693,8 @@ class QuantApplication(QWidget):
     positionSignal = pyqtSignal(list)
     pathSignal = pyqtSignal(str)
 
+    saveFlagDict = {}
+
     def __init__(self, control, master=None):
         super().__init__(master)
 
@@ -2284,6 +2286,7 @@ class QuantApplication(QWidget):
             self.contentEdit.load(
                 QUrl.fromLocalFile(os.path.abspath(r'qtui/quant/python_editor/editor_vs.htm')))
         self.contentEdit.on_switchSignal.connect(self.switch_strategy_path)
+        self.contentEdit.saveDoneSignal.connect(self.saveDoneSlot)
         self.statusBar = QLabel()
         self.statusBar.setText("  极星9.5连接失败，请重新打开极星量化！")
         self.statusBar.setStyleSheet('color: #0062A3;')
@@ -2293,10 +2296,13 @@ class QuantApplication(QWidget):
         self.content_layout.addWidget(self.save_btn, 0, 2, 1, 1)
         self.content_layout.addWidget(self.contentEdit, 2, 0, 20, 3)
         self.content_vbox.setLayout(self.content_layout)
-        self.run_btn.clicked.connect(self.emit_custom_signal)  # 改为提示用户保存当前的文件
+        self._isRunClickflag = True
+        self.run_btn.clicked.connect(
+            lambda: self.emit_custom_signal(True))  # 改为提示用户保存当前的文件
         self.run_btn.clicked.connect(
             lambda: self.create_strategy_policy_win({}, self.strategy_path, False))
-        self.save_btn.clicked.connect(self.emit_custom_signal)
+        self.save_btn.clicked.connect(
+            lambda: self.emit_custom_signal(False))
         self.save_btn.setShortcut("Ctrl+S")  # ctrl + s 快捷保存
 
     def switch_strategy_path(self, path):
@@ -2310,8 +2316,11 @@ class QuantApplication(QWidget):
         """
         self.run_btn.setEnabled(status)
 
-    def emit_custom_signal(self):
-        self.contentEdit.sendSaveSignal(self.strategy_path)
+    def emit_custom_signal(self, flag):
+        isModified = self.contentEdit.sendSaveSignal(self.strategy_path)
+        self._isRunClickflag = flag
+        if flag and isModified:
+            self.run_btn.blockSignals(True)
 
     def create_func_tab(self):
         # 函数列表
@@ -2646,6 +2655,8 @@ class QuantApplication(QWidget):
 
     def create_strategy_policy_win(self, param, path, flag):
         # 运行点击槽函数，弹出策略属性设置窗口
+        if self.run_btn.signalsBlocked():
+            return
         if path:
             # 判断path是否存在
             if not os.path.exists(path):
@@ -2724,6 +2735,14 @@ class QuantApplication(QWidget):
             self.strategy_policy_win.show()
         else:
             MyMessageBox.warning(self, '提示', '请选择策略！！！', QMessageBox.Ok)
+
+    def saveDoneSlot(self):
+        """保存完成信号"""
+        if self._isRunClickflag:  # 判断是否是点击运行按钮触发事件
+            # 取消运行弹窗信号阻塞
+            self.run_btn.blockSignals(False)
+            # 弹出窗口
+            self.create_strategy_policy_win({}, self.strategy_path, False)
 
     def updateLogText(self):
         guiQueue = self._controller.get_logger().getGuiQ()

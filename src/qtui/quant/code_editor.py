@@ -14,6 +14,7 @@ class CodeEditor(QWebEngineView):
     setThemeSignal = pyqtSignal(str)
     on_switchSignal = pyqtSignal(str)
     on_saveMdySignal = pyqtSignal()
+    saveDoneSignal = pyqtSignal()
 
     def __init__(self, *args, **kwargs):
         super(CodeEditor, self).__init__(*args, **kwargs)
@@ -28,6 +29,10 @@ class CodeEditor(QWebEngineView):
         # 设置交互接口
         self.page().setWebChannel(self.channel)
 
+# 向UI发送保存完成信号
+    def sendSaveDoneSignal(self):
+        self.saveDoneSignal.emit()
+
 
 # 向js发送指令
     def sendOpenSignal(self, file):
@@ -41,6 +46,7 @@ class CodeEditor(QWebEngineView):
     def sendSaveSignal(self, file):
         if file in self.__mdy_files:
             self.saveSignal.emit(file)
+        return file in self.__mdy_files
 
     def sendRenameSignal(self, file, newfile):
         self.renameSignal.emit(file, newfile)
@@ -69,7 +75,10 @@ class CodeEditor(QWebEngineView):
             with open(file, mode='w', encoding='utf-8') as f:
                 f.write(text.replace('\r', ''))
         except Exception as e:
-            print(e)    
+            print(e)
+
+        # 保存完成信号发送到界面
+        self.sendSaveDoneSignal()
 
         self.__mdy_files.remove(file)  
 
