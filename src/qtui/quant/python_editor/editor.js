@@ -372,7 +372,7 @@ function add_tab(name, value){
 
     //添加按钮到标签上
     tab.appendChild(btn);
-    //添加按钮到标签栏上
+    //添加标签到标签栏上
     $('tabs').appendChild(tab);
 
     //设置标签和按钮的单击事件
