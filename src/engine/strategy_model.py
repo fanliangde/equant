@@ -89,27 +89,44 @@ class StrategyModel(object):
         self._trdModel.initialize()
 
     def initializeCalc(self):
-        contNo = self._cfgModel.getBenchmark()
         strategyParam = {
             "InitialFunds": float(self._cfgModel.getInitCapital()),  # 初始资金
             "StrategyName": self._strategy.getStrategyName(),  # 策略名称
             "StartTime": "2019-04-01",  # 回测开始时间
             "EndTime": "2019-04-17",  # 回测结束时间
-            "Margin": self._cfgModel.getMarginValue(),  # 保证金
-            "Slippage": self._cfgModel.getSlippage(),  # 滑点
-            "OpenRatio": self._cfgModel.getOpenRatio(),
-            "CloseRatio": self._cfgModel.getCloseRatio(),
-            "OpenFixed": self._cfgModel.getOpenFixed(),
-            "CloseFixed": self._cfgModel.getCloseFixed(),
-            "CloseTodayRatio": self._cfgModel.getCloseTodayRatio(),
-            "CloseTodayFixed": self._cfgModel.getCloseTodayFixed(),
             "KLineType": self._hisModel._getKLineType(),
             "KLineSlice": self._hisModel._getKLineSlice(),
-            "TradeDot": self.getContractUnit(contNo),  # 每手乘数
-            "PriceTick": self.getPriceScale(contNo),  # 最小变动价位
             "Limit": self._config.getLimit(),
         }
         self._calcCenter.initArgs(strategyParam)
+
+    def getSlippage_(self):
+        """获取设置的滑点"""
+        return self._cfgModel.getSlippage()
+
+    def getOpenRatio_(self, contract):
+        """获取设置的合约开仓比例手续费"""
+        return self._cfgModel.getOpenRatio(contract)
+
+    def getCloseRatio_(self, contract):
+        """获取设置的合约平仓比例手续费"""
+        return self._cfgModel.getCloseRatio(contract)
+
+    def getOpenFixed_(self, contract):
+        """获取设置的合约开仓定额手续费"""
+        return self._cfgModel.getOpenFixed(contract)
+
+    def getCloseFixed_(self, contract):
+        """获取设置的合约平仓定额手续费"""
+        return self._cfgModel.getCloseFixed(contract)
+
+    def getCloseTodayRatio_(self, contract):
+        """获取设置的合约平今比例手续费"""
+        return self._cfgModel.getCloseTodayRatio(contract)
+
+    def getCloseTodayFixed_(self, contract):
+        """获取设置的合约平今定额手续费"""
+        return self._cfgModel.getCloseTodayFixed(contract)
 
     # ++++++++++++++++++++++策略接口++++++++++++++++++++++++++++++
     # //////////////////////历史行情接口//////////////////////////
@@ -2595,8 +2612,12 @@ class StrategyModel(object):
     def getGrossLoss(self):
         return self._calcCenter.getProfit()["TotalLose"]
 
-    def getGrossProfit(self):
-        return self._calcCenter.getProfit()["TotalProfit"]
+    def getGrossProfit(self, contNo):
+        if not contNo:
+            return self._calcCenter.getProfit()["TotalProfit"]
+        else:
+            stat = self._calcCenter.getcontStat(contNo)
+            return stat['TotalProfit'] if stat else 0.0
 
     def getMargin(self, contNo):
         if not contNo:

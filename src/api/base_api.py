@@ -2918,7 +2918,7 @@ class BaseApi(object):
     def GrossLoss(self):
         '''
         【说明】
-              返回累计总亏损。
+              返回账户的累计总亏损。
 
         【语法】
               float GrossLoss()
@@ -2934,16 +2934,16 @@ class BaseApi(object):
         '''
         return self._dataModel.getGrossLoss()
 
-    def GrossProfit(self):
+    def GrossProfit(self, contractNo):
         '''
         【说明】
-              返回累计总利润。
+              返回指定合约的总利润。
 
         【语法】
-              float GrossProfit()
+              float GrossProfit(string contractNo='')
 
         【参数】
-              无
+              contractNo 合约编号，为空则返回整个策略的总利润
 
         【备注】
               无
@@ -2951,7 +2951,7 @@ class BaseApi(object):
         【示例】
               无
         '''
-        return self._dataModel.getGrossProfit()
+        return self._dataModel.getGrossProfit(contractNo)
 
     def Margin(self, contractNo):
         '''
@@ -7414,8 +7414,8 @@ def FloatProfit(contractNo=''):
 def GrossLoss():
     return baseApi.GrossLoss()
 
-def GrossProfit():
-    return baseApi.GrossProfit()
+def GrossProfit(contractNo=''):
+    return baseApi.GrossProfit(contractNo)
 
 def Margin(contractNo=''):
     return baseApi.Margin(contractNo)

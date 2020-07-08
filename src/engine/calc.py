@@ -81,14 +81,24 @@ class CalcCenter(object):
 
         self._contStat = {}    
 
-    def _updateContStat(self, ord_ex): 
+    def _updateContStat(self, ord_ex):
+        '''
+        {
+            'Profit':0.0,         # 平仓盈亏
+            'TradeCost':0.0,      # 手续费
+            'TotalLoss': 0.0,     # 总亏损
+            'TotalProfit'         # 总利润
+        }
+        '''
         cont = ord_ex["Order"]["Cont"]
         if cont not in self._contStat:
-            self._contStat[cont] = {'Profit':0.0, 'TradeCost':0.0}
+            self._contStat[cont] = {'Profit':0.0, 'TradeCost':0.0, 'TotalLoss': 0.0, 'TotalProfit': 0.0}
         stat = self._contStat[cont]
 
         stat['Profit'] += ord_ex['LiquidateProfit'] 
-        stat['TradeCost'] += ord_ex['Cost']    
+        stat['TradeCost'] += ord_ex['Cost']
+        stat['TotalLoss'] += 0.0   # 暂时先不计算
+        stat['TotalProfit'] += ord_ex['Profit']
 
     def getcontStat(self, contNo):
         if contNo in  self._contStat:
@@ -98,10 +108,10 @@ class CalcCenter(object):
 
     def initArgs(self, args):
         """初始化参数"""
-        self._strategy = args
-        self._setProfitInitialFundInfo(int(self._strategy["InitialFunds"]) - self._runSet["StartFund"])
+        self._strategyArgs = args
+        self._setProfitInitialFundInfo(int(self._strategyArgs["InitialFunds"]) - self._runSet["StartFund"])
         self._setExpertSetting()
-        self._limit = self._strategy["Limit"]
+        self._limit = copy.copy(self._strategyArgs["Limit"])
 
         self._initOrderCtl()
 
@@ -109,6 +119,7 @@ class CalcCenter(object):
         self._limitCtl = LimitCtl(self._logger, self._limit["ContinueOpenTimes"], self._limit["OpenTimes"],
                                   self._limit["OpenAllowClose"], self._limit["CloseAllowOpen"])
 
+        #TODO: 没起作用？
         self._dirCtl = DirectionCtl(self._logger, 0)
 
     def _updateTradeDate(self, Time):
@@ -126,12 +137,12 @@ class CalcCenter(object):
         :return: None
         """
         self._runSet = {
-            "StartFund": self._strategy["InitialFunds"],
-            "Strategy": self._strategy["StrategyName"],
-            "KLineType": self._strategy["KLineType"],
-            "KLineSlice": self._strategy["KLineSlice"],
-            "StartTime": self._strategy["StartTime"],
-            "EndTime": self._strategy["EndTime"]
+            "StartFund": self._strategyArgs["InitialFunds"],
+            "Strategy": self._strategyArgs["StrategyName"],
+            "KLineType": self._strategyArgs["KLineType"],
+            "KLineSlice": self._strategyArgs["KLineSlice"],
+            "StartTime": self._strategyArgs["StartTime"],
+            "EndTime": self._strategyArgs["EndTime"]
         }
 
     def _setProfitInitialFundInfo(self, initialFund):
@@ -155,19 +166,17 @@ class CalcCenter(object):
         else:
             self._costs[contract] = {}
             # TODO:费率直接在这里写默认值还是传进来
-            # self._costs[contract]["TradeDot"] = self._strategy["TradeDot"]
-            # self._costs[contract]["PriceTick"] = self._strategy["PriceTick"]
             self._costs[contract]["TradeDot"] = self._stModel.getContractUnit(contract)
             self._costs[contract]["PriceTick"] = self._stModel.getPriceScale(contract)
-            self._costs[contract]["Margin"] = self._strategy["Margin"]
-            self._costs[contract]["OpenRatio"] = self._strategy["OpenRatio"]
-            self._costs[contract]["CloseRatio"] = self._strategy["CloseRatio"]
-            self._costs[contract]["OpenFixed"] = self._strategy["OpenFixed"]
-            self._costs[contract]["CloseFixed"] = self._strategy["CloseFixed"]
-            self._costs[contract]["CloseTodayRatio"] = self._strategy["CloseTodayRatio"]
-            self._costs[contract]["CloseTodayFixed"] = self._strategy["CloseTodayFixed"]
-            # 新增
-            self._costs[contract]["Slippage"] = self._strategy["Slippage"]  # 滑点
+            self._costs[contract]["Margin"] = self._stModel.getMarginRatio(contract)
+
+            self._costs[contract]["OpenRatio"] = self._stModel.getOpenRatio_(contract)
+            self._costs[contract]["CloseRatio"] = self._stModel.getCloseRatio_(contract)
+            self._costs[contract]["OpenFixed"] = self._stModel.getOpenFixed_(contract)
+            self._costs[contract]["CloseFixed"] = self._stModel.getCloseFixed_(contract)
+            self._costs[contract]["CloseTodayRatio"] = self._stModel.getCloseTodayRatio_(contract)
+            self._costs[contract]["CloseTodayFixed"] = self._stModel.getCloseTodayFixed_(contract)
+            self._costs[contract]["Slippage"] = self._stModel.getSlippage_()
 
             return self._costs[contract]
 
@@ -629,7 +638,7 @@ class CalcCenter(object):
             charge, charge1, turnover, liquidateProfit, profit, linkList, slipLoss = self._sellCloseToday(order, pInfo,
                                                                                                           qty)
 
-        # TODO：因区分不出外盘订单，所以外判订单的滑点损耗未计算
+        # TODO：因区分不出外盘订单，所以外盘订单的滑点损耗未计算
         elif order["Direct"] == dSell and order["Offset"] == oNone:
             self._calcOrderOuter(order)
             return
@@ -1499,53 +1508,6 @@ class CalcCenter(object):
 
         if self._fundRecords:
             lastTime = self._fundRecords[-1]["Time"]
-
-        # for user in positions:
-        #     for pInfo in positions[user].values():
-        #         if pInfo["TotalBuy"] > 0:
-        #             order = dict()
-        #             order["UserNo"]        = user
-        #             order["OrderType"]     = otLimit                                       # 定单类型
-        #             order["ValidType"]     = vtGFD                                         # 有效类型
-        #             order["ValidTime"]     = '0'                                           # 有效日期时间(GTD情况下使用)
-        #             order["Cont"]          = pInfo["Cont"]                                 # 合约
-        #             order["Direct"]        = dSell                                         # 买卖方向
-        #             order["Offset"]        = oCover                                        # 开仓平仓 或 应价买入开平
-        #             order["Hedge"]         = hSpeculate                                    # 投机套保
-        #             order["OrderPrice"]    = None                                          # 委托价格 或 期权应价买入价格
-        #             order["OrderQty"]      = pInfo["TotalBuy"]                             # 委托数量 或 期权应价数量
-        #             order["DateTimeStamp"] = None                                          # 时间戳（基准合约）
-        #             order["TradeDate"]     = None                                          # 交易日（基准合约）
-        #             #order["TriggerType"]   = None                                          # 触发方式
-        #             #order["CurBar"]        = None                                          # K线信息
-        #             order["CurBarIndex"]   = None                                          # K线索引
-        #             order["StrategyId"]    = None                                          # 策略Id
-        #             order["StrategyName"]  = self._strategy["StrategyName"]                # 策略名称
-        #             order["StrategyStage"] = ST_STATUS_HISTORY                             # 策略运行阶段
-        #             orderList.append(order)
-        #         if pInfo["TotalSell"] > 0:
-        #             order = dict()
-        #             order["UserNo"] = user
-        #             order["OrderType"]     = otLimit                                        # 定单类型
-        #             order["ValidType"]     = vtGFD                                          # 有效类型
-        #             order["ValidTime"]     = '0'                                            # 有效日期时间(GTD情况下使用)
-        #             order["Cont"]          = pInfo["Cont"]                                  # 合约
-        #             order["Direct"]        = dBuy                                           # 买卖方向
-        #             order["Offset"]        = oCover                                         # 开仓平仓 或 应价买入开平
-        #             order["Hedge"]         = hSpeculate                                     # 投机套保
-        #             order["OrderPrice"]    = None                                           # 委托价格 或 期权应价买入价格
-        #             order["OrderQty"]      = pInfo["TotalBuy"]                              # 委托数量 或 期权应价数量
-        #             order["DateTimeStamp"] = None                                           # 时间戳（基准合约）
-        #             order["TradeDate"]     = None                                           # 交易日（基准合约）
-        #             # order["TriggerType"]   = None                                           # 触发方式
-        #             # order["CurBar"]        = None                                           # K线信息
-        #             order["CurBarIndex"]   = None                                           # K线索引
-        #             order["StrategyId"]    = None                                           # 策略Id
-        #             order["StrategyName"]  = self._strategy["StrategyName"]                 # 策略名称
-        #             order["StrategyStage"] = ST_STATUS_HISTORY                              # 策略运行阶段
-        #             orderList.append(order)
-
-
 
         for pInfo in positions.values():
             if pInfo["TotalBuy"] > 0:  # 有持买

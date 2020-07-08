@@ -3533,14 +3533,14 @@ function init_function_info() {
             },{
                 label           : 'GrossLoss()',
                 insertText      : 'GrossLoss()',
-                detail          : '# 返回累计总亏损。\n' +
+                detail          : '# 返回账户的累计总亏损。\n' +
                                   '    float GrossLoss()',
                 kind            : monaco.languages.CompletionItemKind.Function
             },{
-                label           : 'GrossProfit()',
-                insertText      : 'GrossProfit()',
-                detail          : '# 返回累计总利润。\n' +
-                                  '    float GrossProfit()',
+                label           : 'GrossProfit(contractNo=\'\')',
+                insertText      : 'GrossProfit(${1})',
+                detail          : '# 返回指定合约的累计总利润，参数为空则返回整个策略的累计总利润。\n' +
+                                  '    float GrossProfit(string contractNo=\'\')',
                 kind            : monaco.languages.CompletionItemKind.Function
             },{
                 label           : 'Margin(contractNo=\'\')',
