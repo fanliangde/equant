@@ -73,9 +73,6 @@ class CalcCenter(object):
 
         self._reportDetails = {}  # 回测报告详情
 
-        # TODO: setExpertSetting外部调用比较合适
-        # self._setExpertSetting()
-
         # limits
         self._limit = {}  # 下单限制
 
@@ -127,9 +124,7 @@ class CalcCenter(object):
         if self._curTradeDate is None:
             return
 
-        # 计算阶段总结和交易信息
         self._curTradeDate = Time
-        # self._stageStatistics()
 
     def _setExpertSetting(self):
         """
@@ -155,7 +150,7 @@ class CalcCenter(object):
         self._profit["EmptyAssets"] += initialFund  # 空仓资产
         self._profit["EmptyPositionEquity"] += initialFund  # 期初空仓资产
 
-    def getCostRate(self, contract):
+    def _getCostRate(self, contract):
         """
         获取合约费率，找不到就返回默认值
         :param contract: string 合约
@@ -164,19 +159,18 @@ class CalcCenter(object):
         if contract in self._costs:
             return self._costs[contract]
         else:
-            self._costs[contract] = {}
-            # TODO:费率直接在这里写默认值还是传进来
-            self._costs[contract]["TradeDot"] = self._stModel.getContractUnit(contract)
-            self._costs[contract]["PriceTick"] = self._stModel.getPriceScale(contract)
-            self._costs[contract]["Margin"] = self._stModel.getMarginRatio(contract)
-
-            self._costs[contract]["OpenRatio"] = self._stModel.getOpenRatio_(contract)
-            self._costs[contract]["CloseRatio"] = self._stModel.getCloseRatio_(contract)
-            self._costs[contract]["OpenFixed"] = self._stModel.getOpenFixed_(contract)
-            self._costs[contract]["CloseFixed"] = self._stModel.getCloseFixed_(contract)
-            self._costs[contract]["CloseTodayRatio"] = self._stModel.getCloseTodayRatio_(contract)
-            self._costs[contract]["CloseTodayFixed"] = self._stModel.getCloseTodayFixed_(contract)
-            self._costs[contract]["Slippage"] = self._stModel.getSlippage_()
+            self._costs[contract] = {
+                "TradeDot"        :   self._stModel.getContractUnit(contract),
+                "PriceTick"       :   self._stModel.getPriceScale(contract),
+                "Margin"          :   self._stModel.getMarginRatio(contract),
+                "OpenRatio"       :   self._stModel.getOpenRatio_(contract),
+                "CloseRatio"      :   self._stModel.getCloseRatio_(contract),
+                "OpenFixed"       :   self._stModel.getOpenFixed_(contract),
+                "CloseFixed"      :   self._stModel.getCloseFixed_(contract),
+                "CloseTodayRatio" :   self._stModel.getCloseTodayRatio_(contract),
+                "CloseTodayFixed" :   self._stModel.getCloseTodayFixed_(contract),
+                 "Slippage"       :   self._stModel.getSlippage_()
+            }
 
             return self._costs[contract]
 
@@ -224,9 +218,9 @@ class CalcCenter(object):
                     positions[cont]["HoldProfit"] += self._positions[user][cont]["HoldProfit"]
                     positions[cont]["Cost"] += self._positions[user][cont]["Cost"]
         if not contract:
-            return copy.deepcopy(positions)
+            return copy.copy(positions)
         elif contract in positions:
-            return copy.deepcopy(positions[contract])
+            return copy.copy(positions[contract])
         else:
             return {
                 "Cont": contract,
@@ -247,7 +241,6 @@ class CalcCenter(object):
 
     def getUsersPosition(self):
         """获取包含账户信息的持仓信息"""
-        #print("AAAA,pos:", self._positions)
         return copy.deepcopy(self._positions)
 
     def _getSpecificPositionInfo(self, user, contract):
@@ -258,7 +251,7 @@ class CalcCenter(object):
         :return:
         """
         defaultInfo = {
-             "Cont": contract,  # 合约
+             "Cont": contract,
              "TodayBuy": 0,
              "TotalBuy": 0,
              "BuyPrice": 0.0,
@@ -281,9 +274,46 @@ class CalcCenter(object):
             else:
                 return copy.deepcopy(self._positions[user][contract])
 
+    def __calcCoverTCharge(self, cost, qty, orderPrice):
+        """计算平今手续费"""
+        if cost["CloseTodayRatio"]:
+            coverTCharge = orderPrice * qty * cost["TradeDot"] * cost["CloseTodayRatio"]
+        elif cost["CloseTodayFixed"]:
+            coverTCharge = qty * cost["CloseTodayFixed"]
+        else:  # 未设置平今手续费，按平昨手续费计算
+            if cost["CloseRatio"]:
+                coverTCharge = orderPrice * qty * cost["TradeDot"] * cost["CloseRatio"]
+            else:
+                coverTCharge = qty * cost["CloseFixed"]
+        return coverTCharge
+
+    def __calcCoverCharge(self, cost, qty, orderPrice):
+        """计算平仓手续费"""
+        if cost["CloseRatio"]:
+            coverCharge = orderPrice * qty * cost["TradeDot"] * cost["CloseRatio"]
+        else:
+            coverCharge = orderPrice * qty * cost["TradeDot"] * cost["CloseFixed"]
+
+        return coverCharge
+
+    def __calcOpenCharge(self, cost, qty, orderPrice):
+        """计算开仓手续费"""
+        if cost["OpenRatio"]:
+            openCharge = orderPrice * qty * cost["TradeDot"] * cost["OpenRatio"]
+        else:
+            openCharge = qty * cost["OpenFixed"]
+        return openCharge
+
+    def __isSHFEorINE(self, cont):
+        """判断是否支持平今"""
+        type = cont.split("|")[0]
+        if type == "SHFE" or type == "INE":
+            return True
+        return False
+
     def needCover(self, userNo, contNo, direct, orderQty, orderPrice):
         """
-        开仓单信号先平对手仓在开仓，判断能否平对手仓以及能否开仓
+        开仓单信号先平对手仓再开仓，判断能否平对手仓以及能否开仓
         :param userNo:     用户账户
         :param contNo:     合约编号
         :param direct:     买卖方向
@@ -296,7 +326,7 @@ class CalcCenter(object):
         """
         pInfo = self._getSpecificPositionInfo(userNo, contNo)
         availableFund = self.getAvailableFund()
-        cost = self.getCostRate(contNo)
+        cost = self._getCostRate(contNo)
 
         ret = -1
 
@@ -306,21 +336,34 @@ class CalcCenter(object):
 
         if direct == dBuy:  # 买开
             if pInfo["TotalSell"] > 0:
-                if cost["CloseRatio"]:
-                    coverCharge = orderPrice * pInfo["TotalSell"] * cost["TradeDot"] * cost["CloseRatio"]
-                else:
-                    coverCharge = pInfo["TotalSell"] * cost["CloseFixed"]
+                if self.__isSHFEorINE(contNo):  # 上期所和能交所要区分平今平昨的手续费
+                    #平今手续费
+                    coverTCharge = self.__calcCoverTCharge(cost, pInfo["TodaySell"], orderPrice)
+                    #平昨手续费
+                    coverBCharge = self.__calcCoverCharge(cost, pInfo["TotalSell"] - pInfo["TodaySell"], orderPrice)
+
+                    coverCharge = coverTCharge + coverBCharge
+
+                else:     # 其他交易所不区分平今平昨
+                    coverCharge = self.__calcCoverCharge(cost, pInfo["TotalSell"], orderPrice)
+
                 if availableFund < coverCharge:
                     self._logger.error(f"自动平仓：[{userNo}] [{contNo}] 平卖开仓失败")
                     return -1  # 平卖开仓失败
                 else:
-                    # TODO: 需要计算资金变化
-                    if cost["OpenRatio"]:
-                        openCharge = orderPrice * orderQty * cost["TradeDot"] * cost["OpenRatio"]
-                    else:
-                        openCharge = orderQty * cost["OpenFixed"]
+                    # 开仓手续费
+                    openCharge = self.__calcOpenCharge(cost, orderQty, orderPrice)
 
-                    if availableFund - coverCharge < openCharge:
+                    # 需要将平仓盈亏和保证金考虑进去
+
+                    beforePrice = pInfo["SellPrice"]  # 未平之前的持仓价
+                    # 平仓盈亏
+                    liquidateprofit = (beforePrice * pInfo["TotalSell"] - orderPrice * pInfo["TotalSell"]) * cost[
+                        "TradeDot"]
+                    turnover = orderPrice * pInfo["TotalSell"] * cost["TradeDot"]
+                    margin = turnover * cost["Margin"]
+
+                    if availableFund + liquidateprofit - margin - openCharge < coverCharge:
                         self._logger.error(f"自动平仓：[{userNo}] [{contNo}] 开买开仓失败")
                         ret = -2  # 开买开仓失败
                     else:
@@ -328,20 +371,33 @@ class CalcCenter(object):
 
         else:
             if pInfo["TotalBuy"] > 0:
-                if cost["CloseRatio"]:
-                    coverCharge = orderPrice * pInfo["TotalBuy"] * cost["TradeDot"] * cost["CloseRatio"]
-                else:
-                    coverCharge = pInfo["TotalBuy"] * cost["CloseFixed"]
+                if self.__isSHFEorINE(contNo):  # 上期所和能交所要区分平今平昨的手续费
+                    # 平今手续费
+                    coverTCharge = self.__calcCoverTCharge(cost, pInfo["TodayBuy"], orderPrice)
+                    # 平昨手续费
+                    coverBCharge = self.__calcCoverCharge(cost, pInfo["TotalBuy"] - pInfo["TodayBuy"], orderPrice)
+
+                    coverCharge = coverTCharge + coverBCharge
+
+                else:     # 其他交易所不区分平今平昨
+                    coverCharge = self.__calcOpenCharge(cost, pInfo["TotalBuy"], orderPrice)
+
                 if availableFund < coverCharge:
                     self._logger.error(f"自动平仓：[{userNo}] [{contNo}] 平买开仓失败")
                     ret = -1  # 平买开仓失败
                 else:
-                    if cost["OpenRatio"]:
-                        openCharge = orderPrice * orderQty * cost["TradeDot"] * cost["OpenRatio"]
-                    else:
-                        openCharge = orderQty * cost["OpenFixed"]
+                    openCharge = self.__calcOpenCharge(cost, orderQty, orderPrice)
 
-                    if availableFund - coverCharge < openCharge:
+                    # 需要将平仓盈亏和保证金考虑进去
+
+                    beforePrice = pInfo["BuyPrice"]  # 未平之前的持仓价
+                    # 平仓盈亏
+                    liquidateprofit = (beforePrice * pInfo["TotalBuy"] - orderPrice * pInfo["TotalBuy"]) * cost[
+                        "TradeDot"]
+                    turnover = orderPrice * pInfo["TotalBuy"] * cost["TradeDot"]
+                    margin = turnover * cost["Margin"]
+
+                    if availableFund + liquidateprofit - margin - openCharge < coverCharge:
                         self._logger.error(f"自动平仓：[{userNo}] [{contNo}] 开卖开仓失败")
                         ret = -2  # 开卖开仓失败
                     else:
@@ -427,7 +483,7 @@ class CalcCenter(object):
             self._logger.error("考虑滑点计算订单成交价时出错，direct类型错误!")
             raise TypeError
 
-        cost = self.getCostRate(contract)
+        cost = self._getCostRate(contract)
         slippage = cost["Slippage"]
         priceTick = cost["PriceTick"]
         if direct == dBuy:
@@ -464,8 +520,6 @@ class CalcCenter(object):
         }
         :return: 1, 0, addOrder 成功  失败标志
         """
-        # print("---------: ", order)
-        # print("begin:", datetime.now().strftime('%H:%M:%S.%f'))
         if not self._beginDate:
             self._beginDate = order["TradeDate"]
         self._endDate = order["TradeDate"]
@@ -485,7 +539,7 @@ class CalcCenter(object):
 
         order.update({"OrderId": self._orderId})
         self._orderId += 1
-        self._costs[order["Cont"]] = self.getCostRate(order["Cont"])
+        self._costs[order["Cont"]] = self._getCostRate(order["Cont"])
         # self._updateTradeDate(order["TradeDate"])
 
         ftOrder = self._formatOrder(order)
@@ -507,10 +561,8 @@ class CalcCenter(object):
             ftOrder["OrderPrice"],
             ftOrder["OrderQty"],
             ftOrder["OrderType"],
-            ftOrder["Hedge"]))
-
-        # self._logger.trade_info(f"发送虚拟订单，策略Id:{ftOrder['StrategyId']}, 运行阶段：{ftOrder['StrategyStage']}，"
-        #                         f"本地订单号：{ftOrder['OrderId']},订单数据：{repr(order)}")
+            ftOrder["Hedge"])
+            )
 
         contPrice = {
             "Cont": order["Cont"],
@@ -593,7 +645,7 @@ class CalcCenter(object):
 
     def _calcOrder(self, order):
         """"
-        计算订单的扩展持仓信息
+        计算订单的扩展信息
         :return:
         """
         charge = 0  # 手续费
@@ -621,10 +673,6 @@ class CalcCenter(object):
             charge, charge1, turnover, liquidateProfit, profit, linkList, slipLoss = self._buyCloseToday(order, pInfo,
                                                                                                          qty)
 
-        elif order["Direct"] == dBuy and order["Offset"] == oNone:
-            self._calcOrderOuter(order)
-            return
-
         elif order["Direct"] == dSell and order["Offset"] == oOpen:  # 卖开
             qty = order["OrderQty"]
             charge, turnover, margin, profit, slipLoss = self._sellOpen(order, qty)
@@ -637,11 +685,6 @@ class CalcCenter(object):
             qty = order["OrderQty"] if pInfo["TodayBuy"] > order["OrderQty"] else pInfo["TodayBuy"]
             charge, charge1, turnover, liquidateProfit, profit, linkList, slipLoss = self._sellCloseToday(order, pInfo,
                                                                                                           qty)
-
-        # TODO：因区分不出外盘订单，所以外盘订单的滑点损耗未计算
-        elif order["Direct"] == dSell and order["Offset"] == oNone:
-            self._calcOrderOuter(order)
-            return
 
         eo.update({
             "Order": order,
@@ -682,7 +725,7 @@ class CalcCenter(object):
         """ 持仓信息"""
         # 用订单的成交价作为最新价来进行相关计算
         lastPrice = order["OrderPrice"]
-        cost = self.getCostRate(order["Cont"])
+        cost = self._getCostRate(order["Cont"])
         pInfo = self._getSpecificPositionInfo(order["UserNo"], order["Cont"])
 
         # TODO: 计算持仓时默认是优先平今，后期可能会存在优先平今、优先平昨可选的情况
@@ -705,21 +748,6 @@ class CalcCenter(object):
             pInfo["TodaySell"] -= vol
             pInfo["SellPrice"] = self._getHoldPrice(order["Cont"], pInfo["TotalSell"] - vol, False)
 
-        # 买（外盘）
-        elif order["Direct"] == dBuy and order["Offset"] == oNone:
-            if pInfo["TotalSell"] > 0:  # 有对应方向的头寸
-                if pInfo["TotalSell"] >= order["OrderQty"]:
-                    pInfo["TotalSell"] -= order["OrderQty"]
-                else:
-                    pInfo["TotalBuy"] = order["OrderQty"] - pInfo["TotalSell"]
-                    pInfo["TotalSell"] = 0
-            else:
-                pInfo["TotalBuy"] += order["OrderQty"]
-
-            pInfo["BuyPrice"] = (pInfo["TotalBuy"] * pInfo["BuyPrice"] + order["OrderQty"]
-                                 * order["OrderPrice"]) / (pInfo["TotalBuy"] + order["OrderQty"])
-            pInfo["TodayBuy"] = 0
-
         elif order["Direct"] == dSell and order["Offset"] == oOpen:  # 卖出开仓
             pInfo["SellPrice"] = (pInfo["TotalSell"] * pInfo["SellPrice"] + order["OrderQty"]
                                   * order["OrderPrice"]) / (pInfo["TotalSell"] + order["OrderQty"])
@@ -738,27 +766,12 @@ class CalcCenter(object):
             pInfo["TodayBuy"] -= vol
             pInfo["BuyPrice"] = self._getHoldPrice(order["Cont"], pInfo["TotalBuy"] - vol, True)
 
-        elif order["Direct"] == dSell and order["Offset"] == oNone:  # 卖（外盘）
-            if pInfo["TotalBuy"] > 0:  # 有对应方向的头寸
-                if pInfo["TotalBuy"] >= order["OrderQty"]:
-                    pInfo["TotalBuy"] -= order["OrderQty"]
-                else:
-                    pInfo["TotalSell"] = order["OrderQty"] - pInfo["TotalBuy"]
-                    pInfo["TotalBuy"] = 0
-            else:
-                pInfo["TotalSell"] += order["OrderQty"]
-
-            pInfo["SellPrice"] = (pInfo["TotalBuy"] * pInfo["BuyPrice"] + order["OrderQty"]
-                                  * order["OrderPrice"]) / (pInfo["TotalBuy"] + order["OrderQty"])
-            pInfo["TodayBuy"] = 0  # 外盘不计算今持仓，将今持仓置为0
-
         #self._logger.debug("Margin1:%.2f, %d, %d, %d, %.2f" %(lastPrice, pInfo["TotalBuy"], pInfo["TotalSell"], cost["TradeDot"], cost["Margin"]))
         pInfo["LongMargin"] = lastPrice * pInfo["TotalBuy"] * cost["TradeDot"] * cost["Margin"]
         pInfo["ShortMargin"] = lastPrice * pInfo["TotalSell"] * cost["TradeDot"] * cost["Margin"]
         # 持仓盈亏（浮动盈亏）
         pInfo["HoldProfit"] = ((lastPrice - pInfo["BuyPrice"]) * pInfo["TotalBuy"]
                                + (pInfo["SellPrice"] - lastPrice) * pInfo["TotalSell"]) * cost["TradeDot"]
-        # print("00000000000000 : ", pInfo["HoldProfit"])
 
         charge = 0
 
@@ -811,20 +824,6 @@ class CalcCenter(object):
         if contract in self._firstOpenOrder:
             return self._firstOpenOrder[contract]
         return {}
-
-    # def _updateLatestOpenOrder(self, user, contract):
-    #     """
-    #     更新最近一笔开仓单
-    #     """
-    #     pInfo = self._getSpecificPositionInfo(user, contract)
-    #     if pInfo["TotalBuy"] > 0 or pInfo["TotalSell"] > 0:
-    #         head = self._firstHoldPosition - 1 if self._firstHoldPosition > 0 else (-len(self._orders) - 1)
-    #         for eo in self._orders[:head:-1]:
-    #             if eo["Order"]["Cont"] == contract and eo["LeftNum"] > 0:
-    #                 self._latestOpenOrder[contract] = eo["Order"]
-    #                 return
-    #     else:
-    #         self._latestOpenOrder[contract] = {}
 
     def _updateLatestOpenOrder(self, user, contract):
         """
@@ -942,21 +941,6 @@ class CalcCenter(object):
                         or eo["Order"]["Direct"] == dSell and eo["Order"]["Offset"] == oCover:  # 内盘平仓单
                     self._latestCoverOrder[contract] = eo["Order"]
                     return
-                elif eo["Order"]["Direct"] == dBuy and eo["Order"]["Offset"] == oNone \
-                        or eo["Order"]["Direct"] == dSell and eo["Order"]["Offset"] == oNone:  # 外盘订单
-                    if not tempOrder:
-                        tempOrder = eo["Order"]
-                        continue
-
-                    if eo["Order"]["Direct"] != tempOrder["Direct"]:
-                        self._latestCoverOrder[contract] = tempOrder
-                        return
-                    else:
-                        tempOrder = eo["Order"]
-                else:
-                    continue
-
-        return
 
     def getLatestCoverOrder(self, contract):
         """
@@ -967,19 +951,6 @@ class CalcCenter(object):
         if contract in self._latestCoverOrder:
             return self._latestCoverOrder[contract]
         return {}
-
-    # def _updateLatestBuyOpenOrder(self, user, contract):
-    #     """更新最近一笔买方向开仓单"""
-    #     pInfo = self._getSpecificPositionInfo(user, contract)
-    #     if pInfo["TotalBuy"] > 0 or pInfo["TotalSell"] > 0:
-    #         head = self._firstHoldPosition - 1 if self._firstHoldPosition > 0 else (-len(self._orders) - 1)
-    #         # for eo in self._orders[:(-len(self._orders)+1-self._firstHoldPosition):-1]:
-    #         for eo in self._orders[:head:-1]:
-    #             if eo["Order"]["Cont"] == contract and eo["LeftNum"] > 0:
-    #                 self._latestOpenOrder[contract] = eo["Order"]
-    #                 return
-    #     else:
-    #         self._latestOpenOrder[contract] = {}
 
     def _getOpenCharge(self, contract, num, offset, flag, linkList):
         """
@@ -999,12 +970,9 @@ class CalcCenter(object):
             index -= 1
             if leftOrderQty > 0 and contract == eo["Order"]["Cont"] \
                     and (eo["Order"]["Direct"] == dBuy and eo["Order"]["Offset"] == oOpen and flag) \
-                    or (eo["Order"]["Direct"] == dSell and eo["Order"]["Offset"] == oOpen and not flag) \
-                    or (eo["Order"]["Direct"] == dBuy and eo["Order"]["Offset"] == oNone and flag) \
-                    or (eo["Order"]["Direct"] == dSell and eo["Order"]["Offset"] == oNone and not flag):
+                    or (eo["Order"]["Direct"] == dSell and eo["Order"]["Offset"] == oOpen and not flag):
                 # 找到contract合约对应的开仓单(卖开或买开）
-                if offset < eo["LeftNum"] and eo[
-                    "LeftNum"] > 0:  # 考虑到外盘的情况，这里判断条件将offset < order["OrderQty"]改为["LeftNum"]
+                if offset < eo["LeftNum"] and eo["LeftNum"] > 0:
                     validNum = eo["LeftNum"] - offset if offset > 0 else eo["LeftNum"]  # 表示temp订单中平了多少手
                     realNum = validNum if leftOrderQty >= validNum else leftOrderQty
                     singleCharge = eo["Cost"] / eo["LeftNum"]
@@ -1124,38 +1092,6 @@ class CalcCenter(object):
                 break
             self._firstHoldPosition += 1
 
-    # 弃用
-    def _getFirstOpenOrder(self, contract):
-        if not self._orders:
-            return []
-        else:
-            for eo in self._orders:
-                if eo["Order"]["Cont"] == contract \
-                        and (eo["Order"]["Direct"] == dBuy and eo["Order"]["Offset"] == oOpen) \
-                        or (eo["Order"]["Direct"] == dSell and eo["Order"]["Offset"] == oOpen):
-                    if eo["LeftNum"] > 0:
-                        return eo["Order"]
-
-    # updateOrderPrice暂时先不用，与MaxPrice和MinPrice相关的信息暂时先不计算
-    # TODO: 后期如果使用的话需要传入user参数
-    def _updateOrderPrice(self, contPrice):
-        for i in range(self._firstHoldPosition, len(self._orders)):
-            ol = self._orders[i]
-            pInfo = self._getSpecificPositionInfo(contPrice["Cont"])
-            # 开仓单
-            if (ol["Order"]["Direct"] == dBuy and ol["Order"]["Offset"] == oOpen) \
-                    or (ol["Order"]["Direct"] == dSell and ol["Order"]["Offset"] == oOpen) \
-                    or (ol["Order"]["Direct"] == dBuy and ol["Order"]["Offset"] == oNone and pInfo["TotalSell"] == 0) \
-                    or (ol["Order"]["Direct"] == dSell and ol["Order"]["Offset"] == oNone and pInfo["TotalBuy"] == 0):
-                if contPrice["Cont"] == ol["Order"]["Cont"]:
-                    # ol["MaxPrice"] 为空
-                    if contPrice["Price"] > ol["MaxPrice"]:
-                        ol["MaxPrice"] = contPrice["Price"]
-                        ol["MaxTime"] = contPrice["Time"]
-                    if contPrice["Price"] < ol["MinPrice"]:
-                        ol["MinPrice"] = contPrice["Price"]
-                        ol["MinTime"] = contPrice["Time"]
-
     def _calcOrderProfit(self, extendOrder):
         """
 
@@ -1164,8 +1100,7 @@ class CalcCenter(object):
         """
         pInfo = self._getSpecificPositionInfo(extendOrder["Order"]["UserNo"], extendOrder["Order"]["Cont"])
         if (extendOrder["Order"]["Direct"] == dBuy and extendOrder["Order"]["Offset"] == oOpen) \
-                or (extendOrder["Order"]["Direct"] == dSell and extendOrder["Order"]["Offset"] == oOpen) \
-                or (extendOrder["Order"]["Offset"] == oNone and extendOrder["HasOpen"] and not extendOrder["HasClose"]):
+                or (extendOrder["Order"]["Direct"] == dSell and extendOrder["Order"]["Offset"] == oOpen):
             # self._profit["AllTrade"] += extendOrder["Order"]["OrderQty"]  # 开仓手数
             self._profit["AllTimes"] += 1  # 开仓次数
             self._profit["TotalLose"] += - extendOrder["Profit"]  # 总亏损
@@ -1372,7 +1307,7 @@ class CalcCenter(object):
 
                     pInfo = self._updateTodayPosition(pInfo)
 
-                    cost = self.getCostRate(contract)
+                    cost = self._getCostRate(contract)
                     pInfo["LongMargin"] = lastPrice * cost["TradeDot"] * pInfo["TotalBuy"] * cost["Margin"]
                     pInfo["ShortMargin"] = lastPrice * cost["TradeDot"] * pInfo["TotalSell"] * cost["Margin"]
                     pInfo["HoldProfit"] = ((lastPrice - pInfo["BuyPrice"])
@@ -1475,83 +1410,6 @@ class CalcCenter(object):
         # # 由tradeDays怎么能得到交易了多少天呢，直接相减肯定有问题，因为startTime和endTime是整形数据
         # self._profit["TradeDays"] = tradeDays
 
-    def liquidateAll(self, bOrderReport=False):
-        """
-        模拟把所有持仓平完
-        :param bOrderReport:
-        :return:
-        """
-        """
-        "UserNo":         # 用户编号
-        "OrderType":      # 定单类型
-        "ValidType":      # 有效类型
-        "ValidTime":      # 有效日期时间(GTD情况下使用)
-        "Cont":           # 合约
-        "Direct":         # 买卖方向
-        "Offset":         # 开仓平仓 或 应价买入开平
-        "Hedge":          # 投机套保
-        "OrderPrice":     # 委托价格 或 期权应价买入价格
-        "OrderQty" :      # 委托数量 或 期权应价数量
-        "DateTimeStamp":  # 时间戳（基准合约）
-        "TradeDate":      # 交易日（基准合约）
-        "TriggerType":    # 触发方式
-        "CurBar":         # K线信息
-        "CurBarIndex":    # K线索引
-        "StrategyId":     # 策略Id
-        "StrategyName":   # 策略名称
-        "StrategyStage":  # 策略运行阶段
-        }
-        """
-        orderList = []
-        lastTime = 0
-        positions = self.getUsersPosition()
-
-        if self._fundRecords:
-            lastTime = self._fundRecords[-1]["Time"]
-
-        for pInfo in positions.values():
-            if pInfo["TotalBuy"] > 0:  # 有持买
-                order = defaultdict()
-                order["Cont"] = pInfo["Cont"]
-                contPrice = self._getCurrentPrice(pInfo["Cont"])
-                order["OrderPrice"] = pInfo["BuyPrice"] if contPrice["Price"] == 0 else contPrice["Price"]
-                order["DateTimeStamp"] = lastTime
-                order["Direct"] = dSell
-                order["Offset"] = oCover
-                order["OrderQty"] = pInfo["TotalBuy"]
-                orderList.append(order)
-            if pInfo["TotalSell"] > 0:  # 有持卖
-                order = defaultdict()
-                order["Cont"] = pInfo["Cont"]
-                contPrice = self._getCurrentPrice(pInfo["Cont"])
-                order["OrderPrice"] = pInfo["SellPrice"] if contPrice["Price"] == 0 else contPrice["Price"]
-                order["DateTimeStamp"] = lastTime
-                order["Direct"] = dBuy
-                order["Offset"] = oCover
-                order["OrderQty"] = pInfo["TotalSell"]
-                orderList.append(order)
-
-        for i in range(len(orderList)):
-            theOrder = orderList[i]
-            # cost = self.getCostRate(theOrder["Cont"])
-            # self.addOrder(theOrder, cost, bOrderReport)
-            self.addOrder(theOrder)
-
-        if self._runSet["EndTime"] == 0:
-            if lastTime == 0:
-                self._runSet["EndTime"] = self._runSet["StartTime"]
-            else:
-                self._runSet["EndTime"] = lastTime
-
-    def calcLastStaticInfo(self):
-        # 计算最后一个阶段总结数据
-        pass
-        # self._calcStageStaticInfo(self._dailyStatis)
-        # self._calcStageStaticInfo(self._weekStatis)
-        # self._calcStageStaticInfo(self._monthStatis)
-        # self._calcStageStaticInfo(self._quarterStatis)
-        # self._calcStageStaticInfo(self._yearStatis)
-
     def getFundRecord(self):
         """
         获取可用资金记录
@@ -1572,7 +1430,7 @@ class CalcCenter(object):
         :param qty:  手数
         :return: 计算结果
         """
-        cost = self.getCostRate(order["Cont"])
+        cost = self._getCostRate(order["Cont"])
 
         if cost["OpenRatio"]:
             charge = order["OrderPrice"] * qty * cost["TradeDot"] * cost["OpenRatio"]
@@ -1595,7 +1453,7 @@ class CalcCenter(object):
         :param qty: 手数
         :return: 计算结果
         """
-        cost = self.getCostRate(order["Cont"])
+        cost = self._getCostRate(order["Cont"])
         linkList = []
         if cost["CloseRatio"]:
             charge = order["OrderPrice"] * qty * cost["TradeDot"] * cost["CloseRatio"]
@@ -1624,7 +1482,7 @@ class CalcCenter(object):
         """
         计算卖开相关信息
         """
-        cost = self.getCostRate(order["Cont"])
+        cost = self._getCostRate(order["Cont"])
         if cost["OpenRatio"]:
             charge = order["OrderPrice"] * qty * cost["TradeDot"] * cost["OpenRatio"]
         else:
@@ -1642,7 +1500,7 @@ class CalcCenter(object):
         """
         计算卖平相关信息
         """
-        cost = self.getCostRate(order["Cont"])
+        cost = self._getCostRate(order["Cont"])
         linkList = []
 
         if cost["CloseRatio"]:
@@ -1668,7 +1526,7 @@ class CalcCenter(object):
 
     def _buyCloseToday(self, order, pInfo, qty):
         """计算买平今相关信息"""
-        cost = self.getCostRate(order["Cont"])
+        cost = self._getCostRate(order["Cont"])
         linkList = []  # value = {id, vol}
 
         # 手续费，手续费是不是和普通的平仓不一样
@@ -1698,7 +1556,7 @@ class CalcCenter(object):
 
     def _sellCloseToday(self, order, pInfo, qty):
         """计算卖平今相关信息"""
-        cost = self.getCostRate(order["Cont"])
+        cost = self._getCostRate(order["Cont"])
         linkList = []  # value = {id, vol}
 
         if cost["CloseTodayRatio"]:
@@ -1725,106 +1583,6 @@ class CalcCenter(object):
 
         return charge, charge1, turnover, liquidateProfit, profit, linkList, slipLoss
 
-    def _calcOrderOuter(self, order):
-        """
-        计算外盘订单相关信息
-        :param order: 订单
-        :return:
-        """
-        availableFund = self.getAvailableFund()
-        margin = 0
-        liquidateProfit = 0
-        charge = 0
-        turnover = 0
-        profit = 0
-        eoi = defaultdict()  # 扩展订单信息
-        pInfo = self._getSpecificPositionInfo(order["UserNo"], order["Cont"])
-        hasOpen = False  # 标记是否有开仓
-        openQty = 0  # 开仓手数
-        hasClose = False  # 标记是否有平仓
-        closeQty = 0  # 平仓手数
-
-        if order["Direct"] == dBuy and order["Offset"] == oNone:  # 买
-            if pInfo["TotalSell"] > 0:  # 存在对应方向的头寸
-                qty = order["OrderQty"] if pInfo["TotalSell"] >= order["OrderQty"] else pInfo["TotalSell"]
-                charge, charge1, turnover, liquidateProfit, profit, linkList = self._buyClose(order, pInfo, qty)
-                if pInfo["TotalSell"] < order["OrderQty"]:  # 买开
-                    qtyLeft = order["OrderQty"] - pInfo["TotalSell"]
-                    charge_, turnover_, margin, profit_ = self._buyOpen(order, qtyLeft)
-                    charge += charge_
-                    turnover += turnover_
-                    profit += profit_
-                    hasOpen = True
-                    # openQty = qty_left
-                hasClose = True
-                # closeQty = qty
-
-            else:  # 买开
-                qty = order["OrderQty"]
-                charge, turnover, margin, profit = self._buyOpen(order, qty)
-                hasOpen = True
-                # openQty = qty
-
-        if order["Direct"] == dSell and order["Offset"] == oNone:  # 卖
-            if pInfo["TotalBuy"] > 0:  # 存在对应方向的头寸
-                qty = order["OrderQty"] if pInfo["TotalBuy"] >= order["OrderQty"] else pInfo["TotalBuy"]
-                charge, charge1, turnover, liquidateProfit, profit, linkList = self._sellClose(order, pInfo, qty)
-                if pInfo["TotalBuy"] < order["OrderQty"]:  # 卖开
-                    qtyLeft = order["OrderQty"] - pInfo["TotalBuy"]
-                    charge_, turnover_, margin, profit_ = self._buyOpen(order, qtyLeft)
-                    charge += charge_
-                    turnover += turnover_
-                    profit += profit_
-                    hasOpen = True
-                    # openQty = qtyLeft
-                hasClose = True
-                # closeQty = qty
-            else:  # 卖开
-                qty = order["OrderQty"]
-                charge, turnover, margin, profit = self._sellOpen(order, qty)
-                hasOpen = True
-                # openQty = qty
-
-        eoi["Order"] = order
-        eoi["Cost"] = charge
-        eoi["Margin"] = margin
-        eoi["Turnover"] = turnover
-        eoi["LiquidateProfit"] = liquidateProfit
-        eoi["Profit"] = profit
-        # 新增标志信息
-        eoi["HasOpen"] = hasOpen
-        # eoi["OpenQty"] = openQty
-        eoi["HasClose"] = hasClose
-        # eoi["CloseQty"] = closeQty
-
-        if pInfo["TotalSell"] > 0 and order["Direct"] == dBuy:  # 存在平仓
-            eoi["OpenLink"] = []
-            for i in range(len(linkList)):
-                eoi["OpenLink"].append(linkList[i])
-                self._orders[linkList[i]["id"]]["LeftNum"] -= linkList[i]["vol"]
-            eoi["LinkNum"] = len(linkList)
-            eoi["LeftNum"] = 0 if pInfo["TotalSell"] - order["OrderQty"] >= 0 else order["OrderQty"] - pInfo[
-                "TotalSell"]
-        elif pInfo["TotalBuy"] > 0 and order["Direct"] == dSell:
-            eoi["OpenLink"] = []
-            for i in range(len(linkList)):
-                eoi["OpenLink"].append(linkList[i])
-                self._orders[linkList[i]["id"]]["LeftNum"] -= linkList[i]["vol"]
-            eoi["LinkNum"] = len(linkList)
-            eoi["LeftNum"] = 0 if pInfo["TotalBuy"] - order["OrderQty"] >= 0 else order["OrderQty"] - pInfo["TotalSell"]
-
-        else:
-            eoi["OpenLink"] = None
-            eoi["LinkNum"] = 0
-            eoi["LeftNum"] = order["OrderQty"]
-            # eoi["MaxPrice"] = order["OrderPrice"]
-            # eoi["MaxTime"] = order["DateTimeStamp"]
-            # eoi["MinPrice"] = order["OrderPrice"]
-            # eoi["MinTime"] = order["DateTimeStamp"]
-
-        self._orders.append(eoi)
-        return
-
     def _calcTodayPosition(self, order, pInfo, flag):
         """
         计算order的今持仓
@@ -1838,8 +1596,6 @@ class CalcCenter(object):
                 for eo in self._orders[-2::-1]:
                     if order["Cont"] == eo["Order"]["Cont"] and (
                             eo["Order"]["Direct"] == dBuy and eo["Order"]["Offset"] == oOpen):
-                        # if order["CurrentBar"]["TradeDate"] == eo["Order"]["CurrentBar"]["TradeDate"]:
-                        # if order["CurrentBar"]["TradeDate"] == self._tradeDate:
                         if order["TradeDate"] == self._curTradeDate:
                             return pInfo["TodayBuy"] + order["OrderQty"]
                         else:
@@ -1855,8 +1611,6 @@ class CalcCenter(object):
                 for eo in self._orders[-2::-1]:
                     if order["Cont"] == eo["Order"]["Cont"] and (
                             eo["Order"]["Direct"] == dSell and eo["Order"]["Offset"] == oOpen):
-                        # if order["CurrentBar"]["TradeDate"] == eo["Order"]["CurrentBar"]["TradeDate"]:
-                        # if order["CurrentBar"]["TradeDate"] == self._tradeDate:
                         if order["TradeDate"] == self._curTradeDate:
                             return pInfo["TodaySell"] + order["OrderQty"]
                         else:
@@ -2223,30 +1977,6 @@ class CalcCenter(object):
                 self._tradeInfo["MaxLoseComparedIncreaseContinueDaysTime"] = "-"
 
             self._tradeInfo["PreviousDayEquity"] = self._fundRecords[-1]["DynamicEquity"]
-
-    # ----------弃用---------------
-    def curBarOrder(self):
-        """
-        获取当前运行k线的订单
-        :return: 若当根k线存在下单成功的订单，则返回当根k线的订单列表，否则返回-1
-        """
-        curBarOrder = []
-        for _o in self._orders[::-1]:
-            if _o["CurrentBarIndex"] == self._currentBar:
-                curBarOrder.append(_o["Order"])
-
-        if curBarOrder:
-            return curBarOrder
-        return None
-
-    # def curAvailable(self):
-    #     """
-    #
-    #     :return: 返回最新的资金记录信息，若资金记录为空，则返回初始资金
-    #     """
-    #     if self._fundRecords:
-    #         return self._fundRecords[-1]['Available']
-    #     return self._runSet["StartFund"]
 
     def getAvailableFund(self):
         """
