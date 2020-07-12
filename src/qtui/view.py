@@ -1025,15 +1025,16 @@ class StrategyPolicy(QWidget):
         else:
             self._strConfig.setTradeFee('O', 'F', float(openFee))
         # 平仓按比例收费
+        # TODO：平今手续费暂时先按平仓手续费设置
         if closeType == "比例":
             self._strConfig.setTradeFee('C', 'R', float(closeFee) / 100)
+            # 平今手续费
+            self._strConfig.setTradeFee('T', 'R', float(closeFee) / 100)
         else:
             self._strConfig.setTradeFee('C', 'F', float(closeFee))
+            self._strConfig.setTradeFee('T', 'F', float(closeFee))
         # 平今手续费
-        # TODO：平今手续费没有设置
-        # self.config["Money"]["CloseTodayFee"]["Type"] = "F"
-        # self.config["Money"]["CloseTodayFee"]["Type"] = 0
-        self._strConfig.setTradeFee('T', "F", 0)
+        # self._strConfig.setTradeFee('T', "F", 0)
 
         # 滑点损耗
         self._strConfig.setSlippage(float(slippage))
