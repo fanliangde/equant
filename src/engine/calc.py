@@ -48,10 +48,10 @@ class CalcCenter(object):
 
         # _tradeTimeInfo 从开仓到平仓为0记为一次交易
         self._tradeTimeInfo = {
-            "TradeTimes" : 0,
-            "WinTimes"   : 0,
-            "LoseTimes"  : 0,
-            "EventTimes" : 0
+            "TradeTimes"  : 0,    # 交易次数
+            "TradeWins"   : 0,    # 盈利次数
+            "TradeLoses"  : 0,    # 亏损次数
+            "TradeEvents" : 0     # 持平次数
         }
 
         self._yearStatis = []  # 年统计
@@ -293,7 +293,7 @@ class CalcCenter(object):
         if cost["CloseRatio"]:
             coverCharge = orderPrice * qty * cost["TradeDot"] * cost["CloseRatio"]
         else:
-            coverCharge = orderPrice * qty * cost["TradeDot"] * cost["CloseFixed"]
+            coverCharge = qty * cost["CloseFixed"]
 
         return coverCharge
 
@@ -364,7 +364,7 @@ class CalcCenter(object):
                     turnover = orderPrice * pInfo["TotalSell"] * cost["TradeDot"]
                     margin = turnover * cost["Margin"]
 
-                    if availableFund + liquidateprofit - margin - openCharge < coverCharge:
+                    if availableFund + liquidateprofit - margin - coverCharge < openCharge:
                         self._logger.error(f"自动平仓：[{userNo}] [{contNo}] 开买开仓失败")
                         ret = -2  # 开买开仓失败
                     else:
@@ -393,12 +393,12 @@ class CalcCenter(object):
 
                     beforePrice = pInfo["BuyPrice"]  # 未平之前的持仓价
                     # 平仓盈亏
-                    liquidateprofit = (beforePrice * pInfo["TotalBuy"] - orderPrice * pInfo["TotalBuy"]) * cost[
+                    liquidateprofit = (orderPrice * pInfo["TotalBuy"] - beforePrice * pInfo["TotalBuy"]) * cost[
                         "TradeDot"]
                     turnover = orderPrice * pInfo["TotalBuy"] * cost["TradeDot"]
                     margin = turnover * cost["Margin"]
 
-                    if availableFund + liquidateprofit - margin - openCharge < coverCharge:
+                    if availableFund + liquidateprofit - margin - coverCharge < openCharge:
                         self._logger.error(f"自动平仓：[{userNo}] [{contNo}] 开卖开仓失败")
                         ret = -2  # 开卖开仓失败
                     else:
@@ -584,7 +584,7 @@ class CalcCenter(object):
         eo = self._orders[-1]
         self._calcOrderProfit(eo)  # self._calcSingleReturns（eo)是不是可以放在calcOrderProfit中呢？？？
 
-        # TODO：该函数作用??
+        # TODO：该函数作用??????????????????????????????????
         self._calcSingleReturns(eo)
         # 计算交易次数(从开仓到平仓为0记为一次交易)
         self._calcTradeTimes(eo)
@@ -662,6 +662,7 @@ class CalcCenter(object):
             qty = order["OrderQty"] if pInfo["TotalSell"] > order["OrderQty"] else pInfo["TotalSell"]
             charge, charge1, turnover, liquidateProfit, profit, linkList, slipLoss = self.__calcCloseInfo(order, pInfo,
                                                                                                           qty, False)
+
         elif order["Direct"] == dSell and order["Offset"] == oCover:  # 卖平
             qty = order["OrderQty"] if pInfo["TotalBuy"] > order["OrderQty"] else pInfo["TotalBuy"]
             charge, charge1, turnover, liquidateProfit, profit, linkList, slipLoss = self.__calcCloseInfo(order, pInfo,
@@ -675,7 +676,7 @@ class CalcCenter(object):
         elif order["Direct"] == dSell and order["Offset"] == oCoverT:  # 卖平今
             qty = order["OrderQty"] if pInfo["TodayBuy"] > order["OrderQty"] else pInfo["TodayBuy"]
             charge, charge1, turnover, liquidateProfit, profit, linkList, slipLoss = self.__calcCloseTInfo(order, pInfo,
-                                                                                                           qty, False)
+                                                                                                           qty, True)
 
         eo.update({
             "Order": order,
@@ -1102,6 +1103,7 @@ class CalcCenter(object):
         if (extendOrder["Order"]["Direct"] == dBuy and extendOrder["Order"]["Offset"] == oOpen) \
                 or (extendOrder["Order"]["Direct"] == dSell and extendOrder["Order"]["Offset"] == oOpen):
             # self._profit["AllTrade"] += extendOrder["Order"]["OrderQty"]  # 开仓手数
+            # TODO: AllTimes不正确
             self._profit["AllTimes"] += 1  # 开仓次数
             self._profit["TotalLose"] += - extendOrder["Profit"]  # 总亏损
             self._profit["TotalProfit"] += extendOrder["Profit"]  # 累计盈利
@@ -1112,7 +1114,7 @@ class CalcCenter(object):
             if extendOrder["Profit"] > 0:  # 盈利，纯利润盈利了
                 self._continueWin += 1
                 self._continueLose = 0
-                self._profit["TotalWin"] += extendOrder["Profit"]
+                self._profit["TotalWin"] += extendOrder["Profit"]    # 总盈利
                 if extendOrder["Profit"] > self._profit["MaxTradeWin"]:
                     self._profit["MaxTradeWin"] = extendOrder["Profit"]
                 # self._profit["WinTrade"] += extendOrder["Order"]["OrderQty"]
@@ -1135,9 +1137,9 @@ class CalcCenter(object):
 
             self._profit["TotalProfit"] = self._profit["TotalWin"] - self._profit["TotalLose"]  # 累计盈亏
             self._profit["TradeTimes"] += 1  # 交易次数，有一次下单就记录一次交易
-            # TODO：WinRate计算的对么？
-            self._profit["WinRate"] = (self._profit['TradeTimes'] - self._profit['LoseTimes']) / self._profit[
-                'TradeTimes']
+
+            # 胜率WinRate定义为：非亏损交易次数 / 总交易次数，其中一次平仓操作记一次交易
+            self._profit["WinRate"] = (self._profit['TradeTimes'] - self._profit['LoseTimes']) / self._profit['TradeTimes']
 
         self._profit["LiquidateProfit"] += extendOrder["LiquidateProfit"]  # 累计平仓盈亏
         self._profit["Turnover"] += extendOrder["Turnover"]   # 累计成交额
@@ -1155,22 +1157,28 @@ class CalcCenter(object):
         self._profit["Margin"] = self._getHoldMargin()
         self._profit["HoldProfit"] = self._getHoldProfit()
         #####################################################################
-        # Available计算方法是不是有问题，是不是应该将浮动盈亏也计算进去才对呢
+        # 一般期货公司都设置Available不包含浮动盈亏
         #####################################################################
         # TotalProfit表示的是累计盈亏
-        # 可用资金 = 期初资金 + 总盈利 + 浮动盈亏 - 保证金
-        self._profit["Available"] = self._profit["StartFund"] + self._profit["TotalProfit"] + self._profit[
-            "HoldProfit"] - self._profit["Margin"]
+        # 可用资金 = 期初资金 + 总盈亏 + 浮动盈亏 - 保证金（不采用）
+        # self._profit["Available"] = self._profit["StartFund"] + self._profit["TotalProfit"] + self._profit[
+        #     "HoldProfit"] - self._profit["Margin"]
+
+        # 可用资金 = 期初资金 + 总盈亏 - 保证金
+        self._profit["Available"] = self._profit["StartFund"] + self._profit["TotalProfit"] - self._profit["Margin"]
+        # 期末资产 = 期初资金 + 总盈亏 + 浮动盈亏
         self._profit["LastAssets"] = self._profit["StartFund"] + self._profit["TotalProfit"] + self._profit[
             "HoldProfit"]
 
-        # 收益率
+        # 收益率 = 累计盈亏 / 期初资金
         if self._runSet["StartFund"] != 0:
             self._profit["YieldRate"] = self._profit['TotalProfit'] / int(self._runSet['StartFund'])
         else:
             self._profit["YieldRate"] = 0
+
         # 年化单利收益率
         try:
+            # 年化单利收益率 = 盈利率 * 365 / (交易天数 / 365)
             self._profit["AnnualizedSimple"] = self._profit["Returns"] * 365 / self._calcTestDay(self._beginDate,
                                                                                                  self._endDate)
         except ZeroDivisionError as e:
@@ -1182,16 +1190,18 @@ class CalcCenter(object):
         for pInfo in positions.values():
             totalCost += pInfo["Cost"]
 
+        # 空仓资产 = 期末资产 - 清仓手续费
         self._profit["EmptyAssets"] = self._profit["LastAsset"] - totalCost
         temp = self._profit["LastAssets"]
 
         if temp >= self._profit["StartFund"]:
             if temp > self._profit["MaxAssets"]:
-                self._profit["MaxAssets"] = temp
-                self._profit["MaxAssetsTm"] = time
+                self._profit["MaxAssets"] = temp     # 期间最大资产
+                self._profit["MaxAssetsTm"] = time   # 最大资产出现时间
         else:
             if temp < self._profit["MinAssets"]:
-                self._profit["MinAssets"] = temp
+                self._profit["MinAssets"] = temp     # 期间最小资产
+                self._profit["MinAssetsTm"] = time   # 最小资产出现时间
                 self._profit["Risky"] = 1 - self._profit["MinAssets"] / self._profit["StartFund"] if self._profit[
                                                                                 "StartFund"] != 0 else 0  # 风险率
         if preAssets < self._profit["LastAssets"]:
@@ -1426,8 +1436,10 @@ class CalcCenter(object):
         beforePrice = beforeavgprice  # 未平之前的持仓价
         afterPrice = self._getHoldPrice(cont, beforeqty - qty, flag)  # 平过之后的持仓价
         # 平仓盈亏
-        liquidateProfit = ((beforePrice * beforeqty - afterPrice * (beforeqty - qty))
-                           - price * qty) * tradedot
+        if flag:
+            liquidateProfit = (price * qty - (beforePrice * beforeqty - afterPrice * (beforeqty - qty))) * tradedot
+        else:
+            liquidateProfit = ((beforePrice * beforeqty - afterPrice * (beforeqty - qty)) - price * qty) * tradedot
 
         return liquidateProfit
 
@@ -1457,6 +1469,7 @@ class CalcCenter(object):
     def __calcCloseInfo(self, order, pInfo, qty, flag):
         """
         计算平仓相关信息（包括买平、卖平）
+        :param order: 订单详情
         :param pInfo:
         :param qty:
         :param flag 标志位， True为卖平， False为买平
@@ -1481,14 +1494,14 @@ class CalcCenter(object):
                                                          order["OrderPrice"], qty,
                                                          cost["TradeDot"],
                                                          flag)
+
         else:
             charge1 = self._getOpenCharge(order["Cont"], qty, (pInfo["TotalSell"] - qty), flag, linkList)
             liquidateprofit = self.__calcLiquidateProfit(order["Cont"], pInfo["SellPrice"], pInfo["TotalSell"],
                                                          order["OrderPrice"], qty,
                                                          cost["TradeDot"],
                                                          flag)
-        # liquidateprofit = self.__calcLiquidateProfit(order["Cont"], pInfo, order["OrderPrice"], qty, cost["TradeDot"],
-        #                                              flag)
+
         profit = liquidateprofit - charge
         slipLoss = self.__calcSlippage(qty, cost["Slippage"], cost["PriceTick"], cost["TradeDot"])  # 滑点损耗
 
@@ -1499,7 +1512,7 @@ class CalcCenter(object):
         计算平今仓相关信息（包括买平今、卖平今）
         :param pInfo:
         :param qty:
-        :param flag 标志位， True为卖平， False为买平
+        :param flag 标志位， True为卖平今， False为买平今
         :return:
             charge: 平仓手续费
             charge1,
@@ -1512,7 +1525,7 @@ class CalcCenter(object):
         cost = self._getCostRate(order["Cont"])
         linkList = []
         # 手续费
-        charge = self.__calcCoverCharge(cost, qty, order["OrderPrice"])
+        charge = self.__calcCoverTCharge(cost, qty, order["OrderPrice"])
 
         turnover = self.__calcTurnover(order["OrderPrice"], qty, cost["TradeDot"])  # 成交额
         if flag:
@@ -1527,8 +1540,7 @@ class CalcCenter(object):
                                                          order["OrderPrice"], qty,
                                                          cost["TradeDot"],
                                                          flag)
-        # liquidateprofit = self.__calcLiquidateProfit(order["Cont"], pInfo, order["OrderPrice"], qty, cost["TradeDot"],
-        #                                              flag)
+
         profit = liquidateprofit - charge
         slipLoss = self.__calcSlippage(qty, cost["Slippage"], cost["PriceTick"], cost["TradeDot"])  # 滑点损耗
 
