@@ -43,7 +43,6 @@ class CalcCenter(object):
         self._orders = []  # 订单列表
         self._prices = defaultdict(dict)  # 每个合约的最新价信息
         self._fundRecords = []  # 资金记录
-        self._fundInfo = defaultdict(float)  # 资金概要：期初资产、期末资产、交易盈亏、最大资产、最小资产、佣金合计
         self._riskInfo = defaultdict(float)
 
         # _tradeTimeInfo 从开仓到平仓为0记为一次交易
@@ -1176,6 +1175,9 @@ class CalcCenter(object):
         else:
             self._profit["YieldRate"] = 0
 
+        # 盈利率Returns = 净利润 / 期初资金，其中净利润 = 累计盈亏
+        self._profit["Returns"] = self._profit["YieldRate"]
+
         # 年化单利收益率
         try:
             # 年化单利收益率 = 盈利率 * 365 / (交易天数 / 365)
@@ -1202,6 +1204,7 @@ class CalcCenter(object):
             if temp < self._profit["MinAssets"]:
                 self._profit["MinAssets"] = temp     # 期间最小资产
                 self._profit["MinAssetsTm"] = time   # 最小资产出现时间
+                # 风险率Risky: 本金最大回调/本金
                 self._profit["Risky"] = 1 - self._profit["MinAssets"] / self._profit["StartFund"] if self._profit[
                                                                                 "StartFund"] != 0 else 0  # 风险率
         if preAssets < self._profit["LastAssets"]:
@@ -1364,12 +1367,6 @@ class CalcCenter(object):
         })
 
         if beFound:
-            # if abs(self._fundRecords[-1]["DynamicEquity"] - fundRecord["DynamicEquity"]) < 0.001:
-            #     self._fundRecords[-1] = copy.copy(fundRecord)
-            # else:
-            #     self._fundRecords[-1]["Time"] -= 1
-            #     self._fundRecords.append(fundRecord)
-            #  这个地方有问题
             self._fundRecords[-1] = copy.copy(fundRecord)
         else:
             if self._fundRecords:  # 判断是否为空
@@ -1381,23 +1378,22 @@ class CalcCenter(object):
             else:
                 self._fundRecords.append(fundRecord)
 
-        self._fundInfo["StartAsset"] = self._profit["StartFund"]
-        self._fundInfo["LastAsset"] = self._profit["LastAsset"]
-        self._fundInfo["TradeProfit"] = self._profit["TotalProfit"]
-        self._fundInfo["MaxAsset"] = self._profit["MaxAssets"]
-        self._fundInfo["MinAsset"] = self._profit["MinAssets"]
-        self._fundInfo["TotalCost"] = self._profit["Cost"]
-
-        # # TODO: 以下错误
-        # startTime = self._fundRecords[0]["Time"]
-        # endTime = self._fundRecords[-1]["Time"]
-        # tradeDays = endTime - startTime
-        # # 由tradeDays怎么能得到交易了多少天呢，直接相减肯定有问题，因为startTime和endTime是整形数据
-        # self._profit["TradeDays"] = tradeDays
-
     def getFundRecord(self):
         """
         获取可用资金记录
+        每条记录内容注释：
+        {
+          "id": 编号
+          "Time": 时间
+          "TradeDate": 交易日
+          "TradeCost": 当前bar进行的交易产生的手续费
+          "LongMargin": 多头保证金,
+          "ShortMargin": 空头保证金,
+          "Available": 可用资金,
+          "StaticEquity": 静态权益,
+          "DynamicEquity": 动态权益,
+          "YieldRate": 收益率,
+        }
         :return:
         """
         if self._fundRecords:
@@ -1612,10 +1608,6 @@ class CalcCenter(object):
         return self._testDays
 
     @property
-    def paramStatistic(self):
-        return self._fundInfo
-
-    @property
     def getInitSetting(self):
         """获取回测的初始参数设定"""
         return self._runSet
@@ -1641,9 +1633,6 @@ class CalcCenter(object):
         month = parse(day).month
         quarter = int(month / 3 if month % 3 == 0 else month / 3 + 1)
         year = parse(day).year
-
-        end = "".join(self._runSet["EndTime"].split("-"))
-        # self._runSet["EndTime"][0:4] + self._runSet[5:7] + self._runSet[8:]
 
         # 交易次数记下来了，但是会不会存在总盈利和交易次数不匹配的情况呢：比如记录day_statis，
         # 在天的某一时刻有交易次数记录了，此时的总盈利和总亏损为某一值
@@ -1672,8 +1661,8 @@ class CalcCenter(object):
         self._calcStageStaticInfo(self._yearStatis, uflag)
 
     def getLastStaticData(self, periodStatis):
-        if periodStatis:  # 是否为空
-            lastData = periodStatis[-1]
+        if len(periodStatis) > 1:  # 是否为空
+            lastData = periodStatis[-2]
         else:
             lastData = defaultdict(int)
             lastData["Equity"] = self._runSet["StartFund"]
