@@ -1053,6 +1053,7 @@ class CalcCenter(object):
             else:
                 return 0
 
+    # 没用
     def _getCurrentPrice(self, contract):
         if contract in self._prices:
             return self._prices[contract]
@@ -1226,7 +1227,7 @@ class CalcCenter(object):
     def calcProfit(self, contractList, barInfo):
         """
         计算策略实时收益信息，参数为合约的最新价信息
-        :param contractNo: 合约代码列表
+        :param contractList: 合约代码列表
         :param barInfo: 合约的bar信息，类型为字典类型，键值是合约代码
         :return:
         """
@@ -1239,9 +1240,9 @@ class CalcCenter(object):
             raise ImportError("args error")
 
         # 计算空仓周期
+        #TODO：这个函数有问题
         self._calcEmptyPositionPeriod()
 
-        t = None
         contPrices = {}
 
         benchmarkNo = contractList[0]
@@ -1249,10 +1250,11 @@ class CalcCenter(object):
         if not self._beginDate:
             self._beginDate = barInfo[benchmarkNo]["TradeDate"]
         self._endDate = barInfo[benchmarkNo]["TradeDate"]
-        t = barInfo[benchmarkNo]["TradeDate"]
+
+        tradedate = barInfo[benchmarkNo]["TradeDate"]
         timeStamp = barInfo[benchmarkNo]["DateTimeStamp"]
         if self._curTradeDate is None:
-            self._curTradeDate = t
+            self._curTradeDate = tradedate
 
         for contract in contractList:
 
@@ -1276,10 +1278,10 @@ class CalcCenter(object):
             self._updateBuyOpenOrderPrice(barInfo[c]["HighPrice"], barInfo[c]["LowPrice"], c)
             self._updateSellOpenOrderPrice(barInfo[c]["HighPrice"], barInfo[c]["LowPrice"], c)
 
-        self._updateFundRecord(timeStamp, 0, 0, t)
+        self._updateFundRecord(timeStamp, 0, 0, tradedate)
         self._stageStatistics()  # 计算阶段总结
         self._calcTradeInfo()    # 计算交易信息
-        self._updateTradeDate(t)
+        self._updateTradeDate(tradedate)
         # ----------1ms或小于1ms-----------------------
         return
 
@@ -1305,19 +1307,24 @@ class CalcCenter(object):
                     charge = 0
                     pInfo["Cost"] = 0
 
-                    # 多头平仓手续费
-                    if cost["CloseRatio"]:
-                        charge = lastPrice * pInfo["TotalBuy"] * cost["TradeDot"] * cost["CloseRatio"]
+                    if self.__isSHFEorINE(contract):
+                        bCharge = self.__calcCoverCharge(cost, pInfo["TotalBuy"] - pInfo["TodayBuy"], lastPrice)
+                        tCharge = self.__calcCoverTCharge(cost, pInfo["TodayBuy"], lastPrice)
+                        charge = bCharge + tCharge
                     else:
-                        charge = pInfo["TotalBuy"] * cost["CloseFixed"]
-                    #self._positions[contract]["Cost"] += charge
+                        charge = self.__calcCoverCharge(cost, pInfo["TotalBuy"], lastPrice)
+
                     pInfo["Cost"] += charge
 
                     # 空头平仓手续费
-                    if cost["CloseRatio"]:
-                        charge = lastPrice * pInfo["TotalSell"] * cost["TradeDot"] * cost["CloseRatio"]
+                    if self.__isSHFEorINE(contract):
+                        bCharge = self.__calcCoverCharge(cost, pInfo["TotalSell"] - pInfo["TodaySell"],
+                                                         lastPrice)  # 平昨手续费
+                        tCharge = self.__calcCoverTCharge(cost, pInfo["TodaySell"], lastPrice)  # 平今手续费
+                        charge = bCharge + tCharge
                     else:
-                        charge = pInfo["TotalSell"] * cost["CloseFixed"]
+                        charge = self.__calcCoverCharge(cost, pInfo["TotalSell"], lastPrice)
+
                     pInfo["Cost"] += charge
 
                     self._positions[user][contract] = pInfo
@@ -1660,19 +1667,31 @@ class CalcCenter(object):
         uflag = True if parse(str(self._curTradeDate)).year != year else False
         self._calcStageStaticInfo(self._yearStatis, uflag)
 
-    def getLastStaticData(self, periodStatis):
-        if len(periodStatis) > 1:  # 是否为空
-            lastData = periodStatis[-2]
+    # def getLastStaticData1(self, periodStatis):
+    #     if len(periodStatis) > 1:  # 是否为空
+    #         lastData = periodStatis[-2]
+    #     else:
+    #         lastData = defaultdict(int)
+    #         lastData["Equity"] = self._runSet["StartFund"]
+    #     return lastData
+
+    def getLastStaticData(self, periodStatis, flag):
+        if flag:
+            lastData = periodStatis[-1]
         else:
-            lastData = defaultdict(int)
-            lastData["Equity"] = self._runSet["StartFund"]
+            if len(periodStatis) > 1:  # 是否为空
+                lastData = periodStatis[-2]
+            else:
+                lastData = defaultdict(int)
+                lastData["Equity"] = self._runSet["StartFund"]
+
         return lastData
 
     def _calcStageStaticInfo(self, periodStatis, uflag):
         if not self._fundRecords:
             return
 
-        lastPeriodData = self.getLastStaticData(periodStatis)
+        lastPeriodData = self.getLastStaticData(periodStatis, uflag)
         tt, wt, lt, et, tw, tl = 0, 0, 0, 0, 0, 0
         for p in periodStatis:
             tt += p["TradeTimes"]  # 截止目前的总交易次数
@@ -1708,7 +1727,7 @@ class CalcCenter(object):
         elif statis["WinTimes"] != 0:
             if statis["LoseTimes"] == 0:
                 # statis["MeanReturns"] = float("inf")
-                # TODO: 亏损次数是0的时候，亏损率置为1
+                # 亏损次数是0的时候，亏损率置为1
                 statis["MeanReturns"] = (statis["TotalWin"] / statis["WinTimes"])
             else:
                 statis["MeanReturns"] = (statis["TotalWin"] * statis["LoseTimes"]) / (
@@ -1789,7 +1808,6 @@ class CalcCenter(object):
 
     def _calcEmptyPositionPeriod(self):
         """计算空仓信息"""
-        # TODO: strategy中不再含有currentBarIndex了，下面需要更改下
         # 统计k线上有无持仓时，当在当根k线上发生了开仓又平完的操作时，
         # 暂时将该k线也记做空仓的周期吧（这样记是不是错误的呀）
         # if self._strategy["CurrentBarIndex"] == self._currentBar:  # 确保在收盘时统计空仓信
@@ -1837,6 +1855,7 @@ class CalcCenter(object):
         return self._reportDetails
 
     def _calcTradeInfo(self):
+        # TODO: 这个函数好好看下
         # 如果数据不满一天的话怎么办呢？？？（从开始有数据时就使天数加一）
         # 在计算最大、最小这类数据的时候建立了这么多类的私有变量，
         # 是不是可以用局部变量表示呢？
@@ -1939,8 +1958,6 @@ class CalcCenter(object):
         获取回测报告所需的数据
         :return:
         """
-        # 先计算出最后一个阶段的统计数据
-        # self.calcLastStaticInfo()
         result = {}
 
         result["Fund"] = self.getFundRecord()
