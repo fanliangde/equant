@@ -1087,8 +1087,8 @@ class StrategyHisQuote(object):
             lastBar = self.getCurBar(key)
             self._updateCurBar(key, row)
             curBar = self.getCurBar(key)
-            if lastBar is None or math.fabs(curBar["LastPrice"]-lastBar["LastPrice"])>1e-4:
-                self._calcProfitWhenHis()
+            # if lastBar is None or math.fabs(curBar["LastPrice"]-lastBar["LastPrice"])>1e-4:
+            #     self._calcProfitWhenHis()
             if not self._config.hasKLineTrigger():
                 continue
 
@@ -1106,6 +1106,9 @@ class StrategyHisQuote(object):
                     "TriggerData":row,
                 }
                 self._strategy.setCurTriggerSourceInfo(args)
+                # 计算calcProfit
+                if lastBar is None or math.fabs(curBar["LastPrice"]-lastBar["LastPrice"])>1e-4:
+                    self._calcProfitWhenHis()
                 context.setCurTriggerSourceInfo(args)
                 handle_data(context)
 
@@ -1183,8 +1186,8 @@ class StrategyHisQuote(object):
         lastBar = self.getCurBar(key)
         self._updateCurBar(key, kLineData)
         curBar = self.getCurBar(key)
-        if lastBar is None or math.fabs(curBar["LastPrice"] - lastBar["LastPrice"]) > 1e-4:
-            self._calcProfitWhenHis()
+        # if lastBar is None or math.fabs(curBar["LastPrice"] - lastBar["LastPrice"]) > 1e-4:
+        #     self._calcProfitWhenHis()
         # **************************
         # print(key, self._config.getKLineTriggerInfoSimple(), key in self._config.getKLineTriggerInfoSimple())
         if self._config.hasKLineTrigger() and key in self._config.getKLineTriggerInfoSimple():
@@ -1199,6 +1202,8 @@ class StrategyHisQuote(object):
                 "TriggerData": kLineData
             }
             self._strategy.setCurTriggerSourceInfo(args)
+            if lastBar is None or math.fabs(curBar["LastPrice"] - lastBar["LastPrice"]) > 1e-4:
+                self._calcProfitWhenHis()
             context.setCurTriggerSourceInfo(args)
             handle_data(context)
 
@@ -1303,16 +1308,22 @@ class StrategyHisQuote(object):
         # 判断当前触发类型是否需要触发
         if self.checkTriggerEvent(eventCode):
             self._strategy.setCurTriggerSourceInfo(args)
+            if eventCode == ST_TRIGGER_SANPSHOT_FILL:
+                try:
+                    self._calcProfitByQuote(event)
+                except Exception as e:
+                    errText = traceback.format_exc()
+                    self.logger.error(f"即时行情计算浮动盈亏出现错误，{errText}")
             context.setCurTriggerSourceInfo(args)
             handle_data(context)
         
         if eventCode == ST_TRIGGER_SANPSHOT_FILL:
             # 计算浮动盈亏
-            try:
-                self._calcProfitByQuote(event)
-            except Exception as e:
-                errText = traceback.format_exc()
-                self.logger.error(f"即时行情计算浮动盈亏出现错误，{errText}")
+            # try:
+            #     self._calcProfitByQuote(event)
+            # except Exception as e:
+            #     errText = traceback.format_exc()
+            #     self.logger.error(f"即时行情计算浮动盈亏出现错误，{errText}")
 
             # 处理实时阶段止损止盈
             lv1Data = event.getData()["Data"]

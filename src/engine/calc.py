@@ -155,6 +155,18 @@ class CalcCenter(object):
         self._profit["EmptyAssets"] += initialFund  # 空仓资产
         self._profit["EmptyPositionEquity"] += initialFund  # 期初空仓资产
 
+        self._profit["Highest"] = initialFund
+        self._profit["Lowest"] = initialFund
+
+    def __initRetracementTm(self, time_):
+        """初始化回撤时间"""
+        if not self._profit["MaxRetracementStartTm"]:
+            self._profit["MaxRetracementStartTm"] = time_       # 权益最大回撤开始时间
+            self._profit["MaxRetracementEndTm"] = time_         # 权益最大回撤结束时间
+
+            self._profit["MaxRetracementRateStartTm"] = time_   # 权益最大回撤比开始时间
+            self._profit["MaxRetracementRateEndTm"] = time_     # 权益最大回撤比结束时间
+
     def _getCostRate(self, contract):
         """
         获取合约费率，找不到就返回默认值
@@ -525,6 +537,8 @@ class CalcCenter(object):
         self._endDate = order["TradeDate"]
         if self._curTradeDate is None:
             self._curTradeDate = order["TradeDate"]
+
+        self.__initRetracementTm(order["DateTimeStamp"])
 
         # TODO:限制信息写在这里
         # TODO: 应该先判断下面的限制再判断needCover 和 coverJudge
@@ -1208,24 +1222,31 @@ class CalcCenter(object):
                 # 风险率Risky: 本金最大回调/本金
                 self._profit["Risky"] = 1 - self._profit["MinAssets"] / self._profit["StartFund"] if self._profit[
                                                                                 "StartFund"] != 0 else 0  # 风险率
-        if preAssets < self._profit["LastAssets"]:
-            diff = self._profit["MaxAssets"] - preAssets
-            if diff > self._profit["MaxRetracement"]:
-                self._profit["MaxRetracement"] = diff
-                self._profit["MaxRetracementEndTm"] = time
-                self._profit["MaxRetracementStartTm"] = self._profit["MinAssetsTm"]
-                # 权益最大回撤比
 
-                tempAssetRetraceRate = diff / self._profit["MaxAssets"]
-                if tempAssetRetraceRate > self._profit["MaxRetracementRate"]:
-                    try:
-                        self._profit["MaxRetracementRate"] = tempAssetRetraceRate
-                    except ZeroDivisionError:
-                        raise ZeroDivisionError
-                    self._profit["MaxRetracementRateTm"] = time
+        if preAssets < self._profit["LastAssets"]:
+            if self._profit["LastAssets"] > self._profit["Highest"]:
+                self._profit["Highest"] = self._profit["LastAssets"]
+                self._profit["MaxRetracementStartTm"] = time
+                # self._profit["MaxRetracementRateStartTm"] = time
+        elif preAssets > self._profit["LastAssets"]:
+            self._profit["Lowest"] = self._profit["LastAssets"]
+            if self._profit["Highest"] - self._profit["Lowest"] > self._profit["MaxRetracement"]:
+                self._profit["MaxRetracement"] = self._profit["Highest"] - self._profit["Lowest"]
+                self._profit["MaxRetracementEndTm"] = time
+                # 权益最大回撤比 = 最大回撤和最大回撤时的权益的比值
+                retracementRate = 0
+                # TODO: 权益为负值或者为0时怎么处理呢？
+                if self._profit["LastAssets"] != 0:
+                    retracementRate = self._profit["MaxRetracement"] / self._profit["LastAssets"]
+
+                if retracementRate > self._profit["MaxRetracementRate"]:
+                    self._profit["MaxRetracementRate"] = retracementRate
+                    self._profit["MaxRetracementRateStartTm"] = self._profit["MaxRetracementStartTm"]
+                    self._profit["MaxRetracementRateEndTm"] = time
 
     def calcProfit(self, contractList, barInfo):
         """
+        该函数在每次行情变化时调用，行情变动时更新信息
         计算策略实时收益信息，参数为合约的最新价信息
         :param contractList: 合约代码列表
         :param barInfo: 合约的bar信息，类型为字典类型，键值是合约代码
@@ -1240,8 +1261,8 @@ class CalcCenter(object):
             raise ImportError("args error")
 
         # 计算空仓周期
-        #TODO：这个函数有问题
-        self._calcEmptyPositionPeriod()
+        #TODO：计算空仓周期放在这里calcProfit中计算不正确
+        #self._calcEmptyPositionPeriod()
 
         contPrices = {}
 
@@ -1253,6 +1274,9 @@ class CalcCenter(object):
 
         tradedate = barInfo[benchmarkNo]["TradeDate"]
         timeStamp = barInfo[benchmarkNo]["DateTimeStamp"]
+
+        self.__initRetracementTm(timeStamp)
+
         if self._curTradeDate is None:
             self._curTradeDate = tradedate
 
@@ -1806,6 +1830,7 @@ class CalcCenter(object):
         if extendOrder["Profit"] == 0:
             self._tradeTimeInfo["TradeEvents"] += 1
 
+    # 暂时不用
     def _calcEmptyPositionPeriod(self):
         """计算空仓信息"""
         # 统计k线上有无持仓时，当在当根k线上发生了开仓又平完的操作时，
@@ -1860,10 +1885,9 @@ class CalcCenter(object):
         # 在计算最大、最小这类数据的时候建立了这么多类的私有变量，
         # 是不是可以用局部变量表示呢？
 
-        # 计算空仓周期
-        # self._calcEmptyPositionPeriod()
-        if self._continueEmptyPeriod > self._tradeInfo["MaxContinuousEmptyPeriod"]:
-            self._tradeInfo["MaxContinuousEmptyPeriod"] = self._continueEmptyPeriod
+        # 最长空仓周期先不考虑
+        # if self._continueEmptyPeriod > self._tradeInfo["MaxContinuousEmptyPeriod"]:
+        #     self._tradeInfo["MaxContinuousEmptyPeriod"] = self._continueEmptyPeriod
 
         if not self._fundRecords:
             self._tradeInfo["MaxWinContinueDays"] = 0

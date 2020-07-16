@@ -68,7 +68,8 @@ class ReportDetail(object):
         for eo in self._orders:
             if (eo['Order']['Direct'] == dBuy and eo['Order']['Offset'] == oCover) \
                     or (eo['Order']['Direct'] == dSell and eo['Order']['Offset'] == oCover) \
-                    or (eo['Order']['Offset'] == oNone and eo['HasClose']):
+                    or (eo['Order']['Direct'] == dBuy and eo['Order']['Offset'] == oCoverT) \
+                    or (eo['Order']['Direct'] == dBuy and eo['Order']['Offset'] == oCoverT):
                 # 这里的eo['Profit']会多算手续费的吧，如果既有开仓又有平仓的话
                 d += np.square(eo['Profit'] - self.mean_profit)
                 N += 1
@@ -101,8 +102,14 @@ class ReportDetail(object):
         return self._profit['MaxRetracement']
 
     @property
-    def max_retrace_time(self):  # 权益最大回撤时间
-        if len(self._fund_record) < 1:
+    def max_retrace_start_time(self):  # 权益最大回撤开始时间
+        if len(self._fund_record) < 1 or (self._profit['MaxRetracementStartTm'] >= self._profit['MaxRetracementEndTm']):
+            return '-'
+        return self._profit['MaxRetracementStartTm']
+
+    @property
+    def max_retrace_end_time(self):  # 权益最大回撤结束时间
+        if len(self._fund_record) < 1 or (self._profit['MaxRetracementStartTm'] >= self._profit['MaxRetracementEndTm']):
             return '-'
         return self._profit['MaxRetracementEndTm']
 
@@ -111,8 +118,20 @@ class ReportDetail(object):
         return self._profit['MaxRetracementRate']
 
     @property
-    def max_retrace_rate_time(self):  # 权益最大回测比时间
-        return self._profit['MaxRetracementRateTm']
+    def max_retrace_rate_start_time(self):  # 权益最大回测比开始时间
+        if len(self._fund_record) < 1 or (
+                self._profit['MaxRetracementRateStartTm'] >= self._profit['MaxRetracementRateEndTm']):
+            print("111111: ", self._profit["MaxRetracementRateStartTm"])
+            print("222222: ", self._profit["MaxRetracementRateEndTm"])
+            return '-'
+        return self._profit['MaxRetracementRateStartTm']
+
+    @property
+    def max_retrace_rate_end_time(self):  # 权益最大回测比结束时间
+        if len(self._fund_record) < 1 or (
+                self._profit['MaxRetracementRateStartTm'] >= self._profit['MaxRetracementRateEndTm']):
+            return '-'
+        return self._profit['MaxRetracementRateEndTm']
 
     @property
     def risky(self):  # 风险率
@@ -121,14 +140,16 @@ class ReportDetail(object):
     @property
     def rate_of_return_risk(self):  # 收益率/风险率
         if self.risky:
-            return self.annualized_simple / self.risky
+            return self._profit["YieldRate"] / self.risky
+            # return self.annualized_simple / self.risky
         return float('inf')
 
     @property
     def returns(self):  # 盈利率
-        if self._runSet['StartFund']:
-            return self._profit['TotalProfit'] / int(self._runSet['StartFund'])
-        return np.nan
+        # if self._runSet['StartFund']:
+        #     return self._profit['TotalProfit'] / int(self._runSet['StartFund'])
+        # return np.nan
+        return self._profit["Returns"]
 
     @property
     def real_returns(self):  # 实际盈利率（这个不会计算）
@@ -162,9 +183,12 @@ class ReportDetail(object):
 
     @property
     def win_rate(self):  # 胜率
-        if self._profit['TradeTimes']:
-            return (self._profit['TradeTimes'] - self._profit['LoseTimes']) / self._profit['TradeTimes']
-        return 0.0
+        # if self._profit['TradeTimes']:
+        #     return (self._profit['TradeTimes'] - self._profit['LoseTimes']) / self._profit['TradeTimes']
+        try:
+            return self._profit["WinRate"]
+        except:
+            return 0.0
 
     @property
     def mean_win_lose(self):  # 平均盈利/平均亏损（按照全平交易次数计算）
@@ -322,17 +346,19 @@ class ReportDetail(object):
             'EndTime': self.end_time,
             'TestDay': self.test_day,
             'FinalEquity': self.final_equity,
-            'EmptyPeriod': self.empty_period,
-            'MaxContinueEmpty': self.max_continue_empty,
+            # 'EmptyPeriod': self.empty_period,
+            # 'MaxContinueEmpty': self.max_continue_empty,
             # 'MaxTradePeriod': self.max_trade_period,
             'StdDev': self.std_dev,
             'StdDevRate': self.std_dev_rate,
             'Sharpe': self.sharpe,
             'PlmLm': self.plm_lm,
             'MaxRetrace': self.max_retrace,
-            'MaxRetraceTime': self.max_retrace_time,
+            'MaxRetraceStartTime': self.max_retrace_start_time,
+            'MaxRetraceTime': self.max_retrace_end_time,
             'MaxRetraceRate': self.max_retrace_rate,
-            'MaxRetraceRateTime': self.max_retrace_rate_time,
+            'MaxRetraceRateStartTime': self.max_retrace_rate_start_time,
+            'MaxRetraceRateTime': self.max_retrace_rate_end_time,
             'Risky': self.risky,
             'RateofReturnRisk': self.rate_of_return_risk,
             'Returns': self.returns,
