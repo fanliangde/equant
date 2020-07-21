@@ -492,7 +492,14 @@ class StrategyEngine(object):
         if self._lastMoneyTime == 0 or (nowTime - self._lastMoneyTime).total_seconds() >= 1:
             self._reqUserMoney()
             self._lastMoneyTime = nowTime
-        
+
+    def _updateStrategyName(self, strategyPos):
+        newPositions = {}
+        for key, value in strategyPos.items():
+            newKey = self._strategyMgr.getStrategyName(key)
+            newPositions["[" + str(key) + "] " + newKey] = value
+        return newPositions
+
     def _calPosDiff(self, positions):
         '''计算账户仓和策略仓差异'''
         strategyPos = {}
@@ -623,14 +630,16 @@ class StrategyEngine(object):
             
             posInfo = {
                     "Account"  : accPos,
-                    "Strategy" : strategyPos,
+                    "Strategy" : copy.deepcopy(strategyPos),
                 }
             
             posDiff = self._calPosDiff(posInfo)
-            
+            eventData = copy.deepcopy(posDiff)
+            eventData.append(self._updateStrategyName(strategyPos))
+
             event = Event({
-                "EventCode" : EV_EG2UI_POSITION_NOTICE,
-                "Data"      : posDiff,
+                "EventCode"   : EV_EG2UI_POSITION_NOTICE,
+                "Data"        : eventData,
             })
             
             #self.logger.debug("Sync position to ui:%s"%event.getData())

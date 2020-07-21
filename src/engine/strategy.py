@@ -39,6 +39,10 @@ class StrategyManager(object):
     def run(strategy):
         strategy.run()
 
+    def getStrategyName(self, strategyId):
+        assert strategyId in self._strategyInfo, 'error '
+        return self._strategyDict[strategyId].getStrategyName()
+
     def getStrategyState(self, strategyId):
         assert strategyId in self._strategyInfo, 'error '
         return self._strategyInfo[strategyId]["StrategyState"]

@@ -1700,7 +1700,7 @@ class QuantApplication(QWidget):
         super().__init__(master)
 
         self.exitSignal.connect(self.show_warn)
-        self.positionSignal.connect(self.updateSyncPosition)
+        self.positionSignal.connect(self.createStrategyItem)
         self.pathSignal.connect(self.focus_tree_item)
         self.init_settings()
 
@@ -2403,6 +2403,7 @@ class QuantApplication(QWidget):
         # self.func_vbox.setLayout(self.func_layout)
 
     def create_tab(self):
+        self._posTabList = {}
         self.tab_widget = QTabWidget()
         self.tab_widget.setContentsMargins(0, 0, 0, 0)
         # 策略运行table
@@ -2544,13 +2545,66 @@ class QuantApplication(QWidget):
         self.union_layout.addWidget(self.pos_table, 1, 0, 1, 15)
         self.union_monitor.setLayout(self.union_layout)
 
+        self.pos_widget = QTabWidget()
+        self.pos_widget.setTabPosition(QTabWidget.South)
+        self.pos_widget.addTab(self.union_monitor, '持仓监控')
+
         self.tab_widget.addTab(self.strategy_table, "策略运行")  # 策略运行tab
         self.tab_widget.addTab(self.log_widget, "运行日志")  # 运行日志tab
         self.tab_widget.addTab(self.error_info_widget, "错误信息")  # 错误信息志tab
-        self.tab_widget.addTab(self.union_monitor, "组合监控")  # 组合监控tab
+        self.tab_widget.addTab(self.pos_widget, "组合监控")  # 组合监控tab
 
         self.strategy_table.setContextMenuPolicy(Qt.CustomContextMenu)
         self.strategy_table.customContextMenuRequested[QPoint].connect(self.strategy_table_right_menu)
+
+    def createStrategyItem(self, item):
+        obj = self.pos_widget.findChild(QWidget, item[0])
+        posDict = item[1]
+        positions = []
+        for key, value in posDict.items():
+            for k, v in value.items():
+                total = v["TotalBuy"] - v["TotalSell"]
+                positions.append([key, v["Cont"], total, v["TotalBuy"], v["TotalSell"], v["TodayBuy"], v["TodaySell"]])
+
+        if isinstance(obj, QWidget):
+            table = obj.findChild(QTableWidget, item[0] + "table")
+            if isinstance(table, QTableWidget):
+                table.setRowCount(len(positions))
+                for i in range(len(positions)):
+                    for j in range(len(positions[i])):
+                        item = QTableWidgetItem(str(positions[i][j]))
+                        if isinstance(positions[i][j], int) or isinstance(positions[i][j], float):
+                            item.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
+                        elif isinstance(positions[i][j], str):
+                            item.setTextAlignment(Qt.AlignCenter)
+                        table.setItem(i, j, item)
+                table.update()
+        else:
+            item_union_monitor = QWidget()
+            item_union_monitor.setObjectName(item[0])
+            item_union_layout = QGridLayout()
+            item_table = QTableWidget()
+            item_table.setObjectName(item[0] + "table")
+            item_table.setRowCount(0)
+            item_table.setColumnCount(7)
+            item_table.verticalHeader().setMinimumSectionSize(5)
+            item_table.verticalHeader().setDefaultSectionSize(25)
+            item_table.horizontalHeader().setDefaultSectionSize(150)
+            item_table.setColumnWidth(0, 150)
+            item_table.setColumnWidth(1, 150)
+            item_table.verticalHeader().setVisible(False)
+            item_table.setShowGrid(False)
+            item_table.horizontalHeader().setHighlightSections(False)
+            item_table.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
+            item_table.horizontalHeader().setObjectName("StrategyTableHeader")
+            item_table.setEditTriggers(QTableView.NoEditTriggers)  # 不可编辑
+            item_table.setSelectionBehavior(QAbstractItemView.SelectRows)  # 设置只有行选中
+            item_table.setSelectionMode(QAbstractItemView.ExtendedSelection)
+            item_table.setHorizontalHeaderLabels(["账号", "合约", "策略仓", "策略多", "策略空", "策略今多", "策略今空"])
+            item_union_layout.addWidget(item_table, 0, 0, 1, 10)
+            item_union_monitor.setLayout(item_union_layout)
+            self._posTabList[item[0]] = item_union_monitor
+            self.pos_widget.addTab(item_union_monitor, item[0])
 
     def strategy_table_right_menu(self, point):
         self.strategy_table.popMenu = QMenu()
@@ -3017,7 +3071,12 @@ class QuantApplication(QWidget):
         else:
             self.spin.setEnabled(True)
 
-    def updateSyncPosition(self, positions):
+    def updateSyncPosition(self, event):
+        isStActualRun = []
+        isStDeleted = []
+        positions = event.getData()
+        strategyPos = positions[len(positions) - 1]
+        del positions[len(positions) - 1]
         self.pos_table.setRowCount(len(positions))
         for i in range(len(positions)):
             for j in range(len(positions[i])):
@@ -3027,6 +3086,28 @@ class QuantApplication(QWidget):
                 elif isinstance(positions[i][j], str):
                     item.setTextAlignment(Qt.AlignCenter)
                 self.pos_table.setItem(i, j, item)
+        self.pos_table.update()
+
+        for key in strategyPos.keys():
+            isStActualRun.append(str(key))
+
+        for key, value in self._posTabList.items():
+            if key not in isStActualRun:
+                index = self.pos_widget.indexOf(value)
+                if index != -1:
+                    widget = self.pos_widget.widget(index)
+                    self.pos_widget.removeTab(index)
+                    widget.deleteLater()
+                    isStDeleted.append(key)
+
+        for k in isStDeleted:
+            del self._posTabList[k]
+        isStDeleted.clear()
+
+        for key, value in strategyPos.items():
+            item = [str(key), value]
+            self.positionSignal.emit(item)
+
 
     def reportDisplay(self, data, id):
         """
