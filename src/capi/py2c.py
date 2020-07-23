@@ -1300,7 +1300,7 @@ class PyAPI(object):
                 bidList.append(bidDict)
             
             for j in range(EEQU_MAX_L2_DEPTH):
-                if math.isclose(data.BidQuoteFieldL2[j].Price, 0.0):
+                if math.isclose(data.AskQuoteFieldL2[j].Price, 0.0):
                     break
             
                 askDict = {
