@@ -2877,7 +2877,7 @@ class QuantApplication(QWidget):
         strategy_id_list = self.get_run_strategy_id()
         try:
             if strategyId in strategy_id_list:
-                self.updateRunStage(strategyId, dataDict[5])
+                self.updateRunStage(strategyId, dataDict['StrategyState'])
                 return
         except Exception as e:
             self._logger.warn("addExecute exception")
