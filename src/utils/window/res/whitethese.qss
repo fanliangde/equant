@@ -777,3 +777,11 @@ TitleBar {
     max-height: 20px;
 }
 
+
+/* 报告交易详情中自定义表格表头Label、排序按钮、过滤按钮 属性设置 */
+#ReportWnd #ReportView #label_title, #ReportWnd #ReportView #toolButton_filter, #ReportWnd #ReportView #toolButton_sort {
+    background-color: #0E6393;
+    color: #FFFFFF;
+    min-height: 25px;
+    max-height: 25px;
+}

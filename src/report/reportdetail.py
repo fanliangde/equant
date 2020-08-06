@@ -121,8 +121,6 @@ class ReportDetail(object):
     def max_retrace_rate_start_time(self):  # 权益最大回测比开始时间
         if len(self._fund_record) < 1 or (
                 self._profit['MaxRetracementRateStartTm'] >= self._profit['MaxRetracementRateEndTm']):
-            print("111111: ", self._profit["MaxRetracementRateStartTm"])
-            print("222222: ", self._profit["MaxRetracementRateEndTm"])
             return '-'
         return self._profit['MaxRetracementRateStartTm']
 

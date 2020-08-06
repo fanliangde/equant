@@ -433,7 +433,7 @@ class PyAPI(object):
     # U 单个发送，索引可以重复
     def sendKLineData(self, event, type):
         '''
-        功能：推送或者推送回测K线数据
+        功能：推送实时数据或者推送回测K线数据
         参数：
             {
                 'StrategyId'    : 策略id，int,

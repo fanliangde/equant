@@ -18,7 +18,7 @@ class ReportView(QWidget):
         self.parent=parent
         self._windowTitle = "回测报告"
         self._iconPath = r"icon/epolestar ix2.ico"
-        self.styleFile = r"qtui/reportview/style.qss"
+        # self.styleFile = r"qtui/reportview/style.qss"
 
         self._datas = None
 
