@@ -429,14 +429,34 @@ class StrategyModel(object):
         return self._qteModel.getQuoteDataExist(symbol)
 
     # ////////////////////////策略函数////////////////////////////
+    # 暂时不用
+    def isOuterContract(self, contractNo):
+        """判断合约是否为外盘合约"""
+        if not contractNo:
+            return False
+
+        typeList = ["F", "O", "Z", "S", "M"]
+        coverMode = ''
+        CommodityInfo = self.getCommodityInfoFromContNo(contractNo)
+
+        commodityNo = CommodityInfo['CommodityCode']
+        commodityType = CommodityInfo['CommodityType']
+        if commodityNo in self._qteModel._commodityData:
+            commodityModel = self._qteModel._commodityData[commodityNo]
+            coverMode = commodityModel._metaData['CoverMode']
+        if commodityType in typeList and coverMode == 'N':
+            return True
+        return False
+
     def setBuy(self, userNo, contractNo, share, price, needCover=True, orderType=otLimit):
         if self._cfgModel.getTradeDirection() == 2:
             return
         
         contNo = contractNo if contractNo else self._cfgModel.getBenchmark()
         
-        if contNo not in self._cfgModel.getContract():
-            raise Exception(f"请先在设置界面获知使用SetBarInterval方法订阅 {contNo} 合约！")
+        if contNo not in self._cfgModel.getContract():    
+            if not contNo == self._qteModel.getUnderlayContractNo(self._cfgModel.getBenchmark()):
+                raise Exception(f"请先在设置界面获知使用SetBarInterval方法订阅 {contNo} 合约！")
 
         underlayContNo = self._qteModel.getUnderlayContractNo(contNo)
         if len(underlayContNo) > 0:
@@ -476,7 +496,8 @@ class StrategyModel(object):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
 
         if contNo not in self._cfgModel.getContract():
-            raise Exception(f"请先在设置界面获知使用SetBarInterval方法订阅 {contNo} 合约！")
+            if not contNo == self._qteModel.getUnderlayContractNo(self._cfgModel.getBenchmark()):
+                raise Exception(f"请先在设置界面获知使用SetBarInterval方法订阅 {contNo} 合约！")
 
         underlayContNo = self._qteModel.getUnderlayContractNo(contNo)
         if len(underlayContNo) > 0:
@@ -508,7 +529,8 @@ class StrategyModel(object):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
 
         if contNo not in self._cfgModel.getContract():
-            raise Exception(f"请先在设置界面获知使用SetBarInterval方法订阅 {contNo} 合约！")
+            if not contNo == self._qteModel.getUnderlayContractNo(self._cfgModel.getBenchmark()):
+                raise Exception(f"请先在设置界面获知使用SetBarInterval方法订阅 {contNo} 合约！")
 
         underlayContNo = self._qteModel.getUnderlayContractNo(contNo)
         if len(underlayContNo) > 0:
@@ -539,7 +561,8 @@ class StrategyModel(object):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
 
         if contNo not in self._cfgModel.getContract():
-            raise Exception(f"请先在设置界面获知使用SetBarInterval方法订阅 {contNo} 合约！")
+            if not contNo == self._qteModel.getUnderlayContractNo(self._cfgModel.getBenchmark()):
+                raise Exception(f"请先在设置界面获知使用SetBarInterval方法订阅 {contNo} 合约！")
 
         underlayContNo = self._qteModel.getUnderlayContractNo(contNo)
         if len(underlayContNo) > 0:
@@ -1830,6 +1853,7 @@ class StrategyModel(object):
             'ExchangeCode': '',  # 交易所编码
             'CommodityCode': '',  # 商品编码
             'CommodityNo': '',  # 合约到期日期
+            'CommodityType': '',  # 品种类型
         }
         contractNo = contNo
         if not contNo:
@@ -1846,6 +1870,7 @@ class StrategyModel(object):
         ret['CommodityCode'] = '|'.join(contList[0:3])
         #ret['CommodityCode'] = self._qteModel._contractData[contNo].getContract()['CommodityNo']
         ret['CommodityNo'] = contList[-1]
+        ret['CommodityType'] = contList[1]
         return ret
 
     def setStopWinKtBlack(self, op, kt):
