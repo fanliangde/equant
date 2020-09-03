@@ -207,15 +207,14 @@ class MyStringAxis(pg.AxisItem):
         strings = []
         for v in values:
             vs = v * scale
+            _str = ""
             if vs in self.x_values:
                 vstr = self.x_strings[np.abs(self.x_values - vs).argmin()]
-                if (isinstance(vstr, (str))):
-                    vstr = vstr
+                if not isinstance(vstr, (str)):
+                    _str = vstr
                 else:
-                    vstr = vstr.strftime('%Y-%m-%d %H:%M:%S')
-            else:
-                vstr = ""
-            strings.append(vstr)
+                    _str = vstr.strftime('%Y-%m-%d %H:%M:%S')
+            strings.append(_str)
         return strings
 
 

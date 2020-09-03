@@ -91,7 +91,7 @@ function init_editor(layoutid, code_str, theme) {
 
         g_editor.onDidChangeModelContent(function(v) {
             if (!g_loading && g_filename){
-                var attr = editor_arrts[g_filename];
+                var attr = editor_attrs[g_filename];
                 if (attr)
                     modify_nty(g_filename, attr.origin_txt != g_editor.getValue());
             }
@@ -157,7 +157,7 @@ function close_file(file){
 
 //保存代码到本地文件, need_confirm为true时需要用户确认是否保存，否则不需要用户确认直接保存
 function save_file(file, need_confirm) {
-    var attr = editor_arrts[file];
+    var attr = editor_attrs[file];
     if (!attr)
         return;
 
@@ -244,22 +244,22 @@ function $(id){
 var currtab = "";
 var overtab = "";
 // 全局字典 文件->编辑器属性
-var editor_arrts = new Array();
+var editor_attrs = new Array();
 
 
 // 保存编辑器属性
 function save_editor_attr(file, text, is_save){
-    var attr = editor_arrts[file];
+    var attr = editor_attrs[file];
     if (!attr)
     {
-        editor_arrts[file] = {
+        editor_attrs[file] = {
             origin_txt  : text,                             //已保存的文件内容
             modify_txt  : text,                             //修改过的文件内容
             scroll_hpos : null, //{ scrollLeft: 0, scrollTop: 0 },  //滚动条的位置
             cursor_pos  : null, //{ lineNumber: 0, column: 0 },     //光标行索引
             selections  : null                                //所有选中区域
         };
-        attr = editor_arrts[file];
+        attr = editor_attrs[file];
         return;
     }
 
@@ -273,7 +273,7 @@ function save_editor_attr(file, text, is_save){
 
 // 更新编辑器属性
 function update_editor_attr(file){
-    var attr = editor_arrts[file];
+    var attr = editor_attrs[file];
     if (!attr)
         return;
 
@@ -298,7 +298,7 @@ function close_tab(id){
     }
 
     tab.remove();
-    delete editor_attr[id];
+    delete editor_attrs[id];
 }
 
 // 标签改名
@@ -311,8 +311,8 @@ function rename_tab(id, newid){
     tab.innerHTML = newid.substr(newid.lastIndexOf('/')+1);
     tab.appendChild(btn);
 
-    editor_arrts[newid] = editor_arrts[id];
-    delete editor_arrts[id];
+    editor_attrs[newid] = editor_attrs[id];
+    delete editor_attrs[id];
 
     if (id == currtab)
         currtab = newid;
@@ -346,7 +346,7 @@ function switch_tab(newtab) {
         if (btn && btn.className != 'modify_btn')
             btn.className = 'curr_btn';
     }
-    load_file(currtab, tab_new ? editor_arrts[currtab].modify_txt : '');
+    load_file(currtab, tab_new ? editor_attrs[currtab].modify_txt : '');
     update_editor_attr(currtab);
     switch_file(currtab);
 }
@@ -355,7 +355,7 @@ function switch_tab(newtab) {
 function add_tab(name, value){
     if (name == "")
         return;
-    if (editor_arrts.hasOwnProperty(name)){
+    if (editor_attrs.hasOwnProperty(name)){
         switch_tab(name);
         return;
     }
@@ -389,10 +389,10 @@ function add_tab(name, value){
                 _tab = tab.previousElementSibling;
             switch_tab(_tab ? _tab.id : '');
         }
-        if (editor_arrts[tab.id].origin_txt != editor_arrts[tab.id].modify_txt)
+        if (editor_attrs[tab.id].origin_txt != editor_attrs[tab.id].modify_txt)
             save_file(tab.id, true);
 
-        delete editor_arrts[tab.id];
+        delete editor_attrs[tab.id];
         tab.remove();
     }
     tab.onmouseover = function(){

@@ -1369,7 +1369,7 @@ class StrategyEngine(object):
     def _reqUnsubQuote(self, event):
         '''退订即时行情'''
         strategyId = event.getStrategyId()
-        contractList = contractList = self._getContractList(event.getData())
+        contractList = self._getContractList(event.getData())
         
         unSubList = []
         for contNo in contractList:

@@ -26,13 +26,7 @@ class UC_SAR(object):
         oParOpen     = 0
         oPosition    = 0
         oTransition  = 0
-        
-        self.Af[-1]       = self.Af[-1]
-        self.ParOpen[-1]  = self.ParOpen[-1]
-        self.Position[-1] = self.Position[-1]
-        self.HHValue[-1]  = self.HHValue[-1]
-        self.LLValue[-1]  = self.LLValue[-1]
-        
+                
         if len(High) == 1:
             self.Position[-1] = 1
             oTransition = 1
