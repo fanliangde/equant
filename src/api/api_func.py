@@ -76,8 +76,8 @@ _all_func_ = {
                 
     '策略交易': [
                     ['Buy'                 , '多头建仓'],
-                    ['BuyToCover'          , '空头平仓'],
-                    ['Sell'                , '多头平仓'],
+                    ['BuyToCover'          , '平空仓'],
+                    ['Sell'                , '平多仓'],
                     ['SellShort'           , '空头建仓'],
                     ['StartTrade'          , '恢复实盘交易'],
                     ['StopTrade'           , '暂停实盘交易'],
@@ -331,6 +331,7 @@ _all_func_ = {
                     ['SetStopPoint'        , '设置策略的止损点'],
                     ['SetFloatStopPoint'   , '设置策略的浮动止损点'],
                     ['SetStopWinKtBlack'   , '设置不触发止损止盈和浮动止损的K线类型'],
+                    ['SetHisMatch'         , '设置历史回测阶段订单撮合成交'],
                     ['SubQuote'            , '订阅指定合约即时行情'],
                     ['UnsubQuote'          , '退订指定合约即时行情'],
                 ],

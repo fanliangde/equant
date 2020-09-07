@@ -569,6 +569,7 @@ VParams                      = "34"     # 用户设置的参数
 VContSettings                = "35"     # 多合约设置信息\
 VIsAlarm                     = "36"     # 发单报警
 VIsPop                       = "37"     # 允许弹窗
+VIsMatch                     = "38"     # 撮合方式
 
 # K线数据类型
 BarDataClose        = 'C' # 收盘价

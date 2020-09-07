@@ -158,7 +158,7 @@ class StrategyHisQuote(object):
         ...
     }
     '''
-    def __init__(self, strategy, config, calc, parentDateModel):
+    def __init__(self, strategy, config, calc, matching, parentDateModel):
         self._dataModel = parentDateModel
         # K线数据定义
         # response data
@@ -173,6 +173,7 @@ class StrategyHisQuote(object):
         self.logger = strategy.logger
         self._config = config
         self._calc = calc
+        self._matching = matching
         
         self._strategyName = strategy.getStrategyName()
         self._signalName = self._strategyName + "_Signal"
@@ -1237,6 +1238,17 @@ class StrategyHisQuote(object):
         }
 
         self._calc.calcProfit([contNo], priceInfos)
+
+        if self._config.isMatchMode():
+            orders = self._matching.isQuoteMatching(contNo, curBar['LowPrice'], curBar["HighPrice"])
+
+            for order in orders:
+                self._dataModel.buySellOrder(order["UserNo"], order["Cont"], order["OrderType"], order["ValidType"],
+                                             order["Direct"], order["Offset"], order["Hedge"], order["OrderPrice"],
+                                             order["OrderQty"], order["CurBar"])
+
+    def clearWaitOrdersWhenHisOver(self):
+        self._matching._clearWaitOrdersHisOver()
 
     def drawBatchHisKine(self, data):
         self.sendAllHisKLine(data)

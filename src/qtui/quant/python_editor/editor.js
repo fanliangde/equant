@@ -2426,7 +2426,7 @@ function init_function_info() {
             },{
                 label           : 'BuyToCover(orderQty=0, orderPrice=0, contractNo=None, userNo=\'\', coverFlag=\'A\')',
                 insertText      : 'BuyToCover(${1})',
-                detail          : '# 产生一个空头平仓操作\n' +
+                detail          : '# 产生一个平空仓操作\n' +
                                   '    BuyToCover(int orderQty=0, float orderPrice=0, string contractNo=None, string userNo=\'\', char coverFlag = \'A\')\n' +
                                   '\n' +
                                   '参数：\n' +
@@ -2440,8 +2440,8 @@ function init_function_info() {
                                   '    若平今，则需设置为\'T\'\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    产生一个空头平仓操作，无返回值。\n' +
-                                  '    该函数仅用于空头平仓，其处理规则如下：\n' +
+                                  '    产生一个平空仓操作，无返回值。\n' +
+                                  '    该函数仅用于平空仓，其处理规则如下：\n' +
                                   '    如果当前持仓状态为持平，该函数不执行任何操作。\n' +
                                   '    如果当前持仓状态为多仓，该函数不执行任何操作。\n' +
                                   '    如果当前持仓状态为空仓，如果此时orderQty使用默认值，该函数将平掉所有空仓，达到持平的状态，否则只平掉参数orderQty的空仓。\n' +
@@ -2459,7 +2459,7 @@ function init_function_info() {
             },{
                 label           : 'Sell(orderQty=0, orderPrice=0, contractNo=None, userNo=\'\', coverFlag=\'A\')',
                 insertText      : 'Sell(${1})',
-                detail          : '# 产生一个多头平仓操作\n' +
+                detail          : '# 产生一个平多仓操作\n' +
                                   '    Sell(int orderQty=0, float orderPrice=0, string contractNo=None, string userNo=\'\', char coverFlag = \'A\')\n' +
                                   '\n' +
                                   '参数：\n' +
@@ -2473,8 +2473,8 @@ function init_function_info() {
                                   '    若平今，则需设置为\'T\'\n' +
                                   '\n' +
                                   '备注：\n' +
-                                  '    产生一个多头平仓操作，无返回值。\n' +
-                                  '    该函数仅用于多头平仓，其处理规则如下：\n' +
+                                  '    产生一个平多仓操作，无返回值。\n' +
+                                  '    该函数仅用于平多仓，其处理规则如下：\n' +
                                   '    如果当前持仓状态为持平，该函数不执行任何操作。\n' +
                                   '    如果当前持仓状态为空仓，该函数不执行任何操作。\n' +
                                   '    如果当前持仓状态为多仓，如果此时orderQty使用默认值，该函数将平掉所有多仓，达到持平的状态，否则只平掉参数orderQty的多仓。\n' +
@@ -5488,6 +5488,17 @@ function init_function_info() {
                                   '\n' +
                                   '备注：\n' +
                                   '    返回不触发止损/止盈/浮动止损的K线类型列表',
+                kind            : monaco.languages.CompletionItemKind.Function
+            },{
+                label           : 'SetHisMatch()',
+                insertText      : 'SetHisMatch()',
+                detail          : '# 设置历史回测阶段的订单排队撮合成交， 不设置时默认按照委托价格立即成交\n' +
+                                  '    int SetHisMatch()\n' +
+                                  '\n' +
+                                  '备注：\n' +
+                                  '    该函数只能在initialize函数中调用' +
+                                  '    历史回测阶段结束时，清除仍在排队的订单\n' +
+                                  '    返回整型，0成功，-1失败',
                 kind            : monaco.languages.CompletionItemKind.Function
             },{
                 label           : 'SubQuote(contractNo1, contractNo2, contractNo3, ...)',

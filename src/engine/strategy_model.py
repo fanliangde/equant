@@ -12,7 +12,7 @@ from .strategy_trd_model import StrategyTrade
 from .statistics_model import StatisticsModel
 import copy
 
-from engine.calc import CalcCenter
+from engine.calc import CalcCenter, MatchingOrder
 from datetime import datetime, timedelta
 from .popup_win import *
 import winsound
@@ -34,9 +34,10 @@ class StrategyModel(object):
         self._config = self._cfgModel
         # 回测计算
         self._calcCenter = CalcCenter(self.logger, self)
+        self._matching = MatchingOrder()
 
         self._qteModel = StrategyQuote(strategy, self._cfgModel)
-        self._hisModel = StrategyHisQuote(strategy, self._cfgModel, self._calcCenter, self)
+        self._hisModel = StrategyHisQuote(strategy, self._cfgModel, self._calcCenter, self._matching, self)
         self._trdModel = StrategyTrade(strategy, self._cfgModel)
         self._staModel = StatisticsModel(strategy, self._cfgModel)
         
@@ -523,7 +524,7 @@ class StrategyModel(object):
 
 
     def setSell(self, userNo, contractNo, share, price, coverFlag='A', orderType=otLimit):
-        if self._cfgModel.getTradeDirection() == 1:
+        if self._cfgModel.getTradeDirection() == 2:
             return
     
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
@@ -555,7 +556,7 @@ class StrategyModel(object):
         self.buySellOrder(userNo, contNo, orderType, vtGFD, dSell, coverFlag, hSpeculate, price, share, curBar, (defaultPrice > 0))
 
     def setSellShort(self, userNo, contractNo, share, price, needCover=True, orderType=otLimit):
-        if self._cfgModel.getTradeDirection() == 2:
+        if self._cfgModel.getTradeDirection() == 1:
             return
     
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
@@ -833,6 +834,13 @@ class StrategyModel(object):
         if not contNo:
             contNo = self._cfgModel.getBenchmark()
         return self._cfgModel.setFloatStopPoint(startPoint, stopPoint, nPriceType, nAddTick, contNo)
+
+    def setHisMatch(self):
+        if self._strategy.getStatus() == ST_STATUS_NONE:
+            self._cfgModel.setMatchMode()
+            return 0
+        self.logger.error("SetHisMatch函数只能在初始化函数中调用！")
+        return -1
 
     def subscribeQuote(self, contNoTuple):
         if len(contNoTuple) <= 0:
@@ -1167,6 +1175,10 @@ class StrategyModel(object):
                 if isVaildOrder < 0:
                     continue   
 
+            # 订单撮合判断
+            if self._cfgModel.isMatchMode() and not self._matching.isOrderCanFilled(orderParam):
+                continue
+
             canAdded = self._calcCenter.addOrder(orderParam)
             if canAdded < 1:
                 continue 
@@ -1184,7 +1196,8 @@ class StrategyModel(object):
             retCode = None
             eSessionId = None
             if self._strategy.isRealTimeStatus():
-                retCode, eSessionId = self.sendOrder(userNo, contNo, orderType, validType, orderDirct, vCoverFlag, hedge, realPrice, kOrderQty)
+                retCode, eSessionId = self.sendOrder(userNo, contNo, orderType, validType, orderDirct, vCoverFlag,
+                                                     hedge, realPrice, kOrderQty)
             
             if retCode == 0:
                 self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
@@ -1192,11 +1205,16 @@ class StrategyModel(object):
     def sendOrder(self, userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, \
                   triggerType=stNone, triggerMode=tmNone, triggerCondition=tcNone, triggerPrice=0, aFunc=False):
         '''A账户下单函数，不经过calc模块，直接发单'''
-        if entryOrExit in (oCover, oCoverA) and self._cfgModel.getTradeDirection() == 1:
-            return -6, "当前设置仅允许开仓"
-            
-        if entryOrExit == oOpen and self._cfgModel.getTradeDirection() == 2:
-            return -7, "当前设置仅允许平仓"
+        if aFunc:  # 只需要对A函数进行判断，Buy、Sell函数已经判断过了
+            if (orderDirct == dSell and entryOrExit == oOpen) \
+                    and (orderDirct == dBuy and entryOrExit in (oCover, oCoverA, oCoverT)) \
+                    and self._cfgModel.getTradeDirection() == 1:  # 仅多头不允许下卖开、买平单
+                return -6, "当前设置仅允许多头开仓"
+
+            if (orderDirct == dBuy and entryOrExit == oOpen) \
+                    and (orderDirct == dSell and entryOrExit in (oCover, oCoverA, oCoverT)) \
+                    and self._cfgModel.getTradeDirection() == 2:  # 仅多头不允许下买开、卖平单
+                return -7, "当前设置仅允许空头开仓"
         
         if not userNo:
             userNo = self._cfgModel.getUserNo()
@@ -1673,6 +1691,9 @@ class StrategyModel(object):
     def setPlotNumeric(self, name, value, color, main, axis, type, barsback):
         main = '0' if main else '1'
         axis = '0' if axis else '1'
+
+        # if not isinstance(value, float) or not isinstance(value, int):
+        #     raise Exception("PlotNumeric函数value类型应为数值型！")
 
         curBar = self._hisModel.getCurBar()
 

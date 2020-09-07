@@ -180,6 +180,9 @@ class StrategyConfig_new(object):
                 'CloseTodayFee': {},    # 平今手续费
                 'Slippage': 0,    # 滑点损耗
             },
+            'MatchMode': {
+                'HisMatch': 0,   # 历史阶段撮合成交
+            },
             'Limit': {  # 发单设置
                 'OpenTimes': -1,        # 每根K线开仓次数
                 'ContinueOpenTimes': -1, # 最大连续开仓次数
@@ -412,6 +415,15 @@ class StrategyConfig_new(object):
     def getUserNo(self):
         '''获取交易使用的账户'''
         return self._metaData['Money']['UserNo']
+
+    # ----------------------- 撮合方式 ----------------------
+    def setMatchMode(self):
+        '''设置历史阶段是否撮合成交'''
+        self._metaData['MatchMode']['HisMatch'] = True
+
+    def isMatchMode(self):
+        '''获取历史阶段撮合成交'''
+        return bool(self._metaData['MatchMode']['HisMatch'])
 
     # ----------------------- 初始资金 ----------------------
     def setInitCapital(self, capital):

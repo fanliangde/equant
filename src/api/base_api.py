@@ -1383,7 +1383,7 @@ class BaseApi(object):
     def BuyToCover(self, orderQty, orderPrice, contractNo, userNo, coverFlag):
         '''
         【说明】
-              产生一个空头平仓操作
+              产生一个平空仓操作
 
         【语法】
               void BuyToCover(int orderQty=0, float orderPrice=0, string contractNo=None, string userNo='', char coverFlag = 'A')
@@ -1399,8 +1399,8 @@ class BaseApi(object):
                         若平今，则需设置为'T'
 
         【备注】
-              产生一个空头平仓操作，无返回值。
-              该函数仅用于空头平仓，其处理规则如下：
+              产生一个平空仓操作，无返回值。
+              该函数仅用于平空仓，其处理规则如下：
               如果当前持仓状态为持平，该函数不执行任何操作。
               如果当前持仓状态为多仓，该函数不执行任何操作。
               如果当前持仓状态为空仓，如果此时orderQty使用默认值，该函数将平掉所有空仓，达到持平的状态，否则只平掉参数orderQty的空仓。
@@ -1419,7 +1419,7 @@ class BaseApi(object):
     def Sell(self, orderQty, orderPrice, contractNo, userNo, coverFlag):
         '''
         【说明】
-              产生一个多头平仓操作
+              产生一个平多仓操作
 
         【语法】
               void Sell(int orderQty=0, float orderPrice=0, string contractNo=None, string userNo='', char coverFlag = 'A')
@@ -1435,8 +1435,8 @@ class BaseApi(object):
                         若平今，则需设置为'T'
 
         【备注】
-              产生一个多头平仓操作，无返回值。
-              该函数仅用于多头平仓，其处理规则如下：
+              产生一个平多仓操作，无返回值。
+              该函数仅用于平多仓，其处理规则如下：
               如果当前持仓状态为持平，该函数不执行任何操作。
               如果当前持仓状态为空仓，该函数不执行任何操作。
               如果当前持仓状态为多仓，如果此时orderQty使用默认值，该函数将平掉所有多仓，达到持平的状态，否则只平掉参数orderQty的多仓。
@@ -6161,6 +6161,26 @@ class BaseApi(object):
         '''
         return self._dataModel.getStopWinKtBlack()
 
+    def SetHisMatch(self):
+        '''
+        【说明】
+               设置历史回测阶段的订单排队撮合成交，不设置时默认按照委托价格立即成交
+
+        【语法】
+              int SetHisMatch()
+
+        【参数】
+              无
+
+        【备注】
+               该函数只能在initialize函数中调用。历史回测阶段结束时，清除仍在排队的订单
+              返回整型, 0成功，-1失败
+
+        【示例】
+              SetHisMatch()
+        '''
+        return self._dataModel.setHisMatch()
+
     def SubQuote(self, contNoTuple):
         '''
         【说明】
@@ -7900,6 +7920,9 @@ def SetFloatStopPoint(startPoint, stopPoint, nPriceType=0, nAddTick=0, contractN
 
 def SetStopWinKtBlack(op, kt):
     return baseApi.SetStopWinKtBlack(op, kt)
+
+def SetHisMatch():
+    return baseApi.SetHisMatch()
 
 def SubQuote(*args):
     return baseApi.SubQuote(args)

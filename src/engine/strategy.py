@@ -579,6 +579,10 @@ class Strategy:
                     if self._firstTriggerQueueEmpty:
                         self._clearHisPos()
                         self._atHisOver()
+                        # 撮合成交时清除历史阶段排队单
+                        if self._cfgModel.isMatchMode():
+                            self._clearWaitOrder()
+
                         self._runStatus = ST_STATUS_CONTINUES
                         self._send2UiEgStatus(self._runStatus)
                         self._firstTriggerQueueEmpty = False
@@ -622,6 +626,10 @@ class Strategy:
 
         posDict = calc.getUsersPosition()
         #self.logger.debug("PosDict2:%s" %posDict)
+
+    def _clearWaitOrder(self):
+        """清除历史阶段按撮合成交的排队的订单"""
+        self._dataModel.getHisQuoteModel().clearWaitOrdersWhenHisOver()
 
     def _startStrategyThread(self):
         '''历史数据准备完成后，运行策略'''

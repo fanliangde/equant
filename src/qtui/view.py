@@ -106,7 +106,7 @@ class StrategyPolicy(QWidget):
         self._userParam = param if param else {}
         # 策略路径
         self._strategyPath = path
-        # 是否时属性设置运行窗口标志位
+        # 是否是属性设置运行窗口标志位
         self._paramFlag = flag
         self._strConfig = StrategyConfig_new()
 
@@ -163,6 +163,7 @@ class StrategyPolicy(QWidget):
         h_spacerItem3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
         h_spacerItem4 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
         h_spacerItem5 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        h_spacerItem6 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
         v_spacerItem = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         # --------------------触发方式设置-------------------
@@ -258,6 +259,7 @@ class StrategyPolicy(QWidget):
         policy_layout2.addWidget(self.alarmCheckBox)
         policy_layout2.addWidget(self.allowCheckBox)
         policy_layout2.addItem(h_spacerItem4)
+
         policy_layout3 = QHBoxLayout()
         user_label = QLabel('账户：')
         self.set_label_size_policy(user_label)
@@ -266,19 +268,30 @@ class StrategyPolicy(QWidget):
         policy_layout3.addWidget(self.userComboBox)
         policy_layout3.addItem(h_spacerItem5)
 
+        policy_layout4 = QHBoxLayout()
+        match_label = QLabel('撮合方式：')
+        self.set_label_size_policy(match_label)
+        self.matchCheckBox = QCheckBox('历史阶段撮合成交')
+        policy_layout4.addWidget(match_label)
+        policy_layout4.addWidget(self.matchCheckBox)
+        policy_layout4.addItem(h_spacerItem6)
+
         # 设置对齐
         order_label.setFixedWidth(80)
         run_label.setFixedWidth(80)
         user_label.setFixedWidth(80)
+        match_label.setFixedWidth(80)
         self.sendOrderRealtime.setFixedWidth(120)
         self.actualCheckBox.setFixedWidth(120)
         self.sendOrderKStable.setFixedWidth(120)
         self.alarmCheckBox.setFixedWidth(120)
         self.userComboBox.setFixedWidth(120)
+        self.matchCheckBox.setFixedWidth(140)
 
         policy_layout.addLayout(policy_layout1)
         policy_layout.addLayout(policy_layout2)
         policy_layout.addLayout(policy_layout3)
+        policy_layout.addLayout(policy_layout4)
         policy_layout.setSpacing(10)
         self.basePolicy.setLayout(policy_layout)
         # ------------------------------------------------------------
@@ -838,6 +851,9 @@ class StrategyPolicy(QWidget):
         isAlarm = int(self.alarmCheckBox.isChecked())  # 发单报警
         isPop = int(self.allowCheckBox.isChecked())  # 允许弹窗
         # isContinue = self.isContinue.get()
+
+        isMatch = int(self.matchCheckBox.isChecked())  # 历史阶段撮合成交
+
         isOpenTimes = int(self.openTimesCheckBox.isChecked())  # 每根K线同向开仓次数标志
         openTimes = self.openTimesLineEdit.text()  # 每根K线同向开仓次数
 
@@ -980,6 +996,10 @@ class StrategyPolicy(QWidget):
 
         # 账户
         self._strConfig.setUserNo(user)
+        # 撮合方式
+        if isMatch:
+            self._strConfig.setMatchMode()
+
         # 初始资金
         self._strConfig.setInitCapital(int(initFund))
         # 交易方向
@@ -1114,6 +1134,7 @@ class StrategyPolicy(QWidget):
                 VIsActual: isActual,
                 VIsAlarm: isAlarm,
                 VIsPop: isPop,
+                VIsMatch: isMatch,
                 VIsOpenTimes: isOpenTimes,
                 VOpenTimes: openTimes,
                 VIsConOpenTimes: isConOpenTimes,
@@ -1264,6 +1285,11 @@ class StrategyPolicy(QWidget):
             except KeyError as e:
                 self.allowCheckBox.setChecked(0)
 
+            try:
+                self.matchCheckBox.setChecked(conf[VIsMatch])
+            except KeyError as e:
+                self.matchCheckBox.setChecked(0)
+
             self.openTimesCheckBox.setChecked(conf[VIsOpenTimes]),
             self.openTimesLineEdit.setText(conf[VOpenTimes]),
             self.isConOpenTimesCheckBox.setChecked(conf[VIsConOpenTimes]),
@@ -1286,8 +1312,7 @@ class StrategyPolicy(QWidget):
                         self.insert_params(v)
             except KeyError as e:
                 pass
-                # traceback.print_exc()
-            # TODO: DefaultSample
+
             try:
                 if conf[VContSettings]:
                     self._contsInfo = conf[VContSettings]
@@ -1295,7 +1320,7 @@ class StrategyPolicy(QWidget):
                         self.insert_contract_row(v)
             except KeyError as e:
                 pass
-                # traceback.print_exc()
+
 
     def insert_contract_row(self, values):
         """在合约table中插入一行"""

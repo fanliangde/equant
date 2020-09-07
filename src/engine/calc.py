@@ -745,13 +745,14 @@ class CalcCenter(object):
             pInfo["TotalSell"] -= vol
             # 今持卖
             pInfo["TodaySell"] = pInfo["TotalSell"] if pInfo["TotalSell"] < pInfo["TodaySell"] else pInfo["TodaySell"]
-            pInfo["SellPrice"] = self._getHoldPrice(order["Cont"], pInfo["TotalSell"], False)  # 平仓之后剩余持仓的持仓均价
+            pInfo["SellPrice"] = self._getHoldPrice(order["UserNo"], order["Cont"], pInfo["TotalSell"],
+                                                    False)  # 平仓之后剩余持仓的持仓均价
 
         elif order["Direct"] == dBuy and order["Offset"] == oCoverT:  # 买平今
             vol = order["OrderQty"] if pInfo["TodaySell"] > order["OrderQty"] else pInfo["TodaySell"]
             pInfo["TotalSell"] -= vol
             pInfo["TodaySell"] -= vol
-            pInfo["SellPrice"] = self._getHoldPrice(order["Cont"], pInfo["TotalSell"] - vol, False)
+            pInfo["SellPrice"] = self._getHoldPrice(order["UserNo"], order["Cont"], pInfo["TotalSell"] - vol, False)
 
         elif order["Direct"] == dSell and order["Offset"] == oOpen:  # 卖出开仓
             pInfo["SellPrice"] = (pInfo["TotalSell"] * pInfo["SellPrice"] + order["OrderQty"]
@@ -763,13 +764,13 @@ class CalcCenter(object):
             vol = order["OrderQty"] if pInfo["TotalBuy"] > order["OrderQty"] else pInfo["TotalBuy"]
             pInfo["TotalBuy"] -= vol
             pInfo["TodayBuy"] = pInfo["TotalBuy"] if pInfo["TotalBuy"] < pInfo["TodayBuy"] else pInfo["TodayBuy"]
-            pInfo["BuyPrice"] = self._getHoldPrice(order["Cont"], pInfo["TotalBuy"], True)  # 持仓均价
+            pInfo["BuyPrice"] = self._getHoldPrice(order["UserNo"], order["Cont"], pInfo["TotalBuy"], True)  # 持仓均价
 
         elif order["Direct"] == dSell and order["Offset"] == oCoverT:  # 卖平今
             vol = order["OrderQty"] if pInfo["TodayBuy"] > order["OrderQty"] else pInfo["TodayBuy"]
             pInfo["TotalBuy"] -= vol
             pInfo["TodayBuy"] -= vol
-            pInfo["BuyPrice"] = self._getHoldPrice(order["Cont"], pInfo["TotalBuy"] - vol, True)
+            pInfo["BuyPrice"] = self._getHoldPrice(order["UserNo"], order["Cont"], pInfo["TotalBuy"] - vol, True)
 
         #self._logger.debug("Margin1:%.2f, %d, %d, %d, %.2f" %(lastPrice, pInfo["TotalBuy"], pInfo["TotalSell"], cost["TradeDot"], cost["Margin"]))
         pInfo["LongMargin"] = lastPrice * pInfo["TotalBuy"] * cost["TradeDot"] * cost["Margin"]
@@ -1001,19 +1002,21 @@ class CalcCenter(object):
                 offset -= eo["LeftNum"]
         return charge
 
-    def _getHoldPrice(self, contract, holdNum, flag):
+    def _getHoldPrice(self, userNo, contract, holdNum, flag):
         """
         计算持仓均价
+        :param userNo: 账号
         :param contract:
         :param hold_num: 持仓量
         :param flag: 标志位， True为卖平， False为买平
         :return: 卖方向持仓均价
         """
-        positions = self.getPositionInfo()
-        if contract in positions:
-            pInfo = positions[contract]
-        else:
-            return 0
+        # positions = self.getPositionInfo()
+        # if contract in positions:
+        #     pInfo = positions[contract]
+        # else:
+        #     return 0
+        pInfo = self._getSpecificPositionInfo(userNo, contract)
 
         totalPrice = 0
         num = holdNum
@@ -1448,10 +1451,11 @@ class CalcCenter(object):
         return qty * slippageratio * pricetick * tradedot   # 手数 * 滑点 * 最小变动价位 * 每手乘数
 
     # def __calcLiquidateProfit(self, cont, pInfo, price, qty, tradedot, flag):
-    def __calcLiquidateProfit(self, cont, beforeavgprice, beforeqty, price, qty, tradedot, flag):
+    def __calcLiquidateProfit(self, user, cont, beforeavgprice, beforeqty, price, qty, tradedot, flag):
         """
         # 计算平仓盈亏
         :param
+        :param: user: 账号
         :param cont: 合约
         :param pInfo: 仓位信息
         :param price: 订单价格
@@ -1461,7 +1465,7 @@ class CalcCenter(object):
         :return:
         """
         beforePrice = beforeavgprice  # 未平之前的持仓价
-        afterPrice = self._getHoldPrice(cont, beforeqty - qty, flag)  # 平过之后的持仓价
+        afterPrice = self._getHoldPrice(user, cont, beforeqty - qty, flag)  # 平过之后的持仓价
         # 平仓盈亏
         if flag:
             liquidateProfit = (price * qty - (beforePrice * beforeqty - afterPrice * (beforeqty - qty))) * tradedot
@@ -1517,15 +1521,15 @@ class CalcCenter(object):
         turnover = self.__calcTurnover(order["OrderPrice"], qty, cost["TradeDot"])  # 成交额
         if flag:
             charge1 = self._getOpenCharge(order["Cont"], qty, (pInfo["TotalBuy"] - qty), flag, linkList)
-            liquidateprofit = self.__calcLiquidateProfit(order["Cont"], pInfo["BuyPrice"], pInfo["TotalBuy"],
-                                                         order["OrderPrice"], qty,
+            liquidateprofit = self.__calcLiquidateProfit(order["UserNo"], order["Cont"], pInfo["BuyPrice"],
+                                                         pInfo["TotalBuy"], order["OrderPrice"], qty,
                                                          cost["TradeDot"],
                                                          flag)
 
         else:
             charge1 = self._getOpenCharge(order["Cont"], qty, (pInfo["TotalSell"] - qty), flag, linkList)
-            liquidateprofit = self.__calcLiquidateProfit(order["Cont"], pInfo["SellPrice"], pInfo["TotalSell"],
-                                                         order["OrderPrice"], qty,
+            liquidateprofit = self.__calcLiquidateProfit(order["UserNo"], order["Cont"], pInfo["SellPrice"],
+                                                         pInfo["TotalSell"],order["OrderPrice"], qty,
                                                          cost["TradeDot"],
                                                          flag)
 
@@ -1557,14 +1561,14 @@ class CalcCenter(object):
         turnover = self.__calcTurnover(order["OrderPrice"], qty, cost["TradeDot"])  # 成交额
         if flag:
             charge1 = self._getOpenCharge(order["Cont"], qty, (pInfo["TodayBuy"] - qty), flag, linkList)
-            liquidateprofit = self.__calcLiquidateProfit(order["Cont"], pInfo["BuyPrice"], pInfo["TotalBuy"],
-                                                         order["OrderPrice"], qty,
+            liquidateprofit = self.__calcLiquidateProfit(order["UserNo"], order["Cont"], pInfo["BuyPrice"],
+                                                         pInfo["TotalBuy"], order["OrderPrice"], qty,
                                                          cost["TradeDot"],
                                                          flag)
         else:
             charge1 = self._getOpenCharge(order["Cont"], qty, (pInfo["TodaySell"] - qty), flag, linkList)
-            liquidateprofit = self.__calcLiquidateProfit(order["Cont"], pInfo["SellPrice"], pInfo["TotalSell"],
-                                                         order["OrderPrice"], qty,
+            liquidateprofit = self.__calcLiquidateProfit(order["UserNo"], order["Cont"], pInfo["SellPrice"],
+                                                         pInfo["TotalSell"], order["OrderPrice"], qty,
                                                          cost["TradeDot"],
                                                          flag)
 
@@ -2016,3 +2020,79 @@ class CalcCenter(object):
             }
         )
         return result
+
+
+class MatchingOrder(object):
+
+    def __init__(self):
+        self._waitOrders = {}  # 排队订单:  {合约号： [订单1, 订单2, ....]}
+        self._filledOrders = {}  # 成交订单：{合约号：[订单1, 订单2, ....]}
+        self._failedOrders = {}  # 失败订单：{合约号：[订单1, 订单2, ....]}?
+        # self._filledInfo = {}    # 失败信息：{订单号："failed info"}
+
+    def isOrderCanFilled(self, order):
+        """判断订单能否成交"""
+        curBarInfo = order["CurBar"]
+        #分买卖，看单边的最高或者最低
+        if order["Direct"] == dBuy and order["OrderPrice"] >= curBarInfo["LowPrice"]:  # 买单看行情最低价
+            return True
+        elif order["Direct"] == dSell and order["OrderPrice"] <= curBarInfo["HighPrice"]:  # 卖单看行情最高价
+            return True
+
+        self.__addWaitOrders(order)
+
+        return False
+
+    def isQuoteMatching(self, contractNo, lowPrice, highPrice):
+        """
+        判断行情能否使排队订单成交
+        :param contractNo: 合约
+        :param lowPrice: 合约当前的最低价
+        :param highPrice:  合约当前的最高价
+        :return: 满足下单的订单
+        """
+        ords = []
+        if contractNo in self._waitOrders:
+            for order in self._waitOrders[contractNo]:
+                if order["Direct"] == dBuy and order["OrderPrice"] >= lowPrice \
+                        or order["Direct"] == dSell and order["OrderPrice"] <= highPrice:
+                    ords.append(order)
+
+        # 不能动态删除，单独删除吧
+        for item in ords:
+            self._waitOrders[contractNo].remove(item)
+        return ords
+
+    def __addWaitOrders(self, order):
+        """将订单加入排队列表"""
+        if order["Cont"] in self._waitOrders:
+            self._waitOrders[order["Cont"]].append(order)
+        else:
+            self._waitOrders[order["Cont"]] = list()
+            self._waitOrders[order["Cont"]].append(order)
+
+    def __addFilledOrders(self, order):
+        """将订单加入成交列表"""
+        if order["Cont"] in self._filledOrders:
+            self._filledOrders[order["Cont"]].append(order)
+        else:
+            self._filledOrders[order["Cont"]] = list()
+            self._filledOrders[order["Cont"]].append(order)
+
+    def _clearWaitOrdersHisOver(self):
+        """历史阶段结束清除排队单"""
+        for contract in self._waitOrders:
+            self._waitOrders[contract] = list()
+
+    def setOrderState(self, contract, state):
+        pass
+
+    def getOrderState(self, orderid):
+        pass
+
+    def getOrderTime(self, orderid):
+        """获取订单委托时间"""
+        pass
+
+    def getFilledTime(self, orderid):
+        """获取订单成交时间"""
