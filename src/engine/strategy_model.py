@@ -982,11 +982,8 @@ class StrategyModel(object):
 
     def getOrderIsClose(self, userNo, eSession):
         orderStatus = self.getOrderStatus(userNo, eSession)
-        
-        if orderStatus in ('N', '1', '2', '3', '4', '7', '8', 'C', 'E'):
-            return False
-        
-        return True
+
+        return orderStatus in ('6', '9', 'A', 'B', 'F', 'I')
 
     def getOrderTime(self, userNo, eSession):
         return self._trdModel.getOrderTime(userNo, eSession)
