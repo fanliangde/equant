@@ -5372,7 +5372,7 @@ function init_function_info() {
                 label           : 'SetSlippage(slippage)',
                 insertText      : 'SetSlippage(${1})',
                 detail          : '# 设置滑点损耗\n' +
-                                  '    int SetSlippage(float slippage)\n' +
+                                  '    int SetSlippage(int slippage)\n' +
                                   '\n' +
                                   '参数：\n' +
                                   '    slippage 滑点损耗\n' +

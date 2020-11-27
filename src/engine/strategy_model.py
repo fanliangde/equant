@@ -2387,8 +2387,9 @@ class StrategyModel(object):
         return (int(curBar['KLineIndex']) - barIndex)
 
     def getBarsSinceToday(self, contractNo, barType, barValue):
-        contNo = self.getIndexMap(contractNo)
-        key = self.getKey(contNo, barType, barValue)
+        # contNo = self.getIndexMap(contractNo)
+        # key = self.getKey(contNo, barType, barValue)
+        key = self.getKey(contractNo, barType, barValue)
         curBar = self._hisModel.getCurBar(key)
         tradeDate = curBar['TradeDate']
         barList = self._hisModel._curBarDict[key].getTradeDateKLine(tradeDate)

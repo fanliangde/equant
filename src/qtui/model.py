@@ -393,7 +393,7 @@ class GetEgData(object):
         if id not in self._stManager.getStrategyDict() and sStatus != ST_STATUS_REMOVE:
             dataDict = {
                 "StrategyId":   id,
-                "Status":       sStatus
+                "StrategyState":       sStatus
             }
             self._stManager.add_(dataDict)
         else:

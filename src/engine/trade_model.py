@@ -19,7 +19,7 @@ class TLogoinModel:
             'TradeDate' : data['TradeDate']  ,  #交易日期
             'IsReady'   : data['IsReady']       #是否准备就绪
         }
-        
+
         self._userInfo = {}
         
         if data['IsReady'] == EEQU_READY:
@@ -485,7 +485,7 @@ class TradeModel:
 
     def updateMoney(self, apiEvent):
         dataList = apiEvent.getData()
-        #self.logger.debug("updateMoney:%s"%dataList)
+        # self.logger.debug("updateMoney:%s"%dataList)
         for data in dataList:
             userNo = data['UserNo']
             if userNo not in self._userInfo:

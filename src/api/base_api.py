@@ -544,7 +544,7 @@ class BaseApi(object):
               合约委买总量
 
         【语法】
-              int Q_BuyTotalPrice(string contractNo='')
+              int Q_BuyTotalVol(string contractNo='')
 
         【参数】
               contractNo 合约编号, 默认当前合约
@@ -563,7 +563,7 @@ class BaseApi(object):
               合约委卖总量
 
         【语法】
-              int Q_SellTotalPrice(string contractNo='')
+              int Q_SellTotalVol(string contractNo='')
 
         【参数】
               contractNo 合约编号, 默认当前合约
@@ -3251,7 +3251,7 @@ class BaseApi(object):
               返回指定交易帐户的手续费。
 
         【语法】
-              string A_Cost(string userNo='')
+              float A_Cost(string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -3389,7 +3389,7 @@ class BaseApi(object):
               返回当前账户的逐笔平盈。
 
         【语法】
-              float A_PerProfitLoss(string userNo='')
+              float A_PerCoverProfit(string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -3696,16 +3696,21 @@ class BaseApi(object):
          '''
         return self._dataModel.getTodaySellPosition(userNo, contractNo)
 
-    def A_OrderBuyOrSell(self, userNo, localOrderId):
+    def A_OrderBuyOrSell(self, userNo, id):
         '''
         【说明】
               返回指定帐户下当前商品的某个委托单的买卖类型。
 
         【语法】
-              char A_OrderBuyOrSell(int|string localOrderId='')
+              char A_OrderBuyOrSell(int|string id='')
 
         【参数】
-              localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
+              id 有两种形式：
+                      第一种形式是使用A_SendOrder返回的下单编号，格式形如："1-1"，类型为字符串；
+                      第二种形式是极星客户端的交易窗口上委托列表中的定单号，格式形如：1， 类型为整形。
+                      其中第二种形式的下单编号可以在交易数据触发返回的信息中获取，也可以通过
+                      A_FirstOrderNo、A_NextOrderNo、A_LastOrderNo、A_FirstQueueOrderNo、
+                      A_NextQueueOrderNo、A_AllQueueOrderNo、A_AllOrderNo等函数获取。
 
         【备注】
               返回指定帐户下当前商品的某个委托单的买卖类型，返回值为：
@@ -3720,18 +3725,23 @@ class BaseApi(object):
               if nBorS == Enum_Buy():
                 ...
          '''
-        return self._dataModel.getOrderBuyOrSell(userNo, localOrderId)
+        return self._dataModel.getOrderBuyOrSell(userNo, id)
 
-    def A_OrderEntryOrExit(self, userNo, localOrderId):
+    def A_OrderEntryOrExit(self, userNo, id):
         '''
         【说明】
               返回指定帐户下当前商品的某个委托单的开平仓状态。
 
         【语法】
-              char A_OrderEntryOrExit(int|string localOrderId='')
+              char A_OrderEntryOrExit(int|string id='')
 
         【参数】
-              localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
+              id 有两种形式：
+                      第一种形式是使用A_SendOrder返回的下单编号，格式形如："1-1"，类型为字符串；
+                      第二种形式是极星客户端的交易窗口上委托列表中的定单号，格式形如：1， 类型为整形。
+                      其中第二种形式的下单编号可以在交易数据触发返回的信息中获取，也可以通过
+                      A_FirstOrderNo、A_NextOrderNo、A_LastOrderNo、A_FirstQueueOrderNo、
+                      A_NextQueueOrderNo、A_AllQueueOrderNo、A_AllOrderNo等函数获取。
 
         【备注】
               返回指定帐户下当前商品的某个委托单的开平仓状态，返回值：
@@ -3749,18 +3759,23 @@ class BaseApi(object):
               if orderFlag == Enum_Exit():
                 ...
          '''
-        return self._dataModel.getOrderEntryOrExit(userNo, localOrderId)
+        return self._dataModel.getOrderEntryOrExit(userNo, id)
 
-    def A_OrderFilledLot(self, userNo, localOrderId):
+    def A_OrderFilledLot(self, userNo, id):
         '''
         【说明】
               返回指定帐户下当前商品的某个委托单的成交数量。
 
         【语法】
-              float A_OrderFilledLot(int|string localOrderId='')
+              float A_OrderFilledLot(int|string id='')
 
         【参数】
-              localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
+              id 有两种形式：
+                      第一种形式是使用A_SendOrder返回的下单编号，格式形如："1-1"，类型为字符串；
+                      第二种形式是极星客户端的交易窗口上委托列表中的定单号，格式形如：1， 类型为整形。
+                      其中第二种形式的下单编号可以在交易数据触发返回的信息中获取，也可以通过
+                      A_FirstOrderNo、A_NextOrderNo、A_LastOrderNo、A_FirstQueueOrderNo、
+                      A_NextQueueOrderNo、A_AllQueueOrderNo、A_AllOrderNo等函数获取。
 
         【备注】
               返回指定帐户下当前商品的某个委托单的成交数量，返回值为浮点数。
@@ -3769,18 +3784,23 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getOrderFilledLot(userNo, localOrderId)
+        return self._dataModel.getOrderFilledLot(userNo, id)
 
-    def A_OrderFilledPrice(self, userNo, localOrderId):
+    def A_OrderFilledPrice(self, userNo, id):
         '''
         【说明】
               返回指定帐户下当前商品的某个委托单的成交价格。
 
         【语法】
-              float A_OrderFilledPrice(int|string localOrderId='')
+              float A_OrderFilledPrice(int|string id='')
 
         【参数】
-              localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
+              id 有两种形式：
+                      第一种形式是使用A_SendOrder返回的下单编号，格式形如："1-1"，类型为字符串；
+                      第二种形式是极星客户端的交易窗口上委托列表中的定单号，格式形如：1， 类型为整形。
+                      其中第二种形式的下单编号可以在交易数据触发返回的信息中获取，也可以通过
+                      A_FirstOrderNo、A_NextOrderNo、A_LastOrderNo、A_FirstQueueOrderNo、
+                      A_NextQueueOrderNo、A_AllQueueOrderNo、A_AllOrderNo等函数获取。
 
         【备注】
               返回指定帐户下当前商品的某个委托单的成交价格，返回值为浮点数。
@@ -3790,18 +3810,23 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getOrderFilledPrice(userNo, localOrderId)
+        return self._dataModel.getOrderFilledPrice(userNo, id)
 
-    def A_OrderFilledList(self, userNo, localOrderId):
+    def A_OrderFilledList(self, userNo, id):
         """
         【说明】
               返回订单的成交情况信息
 
         【语法】
-              list A_OrderFilledList(int|string localOrderId='')
+              list A_OrderFilledList(int|string id='')
 
         【参数】
-              localOrderId 订单号，或者使用A_SendOrder返回的下单编号。
+              id 有两种形式：
+                      第一种形式是使用A_SendOrder返回的下单编号，格式形如："1-1"，类型为字符串；
+                      第二种形式是极星客户端的交易窗口上委托列表中的定单号，格式形如：1， 类型为整形。
+                      其中第二种形式的下单编号可以在交易数据触发返回的信息中获取，也可以通过
+                      A_FirstOrderNo、A_NextOrderNo、A_LastOrderNo、A_FirstQueueOrderNo、
+                      A_NextQueueOrderNo、A_AllQueueOrderNo、A_AllOrderNo等函数获取。
 
         【备注】
               返回指定帐户下当前商品的某个订单的成交信息，返回值为列表，列表中为字典类型，字典类型中包含成交明细。
@@ -3827,20 +3852,25 @@ class BaseApi(object):
         【示例】
               无
         """
-        return self._dataModel.getOrderFilledList(userNo, localOrderId)
+        return self._dataModel.getOrderFilledList(userNo, id)
 
 
 
-    def A_OrderLot(self, userNo, localOrderId):
+    def A_OrderLot(self, userNo, id):
         '''
         【说明】
               返回指定帐户下当前商品的某个委托单的委托数量。
 
         【语法】
-              float A_OrderLot(int|string localOrderId='')
+              float A_OrderLot(int|string id='')
 
         【参数】
-              localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
+              id 有两种形式：
+                      第一种形式是使用A_SendOrder返回的下单编号，格式形如："1-1"，类型为字符串；
+                      第二种形式是极星客户端的交易窗口上委托列表中的定单号，格式形如：1， 类型为整形。
+                      其中第二种形式的下单编号可以在交易数据触发返回的信息中获取，也可以通过
+                      A_FirstOrderNo、A_NextOrderNo、A_LastOrderNo、A_FirstQueueOrderNo、
+                      A_NextQueueOrderNo、A_AllQueueOrderNo、A_AllOrderNo等函数获取。
 
         【备注】
               返回指定帐户下当前商品的某个委托单的委托数量，返回值为浮点数。
@@ -3849,18 +3879,23 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getOrderLot(userNo, localOrderId)
+        return self._dataModel.getOrderLot(userNo, id)
 
-    def A_OrderPrice(self, userNo, localOrderId):
+    def A_OrderPrice(self, userNo, id):
         '''
         【说明】
               返回指定帐户下当前商品的某个委托单的委托价格。
 
         【语法】
-              float A_OrderPrice(int|string localOrderId='')
+              float A_OrderPrice(int|string id='')
 
         【参数】
-              localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
+              id 有两种形式：
+                      第一种形式是使用A_SendOrder返回的下单编号，格式形如："1-1"，类型为字符串；
+                      第二种形式是极星客户端的交易窗口上委托列表中的定单号，格式形如：1， 类型为整形。
+                      其中第二种形式的下单编号可以在交易数据触发返回的信息中获取，也可以通过
+                      A_FirstOrderNo、A_NextOrderNo、A_LastOrderNo、A_FirstQueueOrderNo、
+                      A_NextQueueOrderNo、A_AllQueueOrderNo、A_AllOrderNo等函数获取。
 
         【备注】
               返回指定帐户下当前商品的某个委托单的委托价格，返回值为浮点数。
@@ -3869,18 +3904,23 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getOrderPrice(userNo, localOrderId)
+        return self._dataModel.getOrderPrice(userNo, id)
 
-    def A_OrderStatus(self, userNo, localOrderId):
+    def A_OrderStatus(self, userNo, id):
         '''
         【说明】
               返回指定帐户下当前商品的某个委托单的状态。
 
         【语法】
-              char A_OrderStatus(int|string localOrderId='')
+              char A_OrderStatus(int|string id='')
 
         【参数】
-              localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
+              id 有两种形式：
+                      第一种形式是使用A_SendOrder返回的下单编号，格式形如："1-1"，类型为字符串；
+                      第二种形式是极星客户端的交易窗口上委托列表中的定单号，格式形如：1， 类型为整形。
+                      其中第二种形式的下单编号可以在交易数据触发返回的信息中获取，也可以通过
+                      A_FirstOrderNo、A_NextOrderNo、A_LastOrderNo、A_FirstQueueOrderNo、
+                      A_NextQueueOrderNo、A_AllQueueOrderNo、A_AllOrderNo等函数获取。
 
         【备注】
               返回指定帐户下当前商品的某个委托单的状态，返回值：
@@ -3910,18 +3950,23 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getOrderStatus(userNo, localOrderId)
+        return self._dataModel.getOrderStatus(userNo, id)
 
-    def A_OrderIsClose(self, userNo, localOrderId):
+    def A_OrderIsClose(self, userNo, id):
         '''
         【说明】
               判断某个委托单是否完结。
 
         【语法】
-              bool A_OrderIsClose(int|string localOrderId='')
+              bool A_OrderIsClose(int|string id='')
 
         【参数】
-              localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
+              id 有两种形式：
+                      第一种形式是使用A_SendOrder返回的下单编号，格式形如："1-1"，类型为字符串；
+                      第二种形式是极星客户端的交易窗口上委托列表中的定单号，格式形如：1， 类型为整形。
+                      其中第二种形式的下单编号可以在交易数据触发返回的信息中获取，也可以通过
+                      A_FirstOrderNo、A_NextOrderNo、A_LastOrderNo、A_FirstQueueOrderNo、
+                      A_NextQueueOrderNo、A_AllQueueOrderNo、A_AllOrderNo等函数获取。
 
         【备注】
               当委托单是完结状态，返回True，否则返回False。
@@ -3936,18 +3981,23 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getOrderIsClose(userNo, localOrderId)
+        return self._dataModel.getOrderIsClose(userNo, id)
 
-    def A_OrderTime(self, userNo, localOrderId):
+    def A_OrderTime(self, userNo, id):
         '''
         【说明】
               返回指定公式应用的帐户下当前商品的某个委托单的委托时间。
 
         【语法】
-              struct_time A_OrderTime(int|string localOrderId='')
+              struct_time A_OrderTime(int|string id='')
 
         【参数】
-              localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
+              id 有两种形式：
+                      第一种形式是使用A_SendOrder返回的下单编号，格式形如："1-1"，类型为字符串；
+                      第二种形式是极星客户端的交易窗口上委托列表中的定单号，格式形如：1， 类型为整形。
+                      其中第二种形式的下单编号可以在交易数据触发返回的信息中获取，也可以通过
+                      A_FirstOrderNo、A_NextOrderNo、A_LastOrderNo、A_FirstQueueOrderNo、
+                      A_NextQueueOrderNo、A_AllQueueOrderNo、A_AllOrderNo等函数获取。
 
         【备注】
               返回指定帐户下当前商品的某个委托单的委托时间，返回格式为YYYYMMDD.hhmmss的数值。
@@ -3956,12 +4006,13 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getOrderTime(userNo, localOrderId)
+        return self._dataModel.getOrderTime(userNo, id)
 
     def A_FirstOrderNo(self, contractNo1, contractNo2, userNo):
         '''
         【说明】
-              返回指定账户第一个订单号。
+              返回指定账户第一个定单号。
+              返回的定单号为极星客户端的交易窗口上委托列表中的定单号，格式形如：1， 类型为整形。
 
         【语法】
               int A_FirstOrderNo(string contractNo1='', string contractNo2='', string userNo='')
@@ -3980,33 +4031,35 @@ class BaseApi(object):
          '''
         return self._dataModel.getFirstOrderNo(userNo, contractNo1, contractNo2)
 
-    def A_NextOrderNo(self, localOrderId, contractNo1, contractNo2, userNo):
+    def A_NextOrderNo(self, orderId, contractNo1, contractNo2, userNo):
         '''
         【说明】
-              返回指定账户下一个订单号。
+              返回指定账户下一个定单号。
+              返回的定单号为极星客户端的交易窗口上委托列表中的定单号，格式形如：1， 类型为整形。
 
         【语法】
-              int A_NextOrderNo(int localOrderId=0, string contractNo1='', string contractNo2='', string userNo='')
+              int A_NextOrderNo(int orderId=0, string contractNo1='', string contractNo2='', string userNo='')
 
         【参数】
-              localOrderId 定单号，默认为0，
+              orderId 定单号，默认为0，为极星客户端的交易窗口上委托列表中的定单号
               contractNo1 合约代码，默认为遍历所有合约。
               contractNo2 合约代码，默认为遍历所有合约。
               userNo  指定的交易账户，默认当前账户
 
         【备注】
-              若返回值为-1，表示没有任何订单，否则，返回处在OrderNo后面的订单索引值，
+              若返回值为-1，表示没有任何订单，否则，返回处在参数orderId后面的订单索引值，
               该函数常和A_FirstOrderNo联合使用。
 
         【示例】
               无
          '''
-        return self._dataModel.getNextOrderNo(userNo, localOrderId, contractNo1, contractNo2)
+        return self._dataModel.getNextOrderNo(userNo, orderId, contractNo1, contractNo2)
 
     def A_LastOrderNo(self, contractNo1, contractNo2, userNo):
         '''
         【说明】
-              返回指定账户最近发送的订单号。
+              返回指定账户最近发送的定单号。
+              返回的定单号为极星客户端的交易窗口上委托列表中的定单号，格式形如：1， 类型为整形。
 
         【语法】
               int A_LastOrderNo(string contractNo1='', string contractNo2='', string userNo='')
@@ -4027,7 +4080,8 @@ class BaseApi(object):
     def A_FirstQueueOrderNo(self, contractNo1, contractNo2, userNo):
         '''
         【说明】
-              返回指定账户第一个排队(可撤)订单号。
+              返回指定账户第一个排队(可撤)定单号。
+              返回的定单号为极星客户端的交易窗口上委托列表中的定单号，格式形如：1， 类型为整形。
 
         【语法】
               int A_FirstQueueOrderNo(string contractNo1='', string contractNo2='', string userNo='')
@@ -4038,7 +4092,7 @@ class BaseApi(object):
               userNo  指定的交易账户，默认当前账户
 
         【备注】
-              若返回值为-1，表示没有任何可撤排队订单，否则，返回第一个订单的索引值。，
+              若返回值为-1，表示没有任何可撤排队订单，否则，返回第一个订单的索引值。
               该函数经常和A_NextQueueOrderNo函数合用，用于遍历排队中的订单。
 
         【示例】
@@ -4046,33 +4100,34 @@ class BaseApi(object):
          '''
         return self._dataModel.getFirstQueueOrderNo(userNo, contractNo1, contractNo2)
 
-    def A_NextQueueOrderNo(self, localOrderId, contractNo1, contractNo2, userNo):
+    def A_NextQueueOrderNo(self, orderId, contractNo1, contractNo2, userNo):
         '''
         【说明】
-              返回指定账户下一个排队(可撤)订单号。
+              返回指定账户下一个排队(可撤)订单号。返回的定单号为极星客户端的交易窗口上委托列表中的定单号，格式形如：1， 类型为整形。
 
         【语法】
-              int A_NextQueueOrderNo(int localOrderId=0, string contractNo1='', string contractNo2='', string userNo='')
+              int A_NextQueueOrderNo(int orderId=0, string contractNo1='', string contractNo2='', string userNo='')
 
         【参数】
-              localOrderId 定单号，默认为0，
+              orderId 定单号，默认为0，
               contractNo1 合约代码，默认为遍历所有合约。
               contractNo2 合约代码，默认为遍历所有合约。
               userNo  指定的交易账户，默认当前账户
 
         【备注】
-              若返回值为-1，表示没有任何排队订单，否则，返回处在OrderNo后面的订单索引值，
+              若返回值为-1，表示没有任何排队订单，否则，返回处在参数orderId后面的订单索引值，
               该函数常和A_FirstQueueOrderNo联合使用。
 
         【示例】
               无
          '''
-        return self._dataModel.getNextQueueOrderNo(userNo, localOrderId, contractNo1, contractNo2)
+        return self._dataModel.getNextQueueOrderNo(userNo, orderId, contractNo1, contractNo2)
 
     def A_AllQueueOrderNo(self, contractNo, userNo):
         '''
         【说明】
-              返回指定账户所有排队(可撤)订单号。
+              返回指定账户所有排队(可撤)定单号。
+              返回的定单号列表为极星客户端的交易窗口上委托列表中的定单号组成的列表，列表元素类型为整形。
 
         【语法】
               list A_AllQueueOrderNo(string contractNo='', string userNo='')
@@ -4112,7 +4167,8 @@ class BaseApi(object):
     def A_AllOrderNo(self, contractNo, userNo):
         '''
         【说明】
-              返回包含指定合约指定账户所有订单号的列表。
+              返回包含指定合约指定账户所有定单号的列表。
+              返回的定单号列表为极星客户端的交易窗口上委托列表中的定单号组成的列表，列表元素类型为整形。
 
         【语法】
               list A_AllOrderNo(string contractNo='', string userNo='')
@@ -4129,25 +4185,30 @@ class BaseApi(object):
          '''
         return self._dataModel.getAllOrderNo(userNo, contractNo)
 
-    def A_OrderContractNo(self, userNo, localOrderId):
+    def A_OrderContractNo(self, userNo, id):
         '''
         【说明】
-              返回订单的合约号。
+              返回定单的合约号。
 
         【语法】
-              string A_OrderContractNo(int|string localOrderId=0)
+              string A_OrderContractNo(int|string id=0)
 
         【参数】
-              localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
+              id 有两种形式：
+                      第一种形式是使用A_SendOrder返回的下单编号，格式形如："1-1"，类型为字符串；
+                      第二种形式是极星客户端的交易窗口上委托列表中的定单号，格式形如：1， 类型为整形。
+                      其中第二种形式的下单编号可以在交易数据触发返回的信息中获取，也可以通过
+                      A_FirstOrderNo、A_NextOrderNo、A_LastOrderNo、A_FirstQueueOrderNo、
+                      A_NextQueueOrderNo、A_AllQueueOrderNo、A_AllOrderNo等函数获取。
 
         【备注】
               返回结果如："ZCE|F|TA|305"等，
-              如果localOrderId没有对应的委托单，则返回结果为字符串。
+              如果id没有对应的委托单，则返回结果为字符串。
 
         【示例】
               无
          '''
-        return self._dataModel.getOrderContractNo(userNo, localOrderId)
+        return self._dataModel.getOrderContractNo(userNo, id)
 
     def A_SendOrder(self, userNo, contractNo, orderDirct, entryOrExit, orderQty, orderPrice, orderType, validType, hedge, triggerType, triggerMode, triggerCondition, triggerPrice):
         '''
@@ -4215,8 +4276,8 @@ class BaseApi(object):
 
         【备注】
               针对当前公式指定的帐户、商品发送委托单，发送成功返回如"1-2"的下单编号，发送失败返回空字符串""。
-              返回结果形式未：retCode, retMsg，retCode的数据类型为可以为负的整数, retMsg的数据类型为字符串。
-              其中发送成功时retCode为0，retMsg为返回的下单编号localOrderId，其组成规则为：策略id-该策略中发送委托单的次数，所以下单编号"1-2"表示在策略id为1的策略中的第2次发送委托单返回的下单编号。
+              返回结果形式为：retCode, retMsg，retCode的数据类型为可以为负的整数, retMsg的数据类型为字符串。
+              其中发送成功时retCode为0，retMsg为返回的下单编号，其组成规则为：策略id-该策略中发送委托单的次数，所以下单编号"1-2"表示在策略id为1的策略中的第2次发送委托单返回的下单编号。
               当发送失败时retCode为负数，retMsg为返回的发送失败的原因，retCode可能返回的值及含义如下：
                 -1 : 未选择实盘运行，请在设置界面勾选"实盘运行"，或者在策略代码中调用SetActual()方法选择实盘运行；
                 -2 : 策略当前状态不是实盘运行状态，请勿在历史回测阶段调用该函数；
@@ -4228,22 +4289,27 @@ class BaseApi(object):
 
         【示例】
               retCode, retMsg = A_SendOrder(Enum_Buy(), Enum_Exit(), 1, Q_AskPrice())
-              当retCode为0时表明发送订单信息成功，retMsg为返回的下单编号localOrderId。
+              当retCode为0时表明发送订单信息成功，retMsg为返回的下单编号，形如"1-1"。
          '''
         return self._dataModel.sendOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, \
                                                       triggerType, triggerMode, triggerCondition, triggerPrice, aFunc=True)
 
 
-    def A_ModifyOrder(self, userNo, localOrderId, contractNo, orderDirct, entryOrExit, orderQty, orderPrice, orderType, validType, hedge, triggerType, triggerMode, triggerCondition, triggerPrice):
+    def A_ModifyOrder(self, userNo, id, contractNo, orderDirct, entryOrExit, orderQty, orderPrice, orderType, validType, hedge, triggerType, triggerMode, triggerCondition, triggerPrice):
         '''
         【说明】
               发送改单指令。
 
         【语法】
-              bool A_ModifyOrder(string localOrderId, char orderDirct, char entryOrExit, int orderQty, float orderPrice, string contractNo='', string userNo='', char orderType='2', char validType='0', char hedge='T', char triggerType='N', char triggerMode='N', char triggerCondition='N', float triggerPrice=0)
+              bool A_ModifyOrder(int|string id, char orderDirct, char entryOrExit, int orderQty, float orderPrice, string contractNo='', string userNo='', char orderType='2', char validType='0', char hedge='T', char triggerType='N', char triggerMode='N', char triggerCondition='N', float triggerPrice=0)
 
         【参数】
-              localOrderId 定单号，或者使用A_SendOrder返回的下单编号，
+              id  有两种形式：
+                      第一种形式是使用A_SendOrder返回的下单编号，格式形如："1-1"，类型为字符串；
+                      第二种形式是极星客户端的交易窗口上委托列表中的定单号，格式形如：1， 类型为整形。
+                      其中第二种形式的下单编号可以在交易数据触发返回的信息中获取，也可以通过
+                      A_FirstOrderNo、A_NextOrderNo、A_LastOrderNo、A_FirstQueueOrderNo、
+                      A_NextQueueOrderNo、A_AllQueueOrderNo、A_AllOrderNo等函数获取。
               orderDirct 发送委托单的买卖类型，取值为Enum_Buy或Enum_Sell之一，
               entryOrExit 发送委托单的开平仓类型，取值为Enum_Entry,Enum_Exit,Enum_ExitToday之一，
               orderQty 委托单的交易数量，
@@ -4310,20 +4376,25 @@ class BaseApi(object):
  
          '''
          
-        return self._dataModel.modifyOrder(userNo, localOrderId, contractNo, orderType, validType, orderDirct, entryOrExit, \
+        return self._dataModel.modifyOrder(userNo, id, contractNo, orderType, validType, orderDirct, entryOrExit, \
                                             hedge, orderPrice, orderQty, triggerType, triggerMode, triggerCondition, triggerPrice)
                                             
 
-    def A_DeleteOrder(self, userNo, localOrderId):
+    def A_DeleteOrder(self, userNo, id):
         '''
         【说明】
               针对指定帐户、商品发送撤单指令。
 
         【语法】
-              bool A_DeleteOrder(int|string localOrderId)
+              bool A_DeleteOrder(int|string id)
 
         【参数】
-              localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
+              id  有两种形式：
+                      第一种形式是使用A_SendOrder返回的下单编号，格式形如："1-1"，类型为字符串；
+                      第二种形式是极星客户端的交易窗口上委托列表中的定单号，格式形如：1， 类型为整形。
+                      其中第二种形式的下单编号可以在交易数据触发返回的信息中获取，也可以通过
+                      A_FirstOrderNo、A_NextOrderNo、A_LastOrderNo、A_FirstQueueOrderNo、
+                      A_NextQueueOrderNo、A_AllQueueOrderNo、A_AllOrderNo等函数获取。
 
         【备注】
               针对指定帐户、商品发送撤单指令，发送成功返回True, 发送失败返回False。
@@ -4333,12 +4404,13 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.deleteOrder(userNo, localOrderId)
+        return self._dataModel.deleteOrder(userNo, id)
 
     def A_GetOrderNo(self, localOrderId):
         '''
         【说明】
               获取下单编号对应的定单号和委托号。
+              返回的定单号为用A_SendOrder下单返回的订单编号所对应的极星客户端的交易窗口上委托列表中的定单号，类型为整形。
 
         【语法】
               string, string A_GetOrderNo(string localOrderId)
@@ -4347,8 +4419,8 @@ class BaseApi(object):
               localOrderId 使用A_SendOrder返回的下单编号。
 
         【备注】
-              针对当前策略使用A_SendOrder返回的下单编号，可以使用A_GetOrderNo获取下单编号对应的定单号和委托号。
-              由于使用A_SendOrder返回的下单编号localOrderId与策略相关，所以在策略重启后localOrderId会发生变化。
+              针对当前策略使用A_SendOrder返回的下单编号，可以使用A_GetOrderNo获取对应的极星客户端的交易窗口上委托列表中的定单号。
+              由于使用A_SendOrder返回的下单编号与策略相关，所以在策略重启后localOrderId会发生变化。
               由于委托单对应的定单号与客户端有关，所以在客户端重启后，委托单对应的定单号可能会发生变化。
               由于委托号是服务器生成的，所以在使用A_SendOrder得到下单编号后，如果服务器还没有返回相应的委托单信息，可能获取不到相应的定单号和委托号。
               当localOrderId对应的定单号和委托号还没有从服务器返回，则对应的值为空字符串。
@@ -4358,7 +4430,7 @@ class BaseApi(object):
               retCode, retMsg = A_SendOrder(.....)
               time.sleep(5)
               if retCode == 0:
-                sessionId, orderNo =  A_GetOrderNo(retMsg)
+                orderId, orderNo =  A_GetOrderNo(retMsg)
          '''
         return self._dataModel.getAOrderNo(localOrderId)
 
@@ -5874,7 +5946,7 @@ class BaseApi(object):
               int SetMargin(float type, float value=0, string contractNo='')
 
         【参数】
-              type 0：按比例收取保证金， 1：按定额收取保证金，
+              type 'R'：按比例收取保证金， 'F'：按定额收取保证金，
               value 按比例收取保证金时的比例， 或者按定额收取保证金时的额度，
               contractNo 合约编号，默认为基础合约。
 
@@ -5882,8 +5954,8 @@ class BaseApi(object):
               返回整型，0成功，-1失败
 
         【示例】
-              SetMargin(0, 0.08) 设置基础合约的保证金按比例收取8%
-              SetMargin(1, 80000, 'ZCE|F|SR|906') 设置合约ZCE|F|SR|906的保证金按额度收取80000
+              SetMargin('R', 0.08) 设置基础合约的保证金按比例收取8%
+              SetMargin('F', 80000, 'ZCE|F|SR|906') 设置合约ZCE|F|SR|906的保证金按额度收取80000
         '''
         return self._dataModel.setMargin(type, value, contractNo)
         
@@ -6019,7 +6091,7 @@ class BaseApi(object):
              设置滑点损耗
 
         【语法】
-              int SetSlippage(float slippage)
+              int SetSlippage(int slippage)
 
         【参数】
               slippage 滑点损耗
@@ -7072,7 +7144,7 @@ class BaseApi(object):
               无
 
         【备注】
-              返回字符串, YYYYMMDD格式, '20190524'
+              返回字符串, YYYYMMDDHHMMSSfff格式, '20190524100101500'，其中fff表示微秒
 
         【示例】
               无
@@ -7559,41 +7631,41 @@ def A_TodayBuyPosition(contractNo='', userNo=''):
 def A_TodaySellPosition(contractNo='', userNo=''):
     return baseApi.A_TodaySellPosition(contractNo, userNo)
 
-def A_OrderBuyOrSell(localOrderId):
-    return baseApi.A_OrderBuyOrSell('', localOrderId)
+def A_OrderBuyOrSell(id):
+    return baseApi.A_OrderBuyOrSell('', id)
 
-def A_OrderEntryOrExit(localOrderId):
-    return baseApi.A_OrderEntryOrExit('', localOrderId)
+def A_OrderEntryOrExit(id):
+    return baseApi.A_OrderEntryOrExit('', id)
 
-def A_OrderFilledLot(localOrderId):
-    return baseApi.A_OrderFilledLot('', localOrderId)
+def A_OrderFilledLot(id):
+    return baseApi.A_OrderFilledLot('', id)
 
-def A_OrderFilledPrice(localOrderId):
-    return baseApi.A_OrderFilledPrice('', localOrderId)
+def A_OrderFilledPrice(id):
+    return baseApi.A_OrderFilledPrice('', id)
 
-def A_OrderFilledList(localOrderId=0):
-    return baseApi.A_OrderFilledList('', localOrderId)
+def A_OrderFilledList(id=0):
+    return baseApi.A_OrderFilledList('', id)
 
-def A_OrderLot(localOrderId):
-    return baseApi.A_OrderLot('', localOrderId)
+def A_OrderLot(id):
+    return baseApi.A_OrderLot('', id)
 
-def A_OrderPrice(localOrderId):
-    return baseApi.A_OrderPrice('', localOrderId)
+def A_OrderPrice(id):
+    return baseApi.A_OrderPrice('', id)
 
-def A_OrderStatus(localOrderId):
-    return baseApi.A_OrderStatus('', localOrderId)
+def A_OrderStatus(id):
+    return baseApi.A_OrderStatus('', id)
 
-def A_OrderIsClose(localOrderId):
-    return baseApi.A_OrderIsClose('', localOrderId)
+def A_OrderIsClose(id):
+    return baseApi.A_OrderIsClose('', id)
 
-def A_OrderTime(localOrderId):
-    return baseApi.A_OrderTime('', localOrderId)
+def A_OrderTime(id):
+    return baseApi.A_OrderTime('', id)
 
 def A_FirstOrderNo(contractNo1='', contractNo2='', userNo=''):
     return baseApi.A_FirstOrderNo(contractNo1, contractNo2, userNo)
 
-def A_NextOrderNo(localOrderId=0, contractNo1='', contractNo2='', userNo=''):
-    return baseApi.A_NextOrderNo(localOrderId, contractNo1, contractNo2, userNo)
+def A_NextOrderNo(orderId=0, contractNo1='', contractNo2='', userNo=''):
+    return baseApi.A_NextOrderNo(orderId, contractNo1, contractNo2, userNo)
 
 def A_LastOrderNo(contractNo1='', contractNo2='', userNo=''):
     return baseApi.A_LastOrderNo(contractNo1, contractNo2, userNo)
@@ -7601,8 +7673,8 @@ def A_LastOrderNo(contractNo1='', contractNo2='', userNo=''):
 def A_FirstQueueOrderNo(contractNo1='', contractNo2='', userNo=''):
     return baseApi.A_FirstQueueOrderNo(contractNo1, contractNo2, userNo)
 
-def A_NextQueueOrderNo(localOrderId=0, contractNo1='', contractNo2='', userNo=''):
-    return baseApi.A_NextQueueOrderNo(localOrderId, contractNo1, contractNo2, userNo)
+def A_NextQueueOrderNo(orderId=0, contractNo1='', contractNo2='', userNo=''):
+    return baseApi.A_NextQueueOrderNo(orderId, contractNo1, contractNo2, userNo)
 
 def A_AllQueueOrderNo(contractNo='', userNo=''):
     return baseApi.A_AllQueueOrderNo(contractNo, userNo)
@@ -7613,17 +7685,17 @@ def A_LatestFilledTime(contractNo='', userNo=''):
 def A_AllOrderNo(contractNo='', userNo=''):
     return baseApi.A_AllOrderNo(contractNo, userNo)
 
-def A_OrderContractNo(localOrderId=0, userNo=''):
-    return baseApi.A_OrderContractNo(userNo, localOrderId)
+def A_OrderContractNo(id=0, userNo=''):
+    return baseApi.A_OrderContractNo(userNo, id)
 
 def A_SendOrder(orderDirct, entryOrExit, orderQty, orderPrice, contractNo='', userNo='', orderType='2', validType='0', hedge='T', triggerType='N', triggerMode='N', triggerCondition='N', triggerPrice=0):
     return baseApi.A_SendOrder(userNo, contractNo, orderDirct, entryOrExit, orderQty, orderPrice, orderType, validType, hedge, triggerType, triggerMode, triggerCondition, triggerPrice)
 
-def A_ModifyOrder(localOrderId, orderDirct, entryOrExit, orderQty, orderPrice, contractNo='', userNo='', orderType='2', validType='0', hedge='T', triggerType='N', triggerMode='N', triggerCondition='N', triggerPrice=0):
-    return baseApi.A_ModifyOrder(userNo, localOrderId, contractNo, orderDirct, entryOrExit, orderQty, orderPrice, orderType, validType, hedge, triggerType, triggerMode, triggerCondition, triggerPrice)
+def A_ModifyOrder(id, orderDirct, entryOrExit, orderQty, orderPrice, contractNo='', userNo='', orderType='2', validType='0', hedge='T', triggerType='N', triggerMode='N', triggerCondition='N', triggerPrice=0):
+    return baseApi.A_ModifyOrder(userNo, id, contractNo, orderDirct, entryOrExit, orderQty, orderPrice, orderType, validType, hedge, triggerType, triggerMode, triggerCondition, triggerPrice)
 
-def A_DeleteOrder(localOrderId):
-    return baseApi.A_DeleteOrder('', localOrderId)
+def A_DeleteOrder(id):
+    return baseApi.A_DeleteOrder('', id)
 
 def A_GetOrderNo(localOrderId):
     return baseApi.A_GetOrderNo(localOrderId)

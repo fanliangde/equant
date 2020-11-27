@@ -2,7 +2,7 @@
 
 from multiprocessing import Process, Queue
 import multiprocessing
-from threading import Thread
+from threading import Thread, RLock
 from .strategy import StrategyManager
 from capi.py2c import PyAPI
 from capi.event import *
@@ -74,7 +74,8 @@ class StrategyEngine(object):
         self._maxStrategyId = 1
         # 创建策略管理器
         self._strategyMgr = StrategyManager(self.logger, self._st2egQueue)
-        
+
+        self._lock = RLock()
         # 策略进程队列列表
         self._eg2stQueueDict = {} #{strategy_id, queue}
         self._isEffective = {}
@@ -282,11 +283,18 @@ class StrategyEngine(object):
                 self.sendErrorMsg(-1, errorText)
 
     def _sendEvent2Strategy(self, strategyId, event):
-        if strategyId not in self._eg2stQueueDict or strategyId not in self._isEffective or not self._isEffective[strategyId]:
+        self._lock.acquire()
+        st_in_dict = self._eg2stQueueDict.get(strategyId, None)
+        self._lock.release()
+
+        if st_in_dict is None or strategyId not in self._isEffective or not self._isEffective[strategyId]:
             return
         if event is None:
             return
+
+        self._lock.acquire()
         eg2stQueue = self._eg2stQueueDict[strategyId]
+        self._lock.release()
         while True:
             try:
                 eg2stQueue.put_nowait(event)
@@ -296,7 +304,9 @@ class StrategyEngine(object):
                 self.logger.warn(f"engine向策略发事件时阻塞，策略id:{strategyId}, 事件号: {event.getEventCode()}")
 
     def _sendEvent2StrategyForce(self, strategyId, event):
+        self._lock.acquire()
         eg2stQueue = self._eg2stQueueDict[strategyId]
+        self._lock.release()
         while True:
             try:
                 eg2stQueue.put_nowait(event)
@@ -308,10 +318,12 @@ class StrategyEngine(object):
     def _sendEvent2AllStrategy(self, event):
         # eg2stQueueDict = copy.deepcopy(self._eg2stQueueDict)
         # for strategyId in eg2stQueueDict:
+        self._lock.acquire()
         for strategyId in self._eg2stQueueDict:
             eventCopy = copy.deepcopy(event)
             eventCopy.setStrategyId(strategyId)
             self._sendEvent2Strategy(strategyId, eventCopy)
+        self._lock.release()
 
     def _dispathQuote2Strategy(self, code, apiEvent):
         '''分发即时行情'''
@@ -365,7 +377,9 @@ class StrategyEngine(object):
         self._updateMaxStrategyId()
         id = self._getStrategyId() if strategyId is None else strategyId
         eg2stQueue = Queue(20000)
+        self._lock.acquire()
         self._eg2stQueueDict[id] = eg2stQueue
+        self._lock.release()
         self._strategyMgr.create(id, eg2stQueue, self._eg2uiQueue, self._st2egQueue, event)
         # broken pip error 修复
         self._isEffective[id] = True
@@ -1658,14 +1672,19 @@ class StrategyEngine(object):
         # make sure quit event is the last
         strategyId = event.getStrategyId()
         self.logger.info(f"策略{strategyId}收到停止信号")
-        if strategyId not in self._eg2stQueueDict or self._isEffective[strategyId] is False:
+        self._lock.acquire()
+        st_in_dict = self._eg2stQueueDict.get(strategyId, None)
+        self._lock.release()
+        if st_in_dict is None or self._isEffective[strategyId] is False:
             return
         self._isEffective[strategyId] = False
 
         # to solve broken pip error
+        self._lock.acquire()
         eg2stQueue = self._eg2stQueueDict[strategyId]
+        self._lock.release()
         eg2stQueue.put(event)
-
+        
     # 当策略退出成功时
     def _cleanStrategyInfo(self, strategyId):
         self._isEffective[strategyId] = False
@@ -1687,11 +1706,14 @@ class StrategyEngine(object):
     # 启动当前策略
     def _onStrategyResume(self, event):
         strategyId = event.getStrategyId()
-        if strategyId in self._eg2stQueueDict and strategyId in self._isEffective and self._isEffective[strategyId]:
+        self._lock.acquire()
+        st_in_dict = self._eg2stQueueDict.get(strategyId, None)
+        self._lock.release()
+        if st_in_dict and strategyId in self._isEffective and self._isEffective[strategyId]:
             self.logger.info("策略 %d 已经存在" % event.getStrategyId())
-            return
-        self._strategyMgr.restartStrategy(self._loadStrategy, event)
-
+        else:
+            self._strategyMgr.restartStrategy(self._loadStrategy, event)
+        
     #  当量化退出时，发事件给所有的策略
     def _onEquantExit(self, event):
         if self._strategyMgr.isAllStrategyQuit():
@@ -1734,12 +1756,15 @@ class StrategyEngine(object):
 
     def _restartStrategyWhenParamsChanged(self, event):
         strategyId = event.getStrategyId()
-        if strategyId in self._eg2stQueueDict and strategyId in self._isEffective and self._isEffective[strategyId]:
+        self._lock.acquire()
+        st_in_dict = self._eg2stQueueDict.get(strategyId, None)
+        self._lock.release()
+        if st_in_dict and strategyId in self._isEffective and self._isEffective[strategyId]:
             self._isEffective[strategyId] = False
             self._isSt2EngineDataEffective[strategyId] = False
             self._cleanStrategyInfo(strategyId)
             self._strategyMgr.destroyProcessByStrategyId(strategyId)
-
+        
         allConfig = copy.deepcopy(self._strategyMgr.getStrategyAttribute(strategyId)["Config"])
         #allConfig = copy.deepcopy(event.getData()["Config"])
         allConfig["Params"] = event.getData()["Config"]["Params"]
