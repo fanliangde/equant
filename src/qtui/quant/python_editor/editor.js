@@ -2914,7 +2914,7 @@ function init_function_info() {
             },{
                 label           : 'MarginRatio(contractNo=\'\')',
                 insertText      : 'MarginRatio(${1})',
-                detail          : '# 获取合约默认保证金比率\n' +
+                detail          : '# 获取设置的合约保证金比率，默认值为0.08\n' +
                                   '    float MarginRatio(string contractNo=\'\')\n' +
                                   '\n' +
                                   '参数：\n' +

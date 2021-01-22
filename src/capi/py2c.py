@@ -1267,6 +1267,8 @@ class PyAPI(object):
             fieldDataDict['FieldData'] = fieldDict
             
             dataList.append(fieldDataDict)
+            if 4 in fieldDict:
+                self.logger.info(f"[OnSnapShot]: 最新价更新时间{fieldDataDict['UpdateTime']}, 最新价{fieldDict[4]}")
         # 发送到引擎
         apiEvent.setData(dataList)
         sid = apiEvent.getSessionId()
@@ -1762,6 +1764,7 @@ class PyAPI(object):
             #     print("郑商所交易状态: ", idict['TradeState'])
             #     print("-------------------------------------------------------------------")
 
+        self.logger.info(f"[onExchangeStateNotice]收到交易所状态数据: {dataList}")
         #self.logger.debug("AAAAA:%s"%dataList)
 
         #发送到引擎  
