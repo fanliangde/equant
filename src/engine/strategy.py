@@ -471,6 +471,7 @@ class Strategy:
             EV_EG2ST_ORDER_RSP              : self._onOrderInfo              ,
             EV_EG2ST_MATCH_RSP              : self._onMatchInfo              ,
             EV_EG2ST_POSITION_RSP           : self._onPositionInfo           ,
+            EV_EG2ST_USER_NOTICE            : self._onUserRedayInfo          ,
 
             #//////////////////////API直接推送的数据/////////////////////
             EEQU_SRVEVENT_TRADE_LOGINQRY    : self._onTradeLoginQry    ,
@@ -566,12 +567,18 @@ class Strategy:
             # runReport中会有等待
 
             self._dataModel.runReport(self._context, self._userModule.handle_data)
-            
+
             if not self._dataModel.getConfigModel().isActualRun():
                 self.logger.warn(f"未选择实盘运行，如果需要请在设置界面勾选'实盘运行'，或者在策略代码中调用SetActual()")
 
             while not self._isExit():
                 try:
+                    # 账号数据未准备就绪就停止实盘运行
+                    userNo = self._cfgModel.getUserNo()
+                    if userNo:
+                        if userNo not in self._trdModel.getUserInfo() or \
+                                not self._trdModel.getUserInfo()[userNo].isDataReady():
+                            raise RuntimeError(f"策略{self._strategyId}: 账号数据未准备就绪，请检查账号状态！")
                     event = self._triggerQueue.get(timeout=0.1)
                     # 发单方式，实时发单、k线稳定后发单。
                     self._dataModel.runRealTime(self._context, self._userModule.handle_data, event)
@@ -829,6 +836,9 @@ class Strategy:
     # 查询持仓数据
     def _reqPosition(self):
         self._reqData(EV_ST2EG_POSITION_REQ)
+
+    def _reqUserReday(self):
+        self._reqData(EV_ST2EG_USERREADY_REQ)
         
     # ////////////////////////////内部数据应答接口////////////////////
     def _onExchange(self, event):
@@ -937,10 +947,14 @@ class Strategy:
     def _onPositionInfo(self, event):
         #self.logger.debug("_onPositionInfo:%s"%event.getData())
         self._onTradePosition(event)
-        #委托信息可能会有很多笔，最后一笔查询下一个数据
+        #持仓信息可能会有很多笔，最后一笔设置数据准备完成标志
         if event.isChainEnd():
-            #TODO：设置为数据完成
-            pass
+            self._reqUserReday()
+
+    def _onUserRedayInfo(self, event):
+        userList = event.getData()
+        for user in userList:
+            self._trdModel.setDataReady(user)
 
     def _onTradeLoginQry(self, apiEvent):
         self._trdModel.updateLoginInfo(apiEvent)
@@ -979,6 +993,12 @@ class Strategy:
 
     def _onTradePositionQry(self, apiEvent):
         self._trdModel.updatePosData(apiEvent)
+
+        # 数据接收完成，置标志位
+        if apiEvent.isChainEnd():
+            dataList = apiEvent.getData()
+            for data in dataList:
+                self._trdModel.setDataReady(data['UserNo'])
 
     def _onTradeOrderQry(self, apiEvent):
         self._trdModel.updateOrderData(apiEvent)

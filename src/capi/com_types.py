@@ -97,6 +97,8 @@ EV_ST2EG_MATCH_REQ                = 0x244           #请求成交信息
 EV_ST2EG_POSITION_REQ             = 0x245           #请求持仓信息
 EV_ST2EG_POSITION_NOTICE          = 0x246           #同步持仓信息
 
+EV_ST2EG_USERREADY_REQ            = 0x247           #请求账户数据准备完成信息
+
 EV_ST2EG_ACTUAL_ORDER             = 0x260           # 实盘订单
 EV_ST2EG_ACTUAL_CANCEL_ORDER      = 0x261           # 实盘撤单
 EV_ST2EG_ACTUAL_MODIFY_ORDER      = 0x262           # 实盘改单
@@ -135,6 +137,8 @@ EV_EG2ST_MONEY_RSP                = 0x342           #资金信息应答
 EV_EG2ST_ORDER_RSP                = 0x343           #委托信息应答，适用登录后启动的策略
 EV_EG2ST_MATCH_RSP                = 0x344           #成交信息应答，适用登录后启动的策略     
 EV_EG2ST_POSITION_RSP             = 0x345           #持仓信息应答，适用登录后启动的策略
+
+EV_EG2ST_USER_NOTICE              = 0x350           #引擎中的账户信息接收完成推送信息推送到策略
 
 EV_EG2ST_STRATEGY_SYNC            = 0x360           #引擎向策略同步信息
 

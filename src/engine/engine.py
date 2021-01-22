@@ -241,7 +241,8 @@ class StrategyEngine(object):
             EV_ST2EG_ORDER_REQ              : self._onOrderReq                 ,
             EV_ST2EG_MATCH_REQ              : self._onMatchReq                 ,
             EV_ST2EG_POSITION_REQ           : self._onPositionReq              ,
-            EV_ST2EG_POSITION_NOTICE        : self._onPositionNotice           ,      
+            EV_ST2EG_POSITION_NOTICE        : self._onPositionNotice           ,
+            EV_ST2EG_USERREADY_REQ          : self._onUserRedayInfoNotice      ,
             
             EV_ST2EG_ACTUAL_ORDER           : self._sendOrder                  ,
             EV_ST2EG_ACTUAL_CANCEL_ORDER    : self._deleteOrder                ,
@@ -1129,7 +1130,7 @@ class StrategyEngine(object):
                 self.logger.warn("Unknown login status: %s"%data)
 
     # 账户信息
-    def _onApiUserInfo(self, apiEvent): 
+    def _onApiUserInfo(self, apiEvent):
         #分用户 分批次请求交易数据，否则队列会阻塞
         #self.logger.debug("_onApiUserInfo:%s"%apiEvent.getData())
         self._trdModel.updateUserInfo(apiEvent)
@@ -1540,6 +1541,15 @@ class StrategyEngine(object):
         # 策略虚拟持仓变化通知
         stragetyId = event.getStrategyId()
         self._strategyPosDict[stragetyId] = event.getData()
+
+    def _onUserRedayInfoNotice(self, event):
+        # 将引擎中记录的账户数据准备完成信息推送给数据
+        userList = []
+        userInfo = self._trdModel.getUserInfo()
+        for user in userInfo:
+            if userInfo[user].isDataReady():
+                userList.append(user)
+        self._sendData2Strategy(event.getStrategyId(), EV_EG2ST_USER_NOTICE, userList[:])
         
     def _reqKLineStrategySwitch(self, event):
         '''切换策略图'''

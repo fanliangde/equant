@@ -258,6 +258,17 @@ class StrategyQuote(QuoteModel):
     @paramValidatorFactory(0)
     def getQAvgPrice(self, contNo):
         quoteDataModel = self._contractData[contNo]
+        con = contNo.split("|")[0]
+        if con == "SHFE" or con == "CFFEX" or con == "INE":
+            # 当日成交额 除以 当日成交量
+            vol = quoteDataModel.getLv1Data(11, 0)
+            turnover = quoteDataModel.getLv1Data(27, 0.0)
+            priceTick = self._strategy._dataModel.getContractUnit(contNo)
+            if vol and priceTick:
+                return turnover / vol / priceTick
+            else:
+                return 0.0
+
         return quoteDataModel.getLv1Data(13, 0.0)
 
     # 合约最新买价

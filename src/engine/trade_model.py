@@ -489,7 +489,7 @@ class TradeModel:
         for data in dataList:
             userNo = data['UserNo']
             if userNo not in self._userInfo:
-                self.logger.error("[updateMoney]The user account(%s) doesn't login!"%userNo)
+                self.logger.warn("[updateMoney]The user account(%s)  data isn't ready!"%userNo)
                 continue
             self._userInfo[userNo].updateMoney(data)
             
@@ -501,7 +501,7 @@ class TradeModel:
         for data in dataList:
             userNo = data['UserNo']
             if userNo not in self._userInfo:
-                self.logger.error("[updateOrderData]The user account(%s) doesn't login!"%userNo)
+                self.logger.warn("[updateOrderData]The user account(%s) data isn't ready!"%userNo)
                 continue
             self._orderUserMap[data['OrderId']] = userNo
             #self.logger.debug('[ORDER]%s'%data)
@@ -515,7 +515,7 @@ class TradeModel:
             for key in dct:
                 userNo = dct[key]['UserNo']
                 if userNo not in self._userInfo:
-                    self.logger.error("[updateMatchData]The user account(%s) doesn't login!" % userNo)
+                    self.logger.warn("[updateMatchData]The user account(%s) data isn't ready!" % userNo)
                     continue
                     # self.logger.debug('[MATCH]%s'%data)
                 self._userInfo[userNo].updateMatch(dct[key])
@@ -526,7 +526,7 @@ class TradeModel:
         for data in dataList:
             userNo = data['UserNo']
             if userNo not in self._userInfo:
-                self.logger.error("[updatePosData]The user account(%s) doesn't login!"%userNo)
+                self.logger.warn("[updatePosData]The user account(%s) data isn't ready!"%userNo)
                 continue
                 
             #self.logger.debug('[POS]%s'%data)

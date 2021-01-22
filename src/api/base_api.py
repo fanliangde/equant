@@ -2017,7 +2017,7 @@ class BaseApi(object):
     def MarginRatio(self, contractNo):
         '''
         【说明】
-              获取合约默认保证金比率
+              获取设置的合约保证金比率，默认值为0.08
 
         【语法】
               float MarginRatio(string contractNo='')

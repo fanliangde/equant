@@ -1206,7 +1206,7 @@ class StrategyModel(object):
             if (orderDirct == dSell and entryOrExit == oOpen) \
                     and (orderDirct == dBuy and entryOrExit in (oCover, oCoverA, oCoverT)) \
                     and self._cfgModel.getTradeDirection() == 1:  # 仅多头不允许下卖开、买平单
-                return -6, "当前设置仅允许多头开仓"
+                return -8, "当前设置仅允许多头开仓"
 
             if (orderDirct == dBuy and entryOrExit == oOpen) \
                     and (orderDirct == dSell and entryOrExit in (oCover, oCoverA, oCoverT)) \
@@ -1245,6 +1245,12 @@ class StrategyModel(object):
         if not userNo or userNo == 'Default':
             #self.logger.warn(f"未指定下单账户信息")
             return -3, "未指定下单账户信息"
+
+        # 判断数据是否准备就绪
+        # if userNo not in self._trdModel.getUserInfo() or not self._trdModel.getUserInfo()[userNo].isDataReady():
+        #     self.logger.warn("交易账号未登陆或交易数据未准备就绪")
+        #     return -6, "交易账号未登陆或交易数据未准备就绪"
+
 
         # 指定的用户未登录
         if not self._trdModel.getSign(userNo):
