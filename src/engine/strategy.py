@@ -576,9 +576,12 @@ class Strategy:
                     # 账号数据未准备就绪就停止实盘运行
                     userNo = self._cfgModel.getUserNo()
                     if userNo:
-                        if userNo not in self._trdModel.getUserInfo() or \
-                                not self._trdModel.getUserInfo()[userNo].isDataReady():
-                            raise RuntimeError(f"策略{self._strategyId}: 账号数据未准备就绪，请检查账号状态！")
+                        if userNo not in self._trdModel.getUserInfo():
+                            continue
+                        elif not self._trdModel.getUserInfo()[userNo].isDataReady():
+
+                            continue
+
                     event = self._triggerQueue.get(timeout=0.1)
                     # 发单方式，实时发单、k线稳定后发单。
                     self._dataModel.runRealTime(self._context, self._userModule.handle_data, event)

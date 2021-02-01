@@ -362,7 +362,7 @@ class GetEgData(object):
             for uInfo in self._userNo:
                 if uInfo["UserNo"] == userNo:
                     self._userNo.remove(uInfo)
-                    self._logger.info(f"[UI]: 账号{uInfo}登出")
+                    self._logger.warn(f"[UI]: 账号{uInfo}登出，策略可能会停止触发，登录后恢复触发!")
                     # 账号列表中可能存在重复账号
                     if uInfo not in self._userNo:
                         break
